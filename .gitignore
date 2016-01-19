@@ -145,3 +145,5 @@ db.sqlite3
 .project
 .pydevproject
 .settings/
+
+analytics_gui/settings/local.py
