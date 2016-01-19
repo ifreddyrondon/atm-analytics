@@ -1,0 +1,445 @@
+{% extends "base/base.html" %}
+{% load bootstrap %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .change-image {
+            padding-top: 90px;
+        }
+
+        .change-image .img-responsive {
+            margin: 0 auto;
+        }
+
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <ol class="breadcrumb">
+                    <li><a href="{% url "analytics:dashboard" %}">home</a></li>
+                    {% if create %}
+                        <li class="active">crear caso</li>
+                    {% else %}
+                        <li class="active">vista de caso</li>
+                    {% endif %}
+                </ol>
+                <div class="wall inner-wall">
+                    {% if create %}
+                        <h1>NUEVO CASO</h1>
+                    {% else %}
+                        <h1>Vista de caso</h1>
+                    {% endif %}
+                    <form method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-error">
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group {% if form.number.errors %}has-error{% endif %}">
+                                    {% if form.number.help_text %}
+                                        <span class="help-block">{{ form.number.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.number.errors %}
+                                        <span class="help-block">{{ form.number.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.number|add_class:"form-control" }}
+                                </div>
+                                <div class="form-group {% if form.name.errors %}has-error{% endif %}">
+                                    {% if form.name.help_text %}
+                                        <span class="help-block">{{ form.name.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.name.errors %}
+                                        <span class="help-block">{{ form.name.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.name|add_class:"form-control" }}
+                                </div>
+                                <div class="form-group {% if form.analyst_name.errors %}has-error{% endif %}">
+                                    {% if form.analyst_name.help_text %}
+                                        <span class="help-block">{{ form.analyst_name.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.analyst_name.errors %}
+                                        <span class="help-block">{{ form.analyst_name.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.analyst_name|add_class:"form-control" }}
+                                </div>
+
+                                <div class="form-group {% if form.created_date.errors %}has-error{% endif %}">
+                                    {% if form.created_date.help_text %}
+                                        <span class="help-block">{{ form.created_date.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.created_date.errors %}
+                                        <span class="help-block">{{ form.created_date.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"
+                                                                             aria-hidden="true"></span></div>
+                                        <input id="id_created_date" name="created_date"
+                                               class="form-control" value="{{ form.created_date.value|default:"" }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group {% if form.missing_amount.errors %}has-error{% endif %}">
+                                    {% if form.missing_amount.help_text %}
+                                        <span class="help-block">{{ form.missing_amount.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.missing_amount.errors %}
+                                        <span class="help-block">{{ form.missing_amount.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.missing_amount|add_class:"form-control" }}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group {% if form.priority.errors %}has-error{% endif %}">
+                                            {% if form.priority.help_text %}
+                                                <span class="help-block">{{ form.priority.help_text }}</span>
+                                            {% endif %}
+                                            {% if form.priority.errors %}
+                                                <span class="help-block">{{ form.priority.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            {{ form.priority }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group {% if form.status.errors %}has-error{% endif %}">
+                                            {% if form.status.help_text %}
+                                                <span class="help-block">{{ form.status.help_text }}</span>
+                                            {% endif %}
+                                            {% if form.status.errors %}
+                                                <span class="help-block">{{ form.status.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            {{ form.status }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 change-image text-center">
+                                <img src="{% static "images/default_avatar.png" %}" class="img-circle img-responsive">
+                                <br>
+                                <span class="btn btn-default btn-file">Browse <input type="file"></span>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group {% if form.company.errors %}has-error{% endif %}">
+                                    {% if form.company.help_text %}
+                                        <span class="help-block">{{ form.company.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.company.errors %}
+                                        <span class="help-block">{{ form.company.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.company|add_class:"form-control" }}
+                                </div>
+
+                                <hr>
+                                <div id="atms-accordion" role="tablist" aria-multiselectable="true"
+                                     class="panel-group form-group">
+
+                                    {% for atm_form in atm_form_set.forms %}
+                                        <div class="panel panel-info atm-form">
+                                            <div class="panel-heading" role="tab" id="heading-{{ atm_form.prefix }}">
+                                                <h4 class="panel-title">
+                                                    <a role="button" data-toggle="collapse"
+                                                       data-parent="#atms-accordion"
+                                                       href="#{{ atm_form.prefix }}" aria-expanded="true">
+                                                        ATM {{ forloop.counter }}
+                                                    </a>
+                                                    <a href="javascript:void (0)" class="pull-right delete-atm">
+                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div id="{{ atm_form.prefix }}" class="panel-collapse collapse in"
+                                                 role="tabpanel">
+                                                <div class="panel-body">
+                                                    {% if atm_form.instance.pk %}
+                                                        {{ atm_form.DELETE | add_class:"hidden" }}
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col-md-4 form-group {% if atm_form.hardware.errors %}has-error{% endif %}">
+                                                            {% if atm_form.hardware.help_text %}
+                                                                <span class="help-block">{{ atm_form.hardware.help_text }}</span>
+                                                            {% endif %}
+                                                            {% if atm_form.hardware.errors %}
+                                                                <span class="help-block errors">{{ atm_form.hardware.errors|join:"<br \>" }}</span>
+                                                            {% endif %}
+                                                            {{ atm_form.hardware|add_class:"form-control select-hardware" }}
+                                                        </div>
+
+                                                        <div class="col-md-4 form-group {% if atm_form.software.errors %}has-error{% endif %}">
+                                                            {% if atm_form.software.help_text %}
+                                                                <span class="help-block">{{ atm_form.software.help_text }}</span>
+                                                            {% endif %}
+                                                            {% if atm_form.software.errors %}
+                                                                <span class="help-block errors">{{ atm_form.software.errors|join:"<br \>" }}</span>
+                                                            {% endif %}
+                                                            {{ atm_form.software|add_class:"form-control select-software" }}
+                                                        </div>
+
+                                                        <div class="col-md-4 form-group {% if atm_form.operating_system.errors %}has-error{% endif %}">
+                                                            {% if atm_form.operating_system.help_text %}
+                                                                <span class="help-block">{{ atm_form.operating_system.help_text }}</span>
+                                                            {% endif %}
+                                                            {% if atm_form.operating_system.errors %}
+                                                                <span class="help-block errors">{{ atm_form.operating_system.errors|join:"<br \>" }}</span>
+                                                            {% endif %}
+                                                            {{ atm_form.operating_system|add_class:"form-control select-so" }}
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="form-group">
+                                                        <button class="btn btn-default" type="button"
+                                                                name="{{ atm_form.prefix }}-collapseErrorsManual"
+                                                                data-toggle="collapse"
+                                                                data-target="#{{ atm_form.prefix }}-collapseErrorsManual"
+                                                                aria-expanded="false"
+                                                                aria-controls="collapseExample">
+                                                            Usted cuenta con los manuales de errores
+                                                        </button>
+                                                        <div class="collapse"
+                                                             id="{{ atm_form.prefix }}-collapseErrorsManual">
+                                                            <br>
+                                                            {{ atm_form.errors_manual }}
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="form-group">
+                                                        <button class="btn btn-default" type="button"
+                                                                name="{{ atm_form.prefix }}-collapseMicrosoftEventViewer"
+                                                                data-toggle="collapse"
+                                                                data-target="#{{ atm_form.prefix }}-collapseMicrosoftEventViewer"
+                                                                aria-expanded="false"
+                                                                aria-controls="collapseExample">
+                                                            Usted cuenta con los logs de Microsoft EventViewer
+                                                        </button>
+                                                        <div class="collapse"
+                                                             id="{{ atm_form.prefix }}-collapseMicrosoftEventViewer">
+                                                            <br>
+                                                            {{ atm_form.microsoft_event_viewer }}
+                                                        </div>
+                                                    </div>
+
+                                                    <hr>
+                                                    <div class="form-group">
+                                                        <button class="btn btn-default" type="button"
+                                                                name="{{ atm_form.prefix }}-collapseCashReplacementSchedule"
+                                                                data-toggle="collapse"
+                                                                data-target="#{{ atm_form.prefix }}-collapseCashReplacementSchedule"
+                                                                aria-expanded="false"
+                                                                aria-controls="collapseExample">
+                                                            Usted cuenta con los horario programadas de la reposición
+                                                            del
+                                                            efectivo
+                                                        </button>
+                                                        <div class="collapse"
+                                                             id="{{ atm_form.prefix }}-collapseCashReplacementSchedule">
+                                                            <br>
+                                                            {{ atm_form.cash_replacement_schedule }}
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row">
+                                                        <div class="form-group col-md-6 {% if atm_form.person_name_journal_virtual.errors %}has-error{% endif %}">
+                                                            {% if atm_form.person_name_journal_virtual.help_text %}
+                                                                <span class="help-block">{{ atm_form.person_name_journal_virtual.help_text }}</span>
+                                                            {% endif %}
+                                                            {% if atm_form.person_name_journal_virtual.errors %}
+                                                                <span class="help-block errors">{{ atm_form.person_name_journal_virtual.errors|join:"<br \>" }}</span>
+                                                            {% endif %}
+                                                            {{ atm_form.person_name_journal_virtual|add_class:"form-control" }}
+                                                        </div>
+                                                        <div class="form-group col-md-6 {% if atm_form.journal_virtual.errors %}has-error{% endif %}">
+                                                            {% if atm_form.journal_virtual.help_text %}
+                                                                <span class="help-block">{{ atm_form.journal_virtual.help_text }}</span>
+                                                            {% endif %}
+                                                            {% if atm_form.journal_virtual.errors %}
+                                                                <span class="help-block errors">{{ atm_form.journal_virtual.errors|join:"<br \>" }}</span>
+                                                            {% endif %}
+                                                            {{ atm_form.journal_virtual  }}
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="form-group {% if atm_form.other_log.errors %}has-error{% endif %}">
+                                                        {% if atm_form.other_log.help_text %}
+                                                            <span class="help-block">{{ atm_form.other_log.help_text }}</span>
+                                                        {% endif %}
+                                                        {% if atm_form.other_log.errors %}
+                                                            <span class="help-block errors">{{ atm_form.other_log.errors|join:"<br \>" }}</span>
+                                                        {% endif %}
+                                                        {{ atm_form.other_log }}
+                                                    </div>
+
+                                                    <div class="form-group {% if atm_form.atm_location.errors %}has-error{% endif %}">
+                                                        {% if atm_form.atm_location.help_text %}
+                                                            <span class="help-block">{{ atm_form.atm_location.help_text }}</span>
+                                                        {% endif %}
+                                                        {% if atm_form.atm_location.errors %}
+                                                            <span class="help-block errors">{{ atm_form.atm_location.errors|join:"<br \>" }}</span>
+                                                        {% endif %}
+                                                        {{ atm_form.atm_location|add_class:"form-control atm-location-select select2-atm" }}
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                    {{ atm_form_set.management_form }}
+
+                                </div>
+
+                                <div class="form-group">
+                                    <a id="add-atm" href="javascript:void(0)" class="btn btn-default btn-lg">Agregar
+                                        ATM</a>
+                                </div>
+
+                                <hr>
+                                <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+                                    {% if form.description.help_text %}
+                                        <span class="help-block">{{ form.description.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.description.errors %}
+                                        <span class="help-block">{{ form.description.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.description|add_class:"form-control" }}
+                                </div>
+
+                                <div class="form-group">
+                                    <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
+                                           value="Guardar"/>
+                                    <input class="btn btn-primary btn-lg pull-left" name="analyze" type="submit"
+                                           value="Analizar"/>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+            // init main form
+            $("#id_created_date").datepicker({format: 'dd-mm-yyyy'});
+
+            function deleteATM(selector) {
+                var $parent = $(selector.currentTarget).parent().parent().parent();
+                // check if instance already exist then check the input
+                if($parent.find("input[id$='-DELETE']").length > 0){
+                    $parent.find("input[id$='-DELETE']").attr('checked', true);
+                    if ($(".atm-form").length > 1) {
+                        $parent.hide()
+                    }
+                } else {
+                    if ($(".atm-form").length > 1) {
+                        $parent.remove();
+                        $("div.panel-collapse:last").collapse('show');
+                        var $totalContainer = $('#id_atms-TOTAL_FORMS');
+                        var total = $totalContainer.val();
+                        $totalContainer.val(total - 1);
+                    }
+                }
+            }
+
+            // function to clone form
+            function cloneMore(selector, type) {
+                // hide all collapse panels
+                $(".panel-collapse").collapse('hide');
+                // make the copy of the new form
+                var newElement = $(selector).clone(false);
+                // get the TOTAL_FORMS selector
+                var $totalContainer = $('#id_' + type + '-TOTAL_FORMS');
+                var total = $totalContainer.val();
+                newElement.find(':input').each(function () {
+                    if ($(this).attr('name')) {
+                        var name = $(this).attr('name').replace('-' + (total - 1) + '-', '-' + total + '-');
+                        var id = 'id_' + name;
+                        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+                        $(this).val("");
+                    }
+                });
+                newElement.find('label').each(function () {
+                    var newFor = $(this).attr('for').replace('-' + (total - 1) + '-', '-' + total + '-');
+                    $(this).attr('for', newFor);
+                });
+                total++;
+                // remove old errors from last form
+                newElement.find(".help-block.errors").text("");
+                newElement.find(".form-group.has-error").removeClass("has-error");
+                // bind delete btn
+                newElement.find(".delete-atm").click(deleteATM);
+                // new prefix
+                var prefix = type + "-" + (total - 1);
+                // change new collapse panel id
+                newElement.find(".panel-collapse").attr('id', prefix);
+                // change href of a for collapse new panel
+                newElement.find(".panel-heading a:first").attr('href', "#" + prefix);
+                // change panel name
+                newElement.find(".panel-heading a:first").html("ATM " + total);
+                // change errors manual data target
+                newElement.find("div.collapse[id$='-collapseErrorsManual']").attr("id", prefix + "-collapseErrorsManual");
+                newElement.find("button[id$='-collapseErrorsManual']").attr("data-target", "#" + prefix + "-collapseErrorsManual");
+                // change microsoft event viewer data target
+                newElement.find("div.collapse[id$='-collapseMicrosoftEventViewer']").attr("id", prefix + "-collapseMicrosoftEventViewer");
+                newElement.find("button[id$='-collapseMicrosoftEventViewer']").attr("data-target", "#" + prefix + "-collapseMicrosoftEventViewer");
+                // change cash replacement schedule
+                newElement.find("div.collapse[id$='-collapseCashReplacementSchedule']").attr("id", prefix + "-collapseCashReplacementSchedule");
+                newElement.find("button[id$='-collapseCashReplacementSchedule']").attr("data-target", "#" + prefix + "-collapseCashReplacementSchedule");
+                // remove old errors from last form
+                newElement.find(".help-block.errors").text("");
+                newElement.find(".has-error").removeClass("has-error");
+                $totalContainer.val(total);
+                // add element to dom
+                $(selector).after(newElement);
+                // show the new collapse panel
+                $(selector).find(".panel-collapse").collapse('show');
+            }
+
+            // add ATM
+            $('#add-atm').click(function () {
+                cloneMore('div.atm-form:last', 'atms');
+            });
+
+            // delete ATM
+            $(".delete-atm").click(deleteATM);
+        })
+    </script>
+{% endblock %}
