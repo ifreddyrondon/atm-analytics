@@ -415,9 +415,6 @@
                     $(this).attr('for', newFor);
                 });
                 total++;
-                // remove old errors from last form
-                newElement.find(".help-block.errors").text("");
-                newElement.find(".form-group.has-error").removeClass("has-error");
                 // bind delete btn
                 newElement.find(".delete-atm").click(deleteATM);
                 // new prefix
