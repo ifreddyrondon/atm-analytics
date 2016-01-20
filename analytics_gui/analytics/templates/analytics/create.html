@@ -111,8 +111,7 @@
                                     <div class="input-group">
                                         <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"
                                                                              aria-hidden="true"></span></div>
-                                        <input id="id_created_date" name="created_date"
-                                               class="form-control" value="{{ form.created_date.value|default:"" }}">
+                                        {{ form.created_date | add_class:"form-control created_date" }}
                                     </div>
                                 </div>
 
@@ -363,7 +362,7 @@
     <script>
         $(function () {
             // init main form
-            $("#id_created_date").datepicker({format: 'dd-mm-yyyy'});
+            $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
             function deleteATM(selector) {
                 var $parent = $(selector.currentTarget).parent().parent().parent();
