@@ -289,6 +289,14 @@
                                                             <span class="help-block">Seleccionar Journal Virtual</span>
                                                             <span class="help-block errors"></span>
                                                         </div>
+                                                        {% if not create %}
+                                                            <div class="col-md-12">
+                                                                {% for file in atm_form.instance.journals.all %}
+                                                                    <a href="{{ file.file.url }}"
+                                                                       target="_blank">{{ file.filename }}</a><br>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
                                                     </div>
                                                     <hr>
                                                     <div class="form-group {% if atm_form.other_log.errors %}has-error{% endif %}">
