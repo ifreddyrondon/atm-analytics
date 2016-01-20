@@ -139,6 +139,9 @@ crashlytics-build.properties
 # MEDIA FILES
 media/*
 
+# STATIC FILES
+analytics_gui/static/
+
 db.sqlite3
 
 ##Eclipse files
