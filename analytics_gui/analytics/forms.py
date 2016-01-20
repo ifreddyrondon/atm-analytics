@@ -17,7 +17,6 @@ default_errors = {
 
 
 class CreateCaseForm(forms.ModelForm):
-
     number = forms.IntegerField(
             help_text='Número de caso',
             min_value=0,
@@ -36,7 +35,8 @@ class CreateCaseForm(forms.ModelForm):
     )
 
     created_date = forms.DateField(
-            input_formats=['%d-%m-%Y'],
+            input_formats=['%d-%m-%Y', ],
+            widget=forms.DateInput(format='%d-%m-%Y'),
             help_text='Fecha de creación del caso',
     )
 
@@ -56,13 +56,12 @@ class CreateCaseForm(forms.ModelForm):
 
 
 class CreateAtmForm(forms.ModelForm):
-
     class Meta:
         model = AtmCase
         fields = (
             'hardware', 'software', 'operating_system', 'errors_manual',
             'microsoft_event_viewer', 'cash_replacement_schedule',
-            'person_name_journal_virtual', 'journal_virtual', 'other_log',
+            'person_name_journal_virtual', 'other_log',
             'atm_location',
         )
 
