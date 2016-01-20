@@ -185,6 +185,7 @@
                                             <div id="{{ atm_form.prefix }}" class="panel-collapse collapse in"
                                                  role="tabpanel">
                                                 <div class="panel-body">
+                                                    {% for fld in atm_form.hidden_fields %}{{ fld }}{% endfor %}
                                                     {% if atm_form.instance.pk %}
                                                         {{ atm_form.DELETE | add_class:"hidden" }}
                                                     {% endif %}
