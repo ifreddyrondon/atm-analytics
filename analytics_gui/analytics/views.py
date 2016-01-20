@@ -54,3 +54,9 @@ def view_case(request, case_id):
         'atm_form_set': atm_form_set,
         'create': False
     })
+
+
+def delete_case(request, case_id):
+    case = get_object_or_404(Case, id=case_id)
+    case.delete()
+    return HttpResponseRedirect(reverse("analytics:dashboard"))

@@ -54,7 +54,11 @@
                     {% if create %}
                         <h1>NUEVO CASO</h1>
                     {% else %}
-                        <h1>Vista de caso</h1>
+                        <h1>
+                            Vista de caso
+                            <a class="btn btn-danger pull-right"
+                               href="{% url "analytics:delete_case" form.instance.id %}">Borrar</a>
+                        </h1>
                     {% endif %}
                     <form method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
