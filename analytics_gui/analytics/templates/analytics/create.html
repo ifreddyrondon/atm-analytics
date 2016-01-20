@@ -285,14 +285,9 @@
                                                             {% endif %}
                                                             {{ atm_form.person_name_journal_virtual|add_class:"form-control" }}
                                                         </div>
-                                                        <div class="form-group col-md-6 {% if atm_form.journal_virtual.errors %}has-error{% endif %}">
-                                                            {% if atm_form.journal_virtual.help_text %}
-                                                                <span class="help-block">{{ atm_form.journal_virtual.help_text }}</span>
-                                                            {% endif %}
-                                                            {% if atm_form.journal_virtual.errors %}
-                                                                <span class="help-block errors">{{ atm_form.journal_virtual.errors|join:"<br \>" }}</span>
-                                                            {% endif %}
-                                                            {{ atm_form.journal_virtual  }}
+                                                        <div class="form-group col-md-6 journal_virtual">
+                                                            <span class="help-block">Seleccionar Journal Virtual</span>
+                                                            <span class="help-block errors"></span>
                                                         </div>
                                                     </div>
                                                     <hr>
@@ -313,7 +308,7 @@
                                                         {% if atm_form.atm_location.errors %}
                                                             <span class="help-block errors">{{ atm_form.atm_location.errors|join:"<br \>" }}</span>
                                                         {% endif %}
-                                                        {{ atm_form.atm_location|add_class:"form-control atm-location-select select2-atm" }}
+                                                        {{ atm_form.atm_location|add_class:"form-control" }}
 
                                                     </div>
                                                 </div>
@@ -364,10 +359,17 @@
             // init main form
             $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
+            // init input multiple for journal virtual
+            $(".atm-form").each(function () {
+                var id = $(this).find(".panel-collapse").attr("id");
+                id = id.replace("atms-", "");
+                $(this).find(".journal_virtual").append('<input type="file" name="atms-' + id + '-journal_virtual" multiple>')
+            });
+
             function deleteATM(selector) {
                 var $parent = $(selector.currentTarget).parent().parent().parent();
                 // check if instance already exist then check the input
-                if($parent.find("input[id$='-DELETE']").length > 0){
+                if ($parent.find("input[id$='-DELETE']").length > 0) {
                     $parent.find("input[id$='-DELETE']").attr('checked', true);
                     if ($(".atm-form").length > 1) {
                         $parent.hide()

@@ -111,15 +111,6 @@ def get_atm_cash_replacement_schedule_attachment_path(instance, filename):
     )
 
 
-def get_atm_journal_virtual_attachment_path(instance, filename):
-    return os.path.join(
-            'atm',
-            'journal_virtual',
-            str(timezone.now()),
-            filename
-    )
-
-
 def get_atm_other_log_attachment_path(instance, filename):
     return os.path.join(
             'atm',
@@ -204,11 +195,6 @@ class AtmCase(models.Model):
             max_length=255,
             help_text='Nombre de la persona que le facilito el Journal virtual')
 
-    journal_virtual = models.FileField(
-            upload_to=get_atm_journal_virtual_attachment_path,
-            help_text='Seleccionar Journal Virtual'
-    )
-
     other_log = models.FileField(
             null=True, blank=True,
             upload_to=get_atm_other_log_attachment_path,
@@ -219,3 +205,23 @@ class AtmCase(models.Model):
             CompanyAtmLocation,
             help_text="Localización del ATM"
     )
+
+
+def get_atm_journal_virtual_attachment_path(instance, filename):
+    return os.path.join(
+            'atm',
+            'journal_virtual',
+            str(timezone.now().date()),
+            filename
+    )
+
+
+class AtmJournal(models.Model):
+    atm = models.ForeignKey(AtmCase, related_name="journals")
+    file = models.FileField(
+            upload_to=get_atm_journal_virtual_attachment_path,
+    )
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
