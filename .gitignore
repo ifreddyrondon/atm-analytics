@@ -147,3 +147,5 @@ db.sqlite3
 .settings/
 
 analytics_gui/settings/local.py
+
+analytics_gui/media/*
