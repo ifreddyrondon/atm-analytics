@@ -54,16 +54,15 @@ def view_case(request, case_id):
         atm_form_set = CreateAtmFormSet(request.POST, request.FILES, instance=case)
         if form.is_valid() and atm_form_set.is_valid():
             case.save()
-            atms = atm_form_set.save()
-            for index, atm in enumerate(atms):
+            atm_form_set.save()
+            for index, atm in enumerate(case.atms.all()):
+                print(index)
                 journal_virtual_key = 'atms-{}-journal_virtual'.format(index)
                 journal_files = request.FILES.getlist(journal_virtual_key)
                 if journal_files > 0:
                     AtmJournal.objects.filter(atm=atm).delete()
                     for journal_file in request.FILES.getlist(journal_virtual_key):
                         AtmJournal.objects.create(atm=atm, file=journal_file)
-
-            return HttpResponseRedirect(reverse("analytics:dashboard"))
 
     return render(request, 'analytics/create.html', {
         'form': form,
