@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet
 from analytics_gui.analytics.models import Case, AtmJournal
+from analytics_gui.analytics.parsers import parse_log_file
 
 
 def dashboard(request):
@@ -78,12 +79,18 @@ def view_case(request, case_id):
 
 def analyze_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
-    for atm in case.atms.all():
-        journal_files = atm.journals.all().values_list('file', flat=True)
-        print(journal_files)
+    atms = case.atms.all()
+
+    # from pprint import pprint
+
+    for atm in atms:
+        for journal_file in atm.journals.all():
+            trace = parse_log_file(journal_file.file.file)
+            # pprint(trace)
 
     return render(request, 'analytics/results.html', {
-        'case': case
+        'case': case,
+        'atms': atms
     })
 
 
