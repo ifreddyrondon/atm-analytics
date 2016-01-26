@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -7,6 +8,7 @@ from analytics_gui.analytics.models import Case, AtmJournal
 from analytics_gui.analytics.parsers import parse_log_file
 
 
+@login_required(login_url='/login')
 def dashboard(request):
     cases = Case.objects.all().order_by('number')
 
@@ -15,6 +17,7 @@ def dashboard(request):
     })
 
 
+@login_required(login_url='/login')
 def create(request):
     form = CreateCaseForm()
     atm_form_set = CreateAtmFormSet()
@@ -48,6 +51,7 @@ def create(request):
     })
 
 
+@login_required(login_url='/login')
 def view_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     form = CreateCaseForm(instance=case)
@@ -77,6 +81,7 @@ def view_case(request, case_id):
     })
 
 
+@login_required(login_url='/login')
 def analyze_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
