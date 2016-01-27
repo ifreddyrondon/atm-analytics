@@ -28,10 +28,11 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Monto faltante estimado</th>
+                            <th>Nombre del caso</th>
+                            <th>Monto faltante</th>
                             <th>Cantidad de ATMs</th>
                             <th>Estado</th>
+                            <th>Resultados</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -42,6 +43,7 @@
                                 <td>${{ case.missing_amount }}</td>
                                 <td>{{ case.atms.count }}</td>
                                 <td>{{ case.get_status_display }}</td>
+                                <td><a href="{% url "analytics:analyze" case.id %}" class="btn btn-default btn-xs">resultados</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
