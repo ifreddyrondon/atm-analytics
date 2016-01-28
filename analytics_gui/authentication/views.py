@@ -44,10 +44,3 @@ class Login(View):
         return render(request, 'authentication/login.html', {
             'form': form
         })
-
-
-class Logout(View):
-    @staticmethod
-    def get(request, *args, **kwargs):
-        logout(request)
-        return redirect('/')
