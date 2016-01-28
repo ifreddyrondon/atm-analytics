@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet
 from analytics_gui.analytics.models import Case, AtmJournal
 from analytics_gui.analytics.parsers import parse_log_file
+from analytics_gui.authentication.models import Company
 
 
 @login_required(login_url='/login')
@@ -19,15 +20,18 @@ def dashboard(request):
 
 @login_required(login_url='/login')
 def create(request):
-    form = CreateCaseForm()
-    atm_form_set = CreateAtmFormSet()
+    company = Company.objects.get(users=request.user)
+
+    form = CreateCaseForm(company=company)
+    atm_form_set = CreateAtmFormSet(company=company)
 
     if request.method == 'POST':
-        form = CreateCaseForm(data=request.POST)
+        form = CreateCaseForm(data=request.POST, company=company)
         if form.is_valid():
             case = form.save(commit=False)
-
-            atm_form_set = CreateAtmFormSet(request.POST, request.FILES, instance=case)
+            case.analyst = request.user
+            atm_form_set = CreateAtmFormSet(
+                    request.POST, request.FILES, instance=case, company=company)
             if atm_form_set.is_valid():
                 case.save()
                 atms = atm_form_set.save()
@@ -47,19 +51,22 @@ def create(request):
     return render(request, 'analytics/create.html', {
         'form': form,
         'atm_form_set': atm_form_set,
-        'create': True
+        'company': company,
+        'create': True,
     })
 
 
 @login_required(login_url='/login')
 def view_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
-    form = CreateCaseForm(instance=case)
-    atm_form_set = CreateAtmFormSet(instance=case)
+    company = Company.objects.get(users=request.user)
+    form = CreateCaseForm(instance=case, company=company)
+    atm_form_set = CreateAtmFormSet(instance=case, company=company)
 
     if request.method == 'POST':
-        form = CreateCaseForm(data=request.POST, instance=case)
-        atm_form_set = CreateAtmFormSet(request.POST, request.FILES, instance=case)
+        form = CreateCaseForm(data=request.POST, instance=case, company=company)
+        atm_form_set = CreateAtmFormSet(
+                request.POST, request.FILES, instance=case, company=company)
         if form.is_valid() and atm_form_set.is_valid():
             case.save()
             atm_form_set.save()
@@ -77,7 +84,8 @@ def view_case(request, case_id):
     return render(request, 'analytics/create.html', {
         'form': form,
         'atm_form_set': atm_form_set,
-        'create': False
+        'company': company,
+        'create': False,
     })
 
 

@@ -1,8 +1,9 @@
 # coding=utf-8
 from django import forms
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, BaseInlineFormSet
 
 from analytics_gui.analytics.models import Case, AtmCase
+from analytics_gui.authentication.models import Bank, CompanyAtmLocation
 
 default_errors = {
     u'required': u"Este campo es requerido",
@@ -20,7 +21,9 @@ class CreateCaseForm(forms.ModelForm):
     number = forms.IntegerField(
             help_text='Número de caso',
             min_value=0,
-            required=False)
+            required=False,
+            widget=forms.TextInput(attrs={'placeholder': str(Case.get_case_number())})
+    )
 
     priority = forms.ChoiceField(
             widget=forms.RadioSelect,
@@ -43,16 +46,29 @@ class CreateCaseForm(forms.ModelForm):
     class Meta:
         model = Case
         fields = (
-            'number', 'name', 'analyst_name', 'priority',
-            'status', 'created_date', 'missing_amount', 'company',
-            'description',
+            'number', 'name', 'priority', 'status', 'created_date',
+            'missing_amount', 'bank', 'description',
         )
 
     def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')
         super(CreateCaseForm, self).__init__(*args, **kwargs)
 
         for key in self.fields:
             self.fields[key].error_messages = default_errors
+
+        self.fields['bank'].queryset = Bank.objects.filter(company=company)
+
+
+class BaseAtmFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')
+        super(BaseAtmFormSet, self).__init__(*args, **kwargs)
+
+        initial = [{'company': company}]
+        self.initial = initial
+        # Make enough extra formsets to hold initial forms
+        self.extra += len(initial)
 
 
 class CreateAtmForm(forms.ModelForm):
@@ -71,10 +87,15 @@ class CreateAtmForm(forms.ModelForm):
         for key in self.fields:
             self.fields[key].error_messages = default_errors
 
+        if kwargs.get('initial'):
+            self.fields['atm_location'].queryset = CompanyAtmLocation.objects.filter(
+                company=kwargs.get('initial').get('company'))
+
 
 CreateAtmFormSet = inlineformset_factory(
         Case,
         AtmCase,
+        formset=BaseAtmFormSet,
         form=CreateAtmForm,
         extra=0,
         min_num=1

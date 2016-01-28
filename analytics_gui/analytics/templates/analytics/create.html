@@ -91,15 +91,6 @@
                                     {% endif %}
                                     {{ form.name|add_class:"form-control" }}
                                 </div>
-                                <div class="form-group {% if form.analyst_name.errors %}has-error{% endif %}">
-                                    {% if form.analyst_name.help_text %}
-                                        <span class="help-block">{{ form.analyst_name.help_text }}</span>
-                                    {% endif %}
-                                    {% if form.analyst_name.errors %}
-                                        <span class="help-block">{{ form.analyst_name.errors|join:"<br \>" }}</span>
-                                    {% endif %}
-                                    {{ form.analyst_name|add_class:"form-control" }}
-                                </div>
 
                                 <div class="form-group {% if form.created_date.errors %}has-error{% endif %}">
                                     {% if form.created_date.help_text %}
@@ -152,19 +143,25 @@
 
                             </div>
                             <div class="col-md-6 change-image text-center">
-                                <img src="{% static "images/default_avatar.png" %}" class="img-circle img-responsive">
+                                {% if form.instance and form.instance.picture %}
+                                    <img src="{{ form.instance.picture.url }}" class="img-circle img-responsive">
+                                {% elif company.logo %}
+                                    <img src="{{ company.logo.url }}" class="img-circle img-responsive">
+                                {% else %}
+                                    <img src="{% static "images/default_avatar.png" %}" class="img-circle img-responsive">
+                                {% endif %}
                                 <br>
-                                <span class="btn btn-default btn-file">Browse <input type="file"></span>
+                                <span class="btn btn-default btn-xs btn-file">Browse <input type="file"></span>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group {% if form.company.errors %}has-error{% endif %}">
-                                    {% if form.company.help_text %}
-                                        <span class="help-block">{{ form.company.help_text }}</span>
+                                <div class="form-group {% if form.bank.errors %}has-error{% endif %}">
+                                    {% if form.bank.help_text %}
+                                        <span class="help-block">{{ form.bank.help_text }}</span>
                                     {% endif %}
-                                    {% if form.company.errors %}
-                                        <span class="help-block">{{ form.company.errors|join:"<br \>" }}</span>
+                                    {% if form.bank.errors %}
+                                        <span class="help-block">{{ form.bank.errors|join:"<br \>" }}</span>
                                     {% endif %}
-                                    {{ form.company|add_class:"form-control" }}
+                                    {{ form.bank|add_class:"form-control" }}
                                 </div>
 
                                 <hr>

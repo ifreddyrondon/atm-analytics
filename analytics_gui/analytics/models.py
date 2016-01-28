@@ -1,25 +1,19 @@
 # coding=utf-8
 import os
 
+from django.contrib.auth.models import User
 from django.db import models
-
-# Create your models here.
 from django.utils import timezone
 
-
-class Company(models.Model):
-    name = models.CharField(max_length=255, help_text='Nombre de la Empresa')
-
-    def __unicode__(self):
-        return self.name
+from analytics_gui.authentication.models import CompanyAtmLocation, Bank
 
 
-class CompanyAtmLocation(models.Model):
-    company = models.ForeignKey(Company)
-    address = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.address
+def get_case_picture_path(instance, filename):
+    return os.path.join(
+            'company',
+            'case',
+            filename
+    )
 
 
 class Case(models.Model):
@@ -43,8 +37,10 @@ class Case(models.Model):
             db_index=True,
             help_text='Número de caso'
     )
+
+    picture = models.ImageField(upload_to=get_case_picture_path, null=True, blank=True)
+
     name = models.CharField(max_length=255, help_text='Nombre del caso')
-    analyst_name = models.CharField(max_length=255, help_text='Nombre del analista')
     priority = models.CharField(
             max_length=1,
             choices=PRIORITY_CHOICES,
@@ -66,20 +62,26 @@ class Case(models.Model):
             help_text="Monto faltante estimado"
     )
 
-    company = models.ForeignKey(Company, help_text='Empresa')
-
     description = models.TextField(
             null=True, blank=True,
             help_text="Breve descripción extra del caso"
     )
+
+    bank = models.ForeignKey(
+            Bank, related_name="bank_cases", help_text="Banco")
+    analyst = models.ForeignKey(User, related_name="analyst_cases")
+
+    @staticmethod
+    def get_case_number():
+        top = Case.objects.order_by('-number')
+        return top[0].number + 1 if len(top) > 0 else 0
 
     def save(self, **kwargs):
         """Get last value of Number from database, and increment before save
         :param **kwargs:
         """
         if not self.number:
-            top = Case.objects.order_by('-number')
-            self.number = top[0].number + 1 if len(top) > 0 else 0
+            self.number = self.get_case_number()
 
         super(Case, self).save()
 

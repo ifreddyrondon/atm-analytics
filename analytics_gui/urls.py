@@ -13,11 +13,12 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
+from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 
 from analytics_gui.authentication.views import Login
-from .authentication import views as auth_views
 from .analytics import urls as analytics_urls
 
 urlpatterns = [
@@ -27,3 +28,6 @@ urlpatterns = [
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='logout'),
     url(r'^', include(analytics_urls, namespace='analytics')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
