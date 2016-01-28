@@ -1,11 +1,10 @@
 # coding=utf-8
 import os
 
-from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
-from analytics_gui.authentication.models import CompanyAtmLocation, Bank
+from analytics_gui.authentication.models import CompanyAtmLocation, Bank, UserDashboard
 
 
 def get_case_picture_path(instance, filename):
@@ -69,7 +68,7 @@ class Case(models.Model):
 
     bank = models.ForeignKey(
             Bank, related_name="bank_cases", help_text="Banco")
-    analyst = models.ForeignKey(User, related_name="analyst_cases")
+    analyst = models.ForeignKey(UserDashboard, related_name="analyst_cases")
 
     @staticmethod
     def get_case_number():
@@ -84,6 +83,9 @@ class Case(models.Model):
             self.number = self.get_case_number()
 
         super(Case, self).save()
+
+    def __unicode__(self):
+        return "{} - {}".format(self.number, self.name)
 
 
 def get_atm_errors_manual_attachment_path(instance, filename):
@@ -208,6 +210,9 @@ class AtmCase(models.Model):
             help_text="Localización del ATM"
     )
 
+    def __unicode__(self):
+        return "{}, {} and {}".format(self.hardware, self.software, self.operating_system)
+
 
 def get_atm_journal_virtual_attachment_path(instance, filename):
     return os.path.join(
@@ -227,3 +232,6 @@ class AtmJournal(models.Model):
     @property
     def filename(self):
         return os.path.basename(self.file.name)
+
+    def __unicode__(self):
+        return self.filename

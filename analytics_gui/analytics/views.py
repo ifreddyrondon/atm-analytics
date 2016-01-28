@@ -20,7 +20,7 @@ def dashboard(request):
 
 @login_required(login_url='/login')
 def create(request):
-    company = Company.objects.get(users=request.user)
+    company = Company.objects.get(users=request.user.dash_user)
 
     form = CreateCaseForm(company=company)
     atm_form_set = CreateAtmFormSet(company=company)
@@ -29,7 +29,7 @@ def create(request):
         form = CreateCaseForm(data=request.POST, company=company)
         if form.is_valid():
             case = form.save(commit=False)
-            case.analyst = request.user
+            case.analyst = request.user.dash_user
             atm_form_set = CreateAtmFormSet(
                     request.POST, request.FILES, instance=case, company=company)
             if atm_form_set.is_valid():
@@ -59,7 +59,7 @@ def create(request):
 @login_required(login_url='/login')
 def view_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
-    company = Company.objects.get(users=request.user)
+    company = Company.objects.get(users=request.user.dash_user)
     form = CreateCaseForm(instance=case, company=company)
     atm_form_set = CreateAtmFormSet(instance=case, company=company)
 
