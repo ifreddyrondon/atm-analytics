@@ -21,6 +21,7 @@ from .authentication import views as auth_views
 from .analytics import urls as analytics_urls
 
 urlpatterns = [
+    url(r'^grappelli/', include('grappelli.urls')),  # grappelli URLS
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^', include(analytics_urls, namespace='analytics')),
