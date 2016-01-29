@@ -39,7 +39,7 @@ class Login(View):
                 return redirect('/admin/')
 
             login(request, user)
-            return redirect('/')
+            return redirect('base:dashboard')
 
         return render(request, 'authentication/login.html', {
             'form': form

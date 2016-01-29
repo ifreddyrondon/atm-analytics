@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from analytics_gui.authentication.views import Login
+from .base import urls as base_urls
 from .analytics import urls as analytics_urls
 
 urlpatterns = [
@@ -26,7 +27,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, name='logout'),
-    url(r'^', include(analytics_urls, namespace='analytics')),
+    url(r'^analytics/', include(analytics_urls, namespace='analytics')),
+    url(r'^', include(base_urls, namespace='base')),
 ]
 
 if settings.DEBUG:

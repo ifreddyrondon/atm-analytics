@@ -6,5 +6,4 @@ urlpatterns = [
     url(r'^case/(?P<case_id>\d+)/$', views.view_case, name='view_case'),
     url(r'^delete/(?P<case_id>\d+)/$', views.delete_case, name='delete_case'),
     url(r'^analyze/(?P<case_id>\d+)/$', views.analyze_case, name='analyze'),
-    url(r'^$', views.dashboard, name='dashboard'),
 ]

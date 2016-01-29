@@ -10,15 +10,6 @@ from analytics_gui.authentication.models import Company
 
 
 @login_required(login_url='/login')
-def dashboard(request):
-    cases = Case.objects.all().order_by('number')
-
-    return render(request, 'analytics/dashboard.html', {
-        "cases": cases
-    })
-
-
-@login_required(login_url='/login')
 def create(request):
     company = Company.objects.get(users=request.user.dash_user)
 

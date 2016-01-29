@@ -1,0 +1,184 @@
+{% extends "base/base.html" %}
+{% load bootstrap %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+
+                <div class="modal fade" id="new-users-modal" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="exampleModalLabel">Nuevo Usuario</h4>
+                            </div>
+                            <form id="add-user-form">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div id="user_first_name-group" class="form-group">
+                                        {{ create_analyst_form.first_name.label_tag|add_class:"control-label" }}
+                                        <span id="user_first_name-error" class="help-block"></span>
+                                        {{ create_analyst_form.first_name }}
+                                    </div>
+                                    <div id="user_last_name-group" class="form-group">
+                                        {{ create_analyst_form.last_name.label_tag|add_class:"control-label" }}
+                                        <span id="user_last_name-error" class="help-block"></span>
+                                        {{ create_analyst_form.last_name }}
+                                    </div>
+                                    <div id="user_email-group" class="form-group">
+                                        {{ create_analyst_form.email.label_tag|add_class:"control-label" }}
+                                        <span id="user_email-error" class="help-block"></span>
+                                        {{ create_analyst_form.email }}
+                                    </div>
+                                    <div id="user_username-group" class="form-group">
+                                        {{ create_analyst_form.username.label_tag|add_class:"control-label" }}
+                                        <span id="user_username-error" class="help-block"></span>
+                                        {{ create_analyst_form.username }}
+                                    </div>
+                                    <div id="user_password-group" class="form-group">
+                                        {{ create_analyst_form.password.label_tag|add_class:"control-label" }}
+                                        <span id="user_password-error" class="help-block"></span>
+                                        {{ create_analyst_form.password }}
+                                    </div>
+                                    <input type="hidden" name="add-user">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                                    </button>
+                                    <input type="submit" value="Crear"
+                                           class="btn btn-primary"/>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary row">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Usuarios
+                            <a href="#" class="pull-right" data-toggle="modal"
+                               data-target="#new-users-modal"><i class="fa fa-user-plus"></i> Agregar Usuario</a>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="text" class="form-control" id="users-table-filter" data-action="filter"
+                               data-filters="#users-table" placeholder="Filtar usuarios"/>
+                    </div>
+                    <table class="table table-hover" id="users-table">
+                        <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Numero de casos</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in company.users.all %}
+                            <tr>
+                                <td>{{ user.user.first_name }}</td>
+                                <td>{{ user.analyst_cases.count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+            var oTable = $("#users-table").DataTable({
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+            $('#users-table-filter').keyup(function () {
+                oTable.search($(this).val()).draw();
+            });
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // NEW USER FORM
+            // function to clean add document modal
+            function cleanNewUserModal() {
+                $('#user_first_name-group').removeClass('has-error');
+                $('#user_first_name-error').text("");
+                $('#user_last_name-group').removeClass('has-error');
+                $('#user_last_name-error').text("");
+                $('#user_email-group').removeClass('has-error');
+                $('#user_email-error').text("");
+                $('#user_username-group').removeClass('has-error');
+                $('#user_username-error').text("");
+                $('#user_password-group').removeClass('has-error');
+                $('#user_password-error').text("");
+            }
+
+            $("#new-users-modal").on('hide.bs.modal', function () {
+                cleanNewUserModal();
+            });
+
+            $('#add-user-form').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                        type: 'POST',
+                        data: $('#add-user-form').serialize()
+                    })
+                    .done(function (data) {
+                        location.reload();
+                    })
+                    .fail(function (data) {
+                        cleanNewUserModal();
+                        console.log(data);
+                        if (data.responseJSON["first_name"]) {
+                            $('#user_first_name-group').addClass('has-error');
+                            $('#user_first_name-error').text(data.responseJSON["first_name"].join("<br>"));
+                        }
+                        if (data.responseJSON["last_name"]) {
+                            $('#user_last_name-group').addClass('has-error');
+                            $('#user_last_name-error').text(data.responseJSON["last_name"].join("<br>"));
+                        }
+                        if (data.responseJSON["email"]) {
+                            $('#user_email-group').addClass('has-error');
+                            $('#user_email-error').text(data.responseJSON["email"].join("<br>"));
+                        }
+                        if (data.responseJSON["username"]) {
+                            $('#user_username-group').addClass('has-error');
+                            $('#user_username-error').text(data.responseJSON["username"].join("<br>"));
+                        }
+                        if (data.responseJSON["password"]) {
+                            $('#user_password-group').addClass('has-error');
+                            $('#user_password-error').text(data.responseJSON["password"].join("<br>"));
+                        }
+                    });
+            });
+        })
+    </script>
+{% endblock %}
