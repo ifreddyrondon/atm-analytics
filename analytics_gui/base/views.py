@@ -5,7 +5,8 @@ from django.shortcuts import render
 
 from analytics_gui.analytics.models import Case
 from analytics_gui.authentication.forms import CreateAnalystForm
-from analytics_gui.authentication.models import Company, UserDashboard
+from analytics_gui.authentication.models import UserDashboard
+from analytics_gui.companies.models import Company
 
 
 @login_required(login_url='/login')

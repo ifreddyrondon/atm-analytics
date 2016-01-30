@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'widget_tweaks',
     'analytics_gui.base',
     'analytics_gui.authentication',
-    'analytics_gui.analytics'
+    'analytics_gui.analytics',
+    'analytics_gui.companies',
 )
 
 MIDDLEWARE_CLASSES = (

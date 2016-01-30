@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet
 from analytics_gui.analytics.models import Case, AtmJournal
 from analytics_gui.analytics.parsers import parse_log_file
-from analytics_gui.authentication.models import Company
+from analytics_gui.companies.models import Company
 
 
 @login_required(login_url='/login')

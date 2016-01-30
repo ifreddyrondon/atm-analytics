@@ -1,8 +1,6 @@
 # coding=utf-8
 from django import forms
 
-from analytics_gui.authentication.models import UserDashboard
-
 default_errors = {
     u'required': u"Este campo es requerido",
     u'invalid': u"Coloca un valor válido",

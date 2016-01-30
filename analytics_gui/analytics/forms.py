@@ -3,7 +3,7 @@ from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 
 from analytics_gui.analytics.models import Case, AtmCase
-from analytics_gui.authentication.models import Bank, CompanyAtmLocation
+from analytics_gui.companies.models import Bank, CompanyAtmLocation
 
 default_errors = {
     u'required': u"Este campo es requerido",

@@ -4,7 +4,8 @@ import os
 from django.db import models
 from django.utils import timezone
 
-from analytics_gui.authentication.models import CompanyAtmLocation, Bank, UserDashboard
+from analytics_gui.authentication.models import UserDashboard
+from analytics_gui.companies.models import Bank, CompanyAtmLocation
 
 
 def get_case_picture_path(instance, filename):
@@ -207,6 +208,7 @@ class AtmCase(models.Model):
 
     atm_location = models.ManyToManyField(
             CompanyAtmLocation,
+            related_name="locations",
             help_text="Localización del ATM"
     )
 
