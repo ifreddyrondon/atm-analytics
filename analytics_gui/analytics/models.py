@@ -49,6 +49,7 @@ class Case(models.Model):
     status = models.CharField(
             max_length=1,
             choices=STATUS_CHOICES,
+            default=STATUS_OPEN,
             help_text='Estado del caso'
     )
     created_date = models.DateField(
@@ -87,6 +88,9 @@ class Case(models.Model):
 
     def __unicode__(self):
         return "{} - {}".format(self.number, self.name)
+
+    class Meta:
+        verbose_name = "Caso"
 
 
 def get_atm_errors_manual_attachment_path(instance, filename):
@@ -214,6 +218,10 @@ class AtmCase(models.Model):
 
     def __unicode__(self):
         return "{}, {} and {}".format(self.hardware, self.software, self.operating_system)
+
+    class Meta:
+        verbose_name = "ATM"
+        verbose_name_plural = "ATMs"
 
 
 def get_atm_journal_virtual_attachment_path(instance, filename):

@@ -34,6 +34,7 @@ class CreateCaseForm(forms.ModelForm):
     status = forms.ChoiceField(
             widget=forms.RadioSelect,
             choices=Case.STATUS_CHOICES,
+            initial=Case.STATUS_OPEN,
             help_text='Estado del caso'
     )
 
