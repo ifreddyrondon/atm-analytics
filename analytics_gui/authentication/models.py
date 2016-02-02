@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -9,10 +9,10 @@ class UserDashboard(models.Model):
     POSITION_ADMIN = '1'
     POSITIONS_CHOICES = (
         (POSITION_ANALYST, "analista"),
-        (POSITION_ADMIN, "admin"),
+        (POSITION_ADMIN, "manager"),
     )
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="dash_user")
+    user = models.OneToOneField(User, related_name="dash_user")
     position = models.CharField(
             max_length=1,
             choices=POSITIONS_CHOICES)

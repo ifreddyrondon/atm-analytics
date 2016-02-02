@@ -21,7 +21,7 @@ class Company(models.Model):
     phone = models.CharField('Teléfono', max_length=255, help_text='Teléfono')
     in_charge = models.OneToOneField(UserDashboard, related_name='manager', verbose_name='Manager')
     users = models.ManyToManyField(
-            UserDashboard, related_name='users', verbose_name='Usuarios', blank=True)
+            UserDashboard, related_name='users', verbose_name='Analistas', blank=True)
 
     def __unicode__(self):
         return self.name
