@@ -7,7 +7,7 @@
     {{ block.super }}
     <style>
         .change-image {
-            padding-top: 90px;
+            padding-top: 50px;
         }
 
         .change-image .img-responsive {
@@ -148,7 +148,8 @@
                                 {% elif company.logo %}
                                     <img src="{{ company.logo.url }}" class="img-circle img-responsive">
                                 {% else %}
-                                    <img src="{% static "images/default_avatar.png" %}" class="img-circle img-responsive">
+                                    <img src="{% static "images/default_avatar.png" %}"
+                                         class="img-circle img-responsive">
                                 {% endif %}
                                 <br>
                                 <span class="btn btn-default btn-xs btn-file">Browse <input type="file"></span>
@@ -230,6 +231,12 @@
                                                                 aria-controls="collapseExample">
                                                             Usted cuenta con los manuales de errores
                                                         </button>
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="hover" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseErrorsManual">
                                                             <br>
@@ -246,6 +253,12 @@
                                                                 aria-controls="collapseExample">
                                                             Usted cuenta con los logs de Microsoft EventViewer
                                                         </button>
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="hover" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseMicrosoftEventViewer">
                                                             <br>
@@ -265,6 +278,12 @@
                                                             del
                                                             efectivo
                                                         </button>
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="hover" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseCashReplacementSchedule">
                                                             <br>
@@ -303,6 +322,12 @@
                                                         {% if atm_form.other_log.errors %}
                                                             <span class="help-block errors">{{ atm_form.other_log.errors|join:"<br \>" }}</span>
                                                         {% endif %}
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="hover" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         {{ atm_form.other_log }}
                                                     </div>
 
@@ -371,6 +396,9 @@
                 $(this).find(".journal_virtual").append('<input type="file" name="atms-' + id + '-journal_virtual" multiple>')
             });
 
+            // init popover (help text)
+            $("[data-toggle=popover]").popover();
+
             function deleteATM(selector) {
                 var $parent = $(selector.currentTarget).parent().parent().parent();
                 // check if instance already exist then check the input
@@ -437,6 +465,8 @@
                 $totalContainer.val(total);
                 // add element to dom
                 $(selector).after(newElement);
+                // init popover
+                newElement.find("[data-toggle=popover]").popover();
                 // show the new collapse panel
                 $(selector).find(".panel-collapse").collapse('show');
             }
