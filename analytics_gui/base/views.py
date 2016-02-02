@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from analytics_gui.analytics.models import Case
 from analytics_gui.authentication.forms import CreateAnalystForm
@@ -11,6 +11,9 @@ from analytics_gui.companies.models import Company
 
 @login_required(login_url='/login')
 def dashboard(request):
+    if request.user.is_superuser:
+        return redirect('/admin/')
+
     user = request.user.dash_user
 
     if user.position == UserDashboard.POSITION_ADMIN:
