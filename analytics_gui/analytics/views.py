@@ -35,7 +35,7 @@ def create(request):
                             AtmJournal.objects.create(atm=atm, file=journal_file)
 
                 if 'save' in request.POST:
-                    return HttpResponseRedirect(reverse("analytics:dashboard"))
+                    return HttpResponseRedirect(reverse("base:dashboard"))
                 elif 'analyze' in request.POST:
                     return HttpResponseRedirect(reverse("analytics:analyze", args=[case.id]))
 
@@ -101,4 +101,4 @@ def analyze_case(request, case_id):
 def delete_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
-    return HttpResponseRedirect(reverse("analytics:dashboard"))
+    return HttpResponseRedirect(reverse("base:dashboard"))
