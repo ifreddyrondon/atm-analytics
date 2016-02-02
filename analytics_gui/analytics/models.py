@@ -245,3 +245,48 @@ class AtmJournal(models.Model):
 
     def __unicode__(self):
         return self.filename
+
+
+class AtmError(models.Model):
+    class Meta:
+        verbose_name = "Error de ATM"
+        verbose_name_plural = "Errores de ATMs"
+
+    ERROR_COLOR_GREEN = '0'
+    ERROR_COLOR_RED = '1'
+    ERRORS_COLORS_CHOICES = (
+        (ERROR_COLOR_GREEN, "verde"),
+        (ERROR_COLOR_RED, "rojo"),
+    )
+
+    ERROR_FAULT_USER = '0'
+    ERROR_FAULT_BANK = '1'
+    ERROR_FAULT_CHOICES = (
+        (ERROR_FAULT_USER, "usuario"),
+        (ERROR_FAULT_BANK, "banco"),
+    )
+
+    identifier = models.CharField(
+            "Identificador",
+            max_length=255,
+            unique=True,
+            db_index=True,
+            help_text="Identificador único del error",
+    )
+    description = models.CharField(
+            "Descripción",
+            max_length=255,
+            help_text="Descripción del error",
+    )
+    fault = models.CharField(
+            "Culpa",
+            max_length=1,
+            choices=ERROR_FAULT_CHOICES,
+            help_text="¿Quién tiene la culpa?",
+    )
+    color = models.CharField(
+            "Color",
+            max_length=1,
+            choices=ERRORS_COLORS_CHOICES,
+            help_text="Color del error",
+    )
