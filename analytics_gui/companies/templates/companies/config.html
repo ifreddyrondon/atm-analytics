@@ -1,0 +1,110 @@
+{% extends "base/base.html" %}
+{% load bootstrap %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .change-image {
+            padding-top: 20px;
+        }
+        .change-image .img-responsive {
+            margin: 0 auto;
+            max-width: 150px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <ol class="breadcrumb">
+                    <li><a href="{% url "base:dashboard" %}">home</a></li>
+                    <li class="active">configuración</li>
+                </ol>
+                <div class="wall inner-wall">
+                    <h1>Configuración</h1>
+                    <form method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-error">
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group {% if form.name.errors %}has-error{% endif %}">
+                                    {% if form.name.help_text %}
+                                        <span class="help-block">{{ form.name.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.name.errors %}
+                                        <span class="help-block">{{ form.name.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.name|add_class:"form-control" }}
+                                </div>
+                                <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                                    {% if form.email.help_text %}
+                                        <span class="help-block">{{ form.email.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.email.errors %}
+                                        <span class="help-block">{{ form.email.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-envelope-o"></i></div>
+                                        {{ form.email|add_class:"form-control" }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group {% if form.phone.errors %}has-error{% endif %}">
+                                    {% if form.phone.help_text %}
+                                        <span class="help-block">{{ form.phone.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.phone.errors %}
+                                        <span class="help-block">{{ form.phone.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-phone"></i></div>
+                                        {{ form.phone | add_class:"form-control" }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 change-image text-center">
+                                {% if form.instance and form.instance.logo %}
+                                    <img src="{{ form.instance.logo.url }}" class="img-circle img-responsive">
+                                {% else %}
+                                    <img src="{% static "images/default_avatar.png" %}"
+                                         class="img-circle img-responsive">
+                                {% endif %}
+                                <br>
+                                <span class="btn btn-default btn-xs btn-file">Browse
+                                    <input type="file"></span>
+                            </div>
+                            <div class="col-md-12">
+                                <hr>
+                                <div class="form-group">
+                                    <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
+                                           value="Guardar"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+
+        })
+    </script>
+{% endblock %}
