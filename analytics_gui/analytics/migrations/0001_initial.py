@@ -27,6 +27,27 @@ class Migration(migrations.Migration):
                 ('other_log', models.FileField(help_text=b'\xc2\xbfOtro tipo de log?', null=True, upload_to=analytics_gui.analytics.models.get_atm_other_log_attachment_path, blank=True)),
                 ('atm_location', models.ManyToManyField(help_text=b'Localizaci\xc3\xb3n del ATM', related_name='locations', to='companies.CompanyAtmLocation')),
             ],
+            options={
+                'verbose_name': 'ATM',
+                'verbose_name_plural': 'ATMs',
+            },
+        ),
+        migrations.CreateModel(
+            name='AtmError',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('identifier', models.CharField(help_text=b'Identificador \xc3\xbanico del error', unique=True, max_length=255, verbose_name=b'Identificador', db_index=True)),
+                ('description', models.CharField(help_text=b'Descripci\xc3\xb3n del error', max_length=255, verbose_name=b'Descripci\xc3\xb3n')),
+                ('hardware', models.CharField(help_text=b'Hardware del ATM', max_length=1, verbose_name=b'Hardware', choices=[(b'0', b'Diebold'), (b'1', b'Wincor Nixdorf'), (b'2', b'NCR'), (b'3', b'Triton')])),
+                ('software', models.CharField(help_text=b'Software del ATM', max_length=1, verbose_name=b'Software', choices=[(b'0', b'Agilis'), (b'1', b'APTRA'), (b'2', b'Procash/probase'), (b'3', b'JAM Dynasty'), (b'4', b'Kal'), (b'5', b'Otro XFS')])),
+                ('operating_system', models.CharField(help_text=b'Sistema Operativo del ATM', max_length=1, verbose_name=b'Sistema Operativo', choices=[(b'0', b'Windows XP'), (b'1', b'Windows 7'), (b'2', b'Windows 8')])),
+                ('fault', models.CharField(help_text=b'\xc2\xbfQui\xc3\xa9n tiene la culpa?', max_length=1, verbose_name=b'Culpa', choices=[(b'0', b'usuario'), (b'1', b'banco'), (b'1', b'transvalores'), (b'3', b'anonimo')])),
+                ('color', models.CharField(help_text=b'Color del error', max_length=1, verbose_name=b'Color', choices=[(b'0', b'verde'), (b'1', b'rojo'), (b'2', b'naranja')])),
+            ],
+            options={
+                'verbose_name': 'Error de ATM',
+                'verbose_name_plural': 'Errores de ATMs',
+            },
         ),
         migrations.CreateModel(
             name='AtmJournal',
@@ -51,6 +72,9 @@ class Migration(migrations.Migration):
                 ('analyst', models.ForeignKey(related_name='analyst_cases', to='authentication.UserDashboard')),
                 ('bank', models.ForeignKey(related_name='bank_cases', to='companies.Bank', help_text=b'Banco')),
             ],
+            options={
+                'verbose_name': 'Caso',
+            },
         ),
         migrations.AddField(
             model_name='atmcase',

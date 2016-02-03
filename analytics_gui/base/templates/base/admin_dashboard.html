@@ -82,9 +82,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for user in company.users.all %}
+                        {% for user in users %}
                             <tr>
-                                <td>{{ user.user.first_name }}</td>
+                                {% if user.user.first_name %}
+                                    <td>{{ user.user.first_name }} {{ user.user.last_name }}</td>
+                                {% else %}
+                                    <td>{{ user.user.username }}</td>
+                                {% endif %}
                                 <td>{{ user.analyst_cases.count }}</td>
                             </tr>
                         {% endfor %}

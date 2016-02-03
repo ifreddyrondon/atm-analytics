@@ -3,6 +3,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from analytics_gui.companies.models import Company
+
 
 class UserDashboard(models.Model):
     POSITION_ANALYST = '0'
@@ -13,9 +15,9 @@ class UserDashboard(models.Model):
     )
 
     user = models.OneToOneField(User, related_name="dash_user")
-    position = models.CharField(
-            max_length=1,
-            choices=POSITIONS_CHOICES)
+    company = models.ForeignKey(Company, related_name='users', verbose_name='Compañia')
+    charge = models.CharField("Cargo", max_length=1, choices=POSITIONS_CHOICES)
+    position = models.PositiveSmallIntegerField("Posición", null=True)
 
     def __unicode__(self):
         return self.user.username

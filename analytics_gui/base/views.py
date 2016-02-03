@@ -15,10 +15,10 @@ def dashboard(request):
         return redirect('/admin/')
 
     user = request.user.dash_user
+    company = Company.objects.get(users=user)
 
-    if user.position == UserDashboard.POSITION_ADMIN:
+    if user.charge == UserDashboard.POSITION_ADMIN:
         create_analyst_form = CreateAnalystForm()
-        company = Company.objects.get(in_charge=user)
 
         if request.method == 'POST':
             if 'add-user' in request.POST:
@@ -31,11 +31,11 @@ def dashboard(request):
                             first_name=create_analyst_form.cleaned_data.get('first_name'),
                             last_name=create_analyst_form.cleaned_data.get('last_name'),
                     )
-                    user_dashboard = UserDashboard.objects.create(
+                    UserDashboard.objects.create(
                             user=user,
-                            position=UserDashboard.POSITION_ANALYST
+                            charge=UserDashboard.POSITION_ANALYST,
+                            company=company,
                     )
-                    company.users.add(user_dashboard)
 
                     return JsonResponse({}, status=200)
                 else:
@@ -43,11 +43,11 @@ def dashboard(request):
 
         return render(request, 'base/admin_dashboard.html', {
             "company": company,
+            "users": company.users.filter(charge=UserDashboard.POSITION_ANALYST),
             "create_analyst_form": create_analyst_form,
         })
-    elif user.position == UserDashboard.POSITION_ANALYST:
-        company = Company.objects.get(users=user)
-        cases = Case.objects.all().order_by('number')
+    elif user.charge == UserDashboard.POSITION_ANALYST:
+        cases = Case.objects.filter(analyst=user).order_by('number')
 
         return render(request, 'base/analyst_dashboard.html', {
             "company": company,

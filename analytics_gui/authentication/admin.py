@@ -14,9 +14,9 @@ class UserDashboardAdmin(admin.ModelAdmin):
     users_list.short_description = 'Usuario'
 
     def position_list(self, obj):
-        return obj.get_position_display()
+        return obj.get_charge_display()
 
-    position_list.short_description = 'Posición'
+    position_list.short_description = 'Cargo'
 
     def company(self, obj):
         if obj.position == UserDashboard.POSITION_ADMIN:

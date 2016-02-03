@@ -9,9 +9,31 @@
         .change-image {
             padding-top: 20px;
         }
+
         .change-image .img-responsive {
             margin: 0 auto;
             max-width: 150px;
+        }
+
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
         }
     </style>
 {% endblock %}
@@ -82,8 +104,7 @@
                                          class="img-circle img-responsive">
                                 {% endif %}
                                 <br>
-                                <span class="btn btn-default btn-xs btn-file">Browse
-                                    <input type="file"></span>
+                                <span class="btn btn-default btn-xs btn-file">Cambiar <input type="file"></span>
                             </div>
                             <div class="col-md-12">
                                 <hr>

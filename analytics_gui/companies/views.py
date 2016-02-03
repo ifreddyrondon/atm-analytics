@@ -8,7 +8,7 @@ from analytics_gui.companies.models import Company
 @login_required(login_url='/login')
 def config(request):
     user = request.user.dash_user
-    company = Company.objects.get(in_charge=user)
+    company = Company.objects.get(users=user)
 
     config_form = ConfigForm(instance=company)
 

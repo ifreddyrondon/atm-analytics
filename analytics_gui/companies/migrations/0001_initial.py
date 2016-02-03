@@ -8,7 +8,6 @@ import analytics_gui.companies.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0001_initial'),
     ]
 
     operations = [
@@ -33,8 +32,6 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(help_text=b'Nombre de la Empresa', max_length=255, verbose_name=b'Nombre')),
                 ('email', models.EmailField(help_text=b'Email', max_length=255, verbose_name=b'Email')),
                 ('phone', models.CharField(help_text=b'Tel\xc3\xa9fono', max_length=255, verbose_name=b'Tel\xc3\xa9fono')),
-                ('in_charge', models.OneToOneField(related_name='manager', verbose_name=b'Manager', to='authentication.UserDashboard')),
-                ('users', models.ManyToManyField(related_name='users', verbose_name=b'Analistas', to='authentication.UserDashboard', blank=True)),
             ],
             options={
                 'verbose_name': 'Compa\xf1ia',

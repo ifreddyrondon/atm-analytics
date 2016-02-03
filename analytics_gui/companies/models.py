@@ -3,8 +3,6 @@ import os
 
 from django.db import models
 
-from analytics_gui.authentication.models import UserDashboard
-
 
 def get_company_logo_attachment_path(instance, filename):
     return os.path.join(
@@ -19,9 +17,6 @@ class Company(models.Model):
     name = models.CharField('Nombre', max_length=255, help_text='Nombre de la Empresa')
     email = models.EmailField('Email', max_length=255, help_text='Email')
     phone = models.CharField('Teléfono', max_length=255, help_text='Teléfono')
-    in_charge = models.OneToOneField(UserDashboard, related_name='manager', verbose_name='Manager')
-    users = models.ManyToManyField(
-            UserDashboard, related_name='users', verbose_name='Analistas', blank=True)
 
     def __unicode__(self):
         return self.name

@@ -1,7 +1,15 @@
 from django.contrib import admin
 from grappelli.forms import GrappelliSortableHiddenMixin
 
+from analytics_gui.authentication.models import UserDashboard
 from analytics_gui.companies.models import CompanyAtmLocation, Bank, Company
+
+
+class UserDashboardInline(GrappelliSortableHiddenMixin, admin.TabularInline):
+    classes = ('grp-collapse grp-open',)
+    model = UserDashboard
+    extra = 1
+    sortable_field_name = "position"
 
 
 class CompanyBankInline(GrappelliSortableHiddenMixin, admin.TabularInline):
@@ -19,7 +27,7 @@ class CompanyAtmLocationInline(GrappelliSortableHiddenMixin, admin.TabularInline
 
 
 class CompanyAdmin(admin.ModelAdmin):
-    inlines = (CompanyBankInline, CompanyAtmLocationInline,)
+    inlines = (UserDashboardInline, CompanyBankInline, CompanyAtmLocationInline,)
     list_display = ('name', 'banks_list', 'atm_number_4_bank',)
 
     def banks_list(self, obj):
