@@ -254,16 +254,57 @@ class AtmError(models.Model):
 
     ERROR_COLOR_GREEN = '0'
     ERROR_COLOR_RED = '1'
+    ERROR_COLOR_ORANGE = '2'
     ERRORS_COLORS_CHOICES = (
         (ERROR_COLOR_GREEN, "verde"),
         (ERROR_COLOR_RED, "rojo"),
+        (ERROR_COLOR_ORANGE, "naranja"),
     )
 
     ERROR_FAULT_USER = '0'
     ERROR_FAULT_BANK = '1'
+    ERROR_FAULT_TRANSVALORES = '2'
+    ERROR_FAULT_ANONYMOUS = '3'
     ERROR_FAULT_CHOICES = (
         (ERROR_FAULT_USER, "usuario"),
         (ERROR_FAULT_BANK, "banco"),
+        (ERROR_FAULT_BANK, "transvalores"),
+        (ERROR_FAULT_ANONYMOUS, "anonimo"),
+    )
+
+    HARDWARE_DIEBOLD = '0'
+    HARDWARE_WINCOR_NIXDORF = '1'
+    HARDWARE_NCR = '2'
+    HARDWARE_TRISTON = '3'
+    HARDWARE_CHOICES = (
+        (HARDWARE_DIEBOLD, "Diebold"),
+        (HARDWARE_WINCOR_NIXDORF, "Wincor Nixdorf"),
+        (HARDWARE_NCR, "NCR"),
+        (HARDWARE_TRISTON, "Triton"),
+    )
+
+    SOFTWARE_AGILIS = '0'
+    SOFTWARE_APTRA = '1'
+    SOFTWARE_PROCASH_PROBASE = '2'
+    SOFTWARE_JAM_DYNASTY = '3'
+    SOFTWARE_KAL = '4'
+    SOFTWARE_OTRO = '5'
+    SOFTWARE_CHOICES = (
+        (SOFTWARE_AGILIS, "Agilis"),
+        (SOFTWARE_APTRA, "APTRA"),
+        (SOFTWARE_PROCASH_PROBASE, "Procash/probase"),
+        (SOFTWARE_JAM_DYNASTY, "JAM Dynasty"),
+        (SOFTWARE_KAL, "Kal"),
+        (SOFTWARE_OTRO, "Otro XFS"),
+    )
+
+    OS_WINDOWS_XP = '0'
+    OS_WINDOWS_7 = '1'
+    OS_WINDOWS_8 = '2'
+    OS_CHOICES = (
+        (OS_WINDOWS_XP, "Windows XP"),
+        (OS_WINDOWS_7, "Windows 7"),
+        (OS_WINDOWS_8, "Windows 8"),
     )
 
     identifier = models.CharField(
@@ -273,17 +314,41 @@ class AtmError(models.Model):
             db_index=True,
             help_text="Identificador único del error",
     )
+
     description = models.CharField(
             "Descripción",
             max_length=255,
             help_text="Descripción del error",
     )
+
+    hardware = models.CharField(
+            "Hardware",
+            max_length=1,
+            choices=HARDWARE_CHOICES,
+            help_text="Hardware del ATM",
+    )
+
+    software = models.CharField(
+            "Software",
+            max_length=1,
+            choices=SOFTWARE_CHOICES,
+            help_text="Software del ATM",
+    )
+
+    operating_system = models.CharField(
+            "Sistema Operativo",
+            max_length=1,
+            choices=OS_CHOICES,
+            help_text="Sistema Operativo del ATM",
+    )
+
     fault = models.CharField(
             "Culpa",
             max_length=1,
             choices=ERROR_FAULT_CHOICES,
             help_text="¿Quién tiene la culpa?",
     )
+
     color = models.CharField(
             "Color",
             max_length=1,
