@@ -197,7 +197,7 @@
                                     {% if form.bank.errors %}
                                         <span class="help-block">{{ form.bank.errors|join:"<br \>" }}</span>
                                     {% endif %}
-                                    {{ form.bank|add_class:"form-control" }}
+                                    {{ form.bank|add_class:"form-control select2-bank" }}
                                 </div>
 
                                 <hr>
@@ -333,8 +333,8 @@
                                                                        target="_blank">{{ file.filename }}</a><br>
                                                                 </div>
                                                             {% endfor %}
+                                                            <br>
                                                         {% endif %}
-                                                        <br>
                                                         <div class="journal-file-container">
                                                             <span class="btn btn-default btn-xs btn-file"
                                                                   style="margin-bottom: 2px">
@@ -362,7 +362,7 @@
                                                         {% if atm_form.atm_location.errors %}
                                                             <span class="help-block errors">{{ atm_form.atm_location.errors|join:"<br \>" }}</span>
                                                         {% endif %}
-                                                        {{ atm_form.atm_location|add_class:"form-control" }}
+                                                        {{ atm_form.atm_location|add_class:"form-control select2-location" }}
 
                                                     </div>
                                                 </div>
@@ -413,7 +413,13 @@
             // init main form
             $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
-            {#            // init input multiple for journal virtual#}
+            // init select2
+            $(".select2-bank").select2({placeholder: "Seleccione un banco"});
+            $(".select2-location").select2({
+                placeholder: "Seleccione una Localización, puede comenzar escribiendo para filtrar"
+            });
+
+            // init input multiple for journal virtual
             $(".atm-form").each(function () {
                 var id = $(this).find(".panel-collapse").attr("id");
                 var name = "atms-" + id.replace("atms-", "") + "-journal_virtual";
@@ -522,11 +528,16 @@
                 newElement.find(".help-block.errors").text("");
                 newElement.find(".has-error").removeClass("has-error");
                 $totalContainer.val(total);
+                // init select2
+                newElement.find(".select2").next().remove();
+                newElement.find(".select2").removeClass("select2-hidden-accessible");
                 // add element to dom
                 $(selector).after(newElement);
-                // init popover
                 // show the new collapse panel
                 $(selector).find(".panel-collapse").collapse('show');
+                $(selector).find(".select2").select2({
+                    placeholder: "Seleccione una Localización, puede comenzar escribiendo para filtrar"
+                });
             }
 
             // add ATM
