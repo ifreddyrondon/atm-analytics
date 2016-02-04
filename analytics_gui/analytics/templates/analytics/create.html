@@ -233,7 +233,7 @@
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
                                                            class="pull-right" data-placement="left"
-                                                           data-trigger="hover" title="Texto de Ayuda"
+                                                           data-trigger="focus" title="Texto de Ayuda"
                                                            data-content="Here's some amazing content.">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
@@ -253,12 +253,6 @@
                                                                 aria-controls="collapseExample">
                                                             Usted cuenta con los logs de Microsoft EventViewer
                                                         </button>
-                                                        <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="hover" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
-                                                            <i class="fa fa-question-circle fa-2x"></i>
-                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseMicrosoftEventViewer">
                                                             <br>
@@ -278,12 +272,6 @@
                                                             del
                                                             efectivo
                                                         </button>
-                                                        <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="hover" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
-                                                            <i class="fa fa-question-circle fa-2x"></i>
-                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseCashReplacementSchedule">
                                                             <br>
@@ -291,28 +279,35 @@
                                                         </div>
                                                     </div>
                                                     <hr>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 {% if atm_form.person_name_journal_virtual.errors %}has-error{% endif %}">
-                                                            {% if atm_form.person_name_journal_virtual.help_text %}
-                                                                <span class="help-block">{{ atm_form.person_name_journal_virtual.help_text }}</span>
-                                                            {% endif %}
-                                                            {% if atm_form.person_name_journal_virtual.errors %}
-                                                                <span class="help-block errors">{{ atm_form.person_name_journal_virtual.errors|join:"<br \>" }}</span>
-                                                            {% endif %}
-                                                            {{ atm_form.person_name_journal_virtual|add_class:"form-control" }}
-                                                        </div>
-                                                        <div class="form-group col-md-6 journal_virtual">
-                                                            <span class="help-block">Seleccionar Journal Virtual</span>
-                                                            <span class="help-block errors"></span>
-                                                        </div>
+                                                    <div class="form-group {% if atm_form.person_name_journal_virtual.errors %}has-error{% endif %}">
+                                                        {% if atm_form.person_name_journal_virtual.help_text %}
+                                                            <span class="help-block">{{ atm_form.person_name_journal_virtual.help_text }}</span>
+                                                        {% endif %}
+                                                        {% if atm_form.person_name_journal_virtual.errors %}
+                                                            <span class="help-block errors">{{ atm_form.person_name_journal_virtual.errors|join:"<br \>" }}</span>
+                                                        {% endif %}
+                                                        {{ atm_form.person_name_journal_virtual|add_class:"form-control" }}
+                                                    </div>
+                                                    <div class="form-group journal_virtual">
+                                                        <span class="help-block">Seleccionar Journal Virtual</span>
+                                                        <span class="help-block errors"></span>
                                                         {% if not create %}
-                                                            <div class="col-md-12">
-                                                                {% for file in atm_form.instance.journals.all %}
+                                                            {% for file in atm_form.instance.journals.all %}
+                                                                <div class="journal-file-container">
                                                                     <a href="{{ file.file.url }}"
                                                                        target="_blank">{{ file.filename }}</a><br>
-                                                                {% endfor %}
-                                                            </div>
+                                                                </div>
+                                                            {% endfor %}
                                                         {% endif %}
+                                                        <br>
+                                                        <div class="journal-file-container">
+                                                            <span class="btn btn-default btn-xs btn-file"
+                                                                  style="margin-bottom: 2px">
+                                                            Añadir archivo<input type="file" class="add-journal"
+                                                                                 name="atms-{{ forloop.counter0 }}-journal_virtual[]">
+                                                            </span>
+                                                            <span class="selectedFiles"></span>
+                                                        </div>
                                                     </div>
                                                     <hr>
                                                     <div class="form-group {% if atm_form.other_log.errors %}has-error{% endif %}">
@@ -322,12 +317,6 @@
                                                         {% if atm_form.other_log.errors %}
                                                             <span class="help-block errors">{{ atm_form.other_log.errors|join:"<br \>" }}</span>
                                                         {% endif %}
-                                                        <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="hover" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
-                                                            <i class="fa fa-question-circle fa-2x"></i>
-                                                        </a>
                                                         {{ atm_form.other_log }}
                                                     </div>
 
@@ -389,12 +378,37 @@
             // init main form
             $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
-            // init input multiple for journal virtual
+            {#            // init input multiple for journal virtual#}
             $(".atm-form").each(function () {
                 var id = $(this).find(".panel-collapse").attr("id");
-                id = id.replace("atms-", "");
-                $(this).find(".journal_virtual").append('<input type="file" name="atms-' + id + '-journal_virtual" multiple>')
+                var name = "atms-" + id.replace("atms-", "") + "-journal_virtual";
+                $(this).find(".journal_virtual").find(".add-journal").change(handleFileSelect);
             });
+
+            function deleteJournalFile(evt) {
+                $(evt.currentTarget).parent().parent().parent().remove();
+            }
+
+            function handleFileSelect(evt) {
+                //to check that even single file is selected or not
+                if (!evt.target.files) return;
+
+                var $parent = $(evt.currentTarget).parent().parent();
+                var output = [];
+                for (var i = 0, f; f = evt.target.files[i]; i++) {
+                    output.push('<span style="padding:5px"><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                            f.size, ' bytes, last modified: ',
+                            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                            '<a href="javascript:void(0)" data-file-name="' + f.name + '" class="btn btn-danger btn-xs delete-journal-file" style="margin-left:10px">X</a>',
+                            '</span>');
+                }
+                $parent.find(".selectedFiles").html(output.join(''));
+                var $newInput = $parent.clone(false);
+                $newInput.find(".selectedFiles").html("");
+                $newInput.find(".add-journal").change(handleFileSelect);
+                $parent.parent().append($newInput);
+                $parent.find(".delete-journal-file").click(deleteJournalFile);
+            }
 
             // init popover (help text)
             $("[data-toggle=popover]").popover();
@@ -459,6 +473,16 @@
                 // change cash replacement schedule
                 newElement.find("div.collapse[id$='-collapseCashReplacementSchedule']").attr("id", prefix + "-collapseCashReplacementSchedule");
                 newElement.find("button[id$='-collapseCashReplacementSchedule']").attr("data-target", "#" + prefix + "-collapseCashReplacementSchedule");
+                // remove old journal files selected
+                $journal_virtual = newElement.find(".journal_virtual");
+                $journal_virtual.find(".journal-file-container").remove();
+                $journal_virtual.append('<div class="journal-file-container">' +
+                        '<span class="btn btn-default btn-xs btn-file" style="margin-bottom: 2px">' +
+                        'Añadir archivo <input type="file" class="add-journal" name="atms-' + (total - 1) + '-journal_virtual[]">' +
+                        '</span>' +
+                        '<span class="selectedFiles"></span>' +
+                        '</div>');
+                $journal_virtual.find(".add-journal").change(handleFileSelect);
                 // remove old errors from last form
                 newElement.find(".help-block.errors").text("");
                 newElement.find(".has-error").removeClass("has-error");
@@ -466,7 +490,6 @@
                 // add element to dom
                 $(selector).after(newElement);
                 // init popover
-                newElement.find("[data-toggle=popover]").popover();
                 // show the new collapse panel
                 $(selector).find(".panel-collapse").collapse('show');
             }

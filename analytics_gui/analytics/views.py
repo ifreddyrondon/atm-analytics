@@ -27,12 +27,12 @@ def create(request):
                 case.save()
                 atms = atm_form_set.save()
                 for index, atm in enumerate(atms):
-                    journal_virtual_key = 'atms-{}-journal_virtual'.format(index)
+                    journal_virtual_key = 'atms-{}-journal_virtual[]'.format(index)
                     journal_files = request.FILES.getlist(journal_virtual_key)
                     if len(journal_files) > 0:
                         AtmJournal.objects.filter(atm=atm).delete()
-                        for journal_file in request.FILES.getlist(journal_virtual_key):
-                            AtmJournal.objects.create(atm=atm, file=journal_file)
+                        [AtmJournal.objects.create(atm=atm, file=journal_file) for journal_file in
+                         journal_files]
 
                 if 'save' in request.POST:
                     return HttpResponseRedirect(reverse("base:dashboard"))
@@ -61,13 +61,16 @@ def view_case(request, case_id):
         if form.is_valid() and atm_form_set.is_valid():
             case.save()
             atm_form_set.save()
-            for index, atm in enumerate(case.atms.all()):
-                journal_virtual_key = 'atms-{}-journal_virtual'.format(index)
+            for index, atm_form in enumerate(atm_form_set):
+                if not atm_form.instance.id:
+                    continue
+
+                journal_virtual_key = 'atms-{}-journal_virtual[]'.format(index)
                 journal_files = request.FILES.getlist(journal_virtual_key)
                 if len(journal_files) > 0:
-                    AtmJournal.objects.filter(atm=atm).delete()
-                    for journal_file in request.FILES.getlist(journal_virtual_key):
-                        AtmJournal.objects.create(atm=atm, file=journal_file)
+                    AtmJournal.objects.filter(atm=atm_form.instance).delete()
+                    [AtmJournal.objects.create(atm=atm_form.instance, file=journal_file) for journal_file in
+                     journal_files]
 
             if 'analyze' in request.POST:
                 return HttpResponseRedirect(reverse("analytics:analyze", args=[case.id]))
