@@ -139,9 +139,20 @@
                                             {% if form.priority.errors %}
                                                 <span class="help-block">{{ form.priority.errors|join:"<br \>" }}</span>
                                             {% endif %}
-                                            {{ form.priority }}
+                                            <div class="btn-group" data-toggle="buttons">
+                                                {% for choice in form.priority.field.choices %}
+                                                    <label class="btn btn-primary {% ifequal form.priority.value choice.0 %}active{% endifequal %}">
+                                                        <input id="id_priority_{{ forloop.counter0 }}" name="priority"
+                                                               type="radio" value="{{ choice.0 }}"
+                                                                {% ifequal form.priority.value choice.0 %}
+                                                               checked="checked"
+                                                                {% endifequal %}>{{ choice.1 }}
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="form-group {% if form.status.errors %}has-error{% endif %}">
                                             {% if form.status.help_text %}
@@ -150,7 +161,17 @@
                                             {% if form.status.errors %}
                                                 <span class="help-block">{{ form.status.errors|join:"<br \>" }}</span>
                                             {% endif %}
-                                            {{ form.status }}
+                                            <div class="btn-group" data-toggle="buttons">
+                                                {% for choice in form.status.field.choices %}
+                                                    <label class="btn btn-primary {% ifequal form.status.value choice.0 %}active{% endifequal %}">
+                                                        <input id="id_status_{{ forloop.counter0 }}" name="status"
+                                                               type="radio" value="{{ choice.0 }}"
+                                                                {% ifequal form.status.value choice.0 %}
+                                                               checked="checked"
+                                                                {% endifequal %}>{{ choice.1 }}
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
