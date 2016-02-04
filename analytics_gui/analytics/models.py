@@ -33,6 +33,13 @@ class Case(models.Model):
         (STATUS_CLOSE, "cerrado"),
     )
 
+    CURRENCY_USD = '0'
+    CURRENCY_EURO = '1'
+    CURRENCY_CHOICES = (
+        (CURRENCY_USD, "dolar US"),
+        (CURRENCY_EURO, "euro"),
+    )
+
     number = models.IntegerField(
             db_index=True,
             help_text='Número de caso'
@@ -61,6 +68,12 @@ class Case(models.Model):
             max_digits=19,
             decimal_places=2,
             help_text="Monto faltante estimado"
+    )
+
+    missing_amount_currency = models.CharField(
+            max_length=1,
+            choices=CURRENCY_CHOICES,
+            help_text='Divisa'
     )
 
     description = models.TextField(

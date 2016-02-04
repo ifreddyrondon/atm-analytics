@@ -48,7 +48,7 @@ class CreateCaseForm(forms.ModelForm):
         model = Case
         fields = (
             'number', 'name', 'priority', 'status', 'created_date',
-            'missing_amount', 'bank', 'description',
+            'missing_amount', 'missing_amount_currency', 'bank', 'description',
         )
 
     def __init__(self, *args, **kwargs):

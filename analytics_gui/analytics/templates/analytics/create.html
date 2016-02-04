@@ -105,15 +105,29 @@
                                         {{ form.created_date | add_class:"form-control created_date" }}
                                     </div>
                                 </div>
-
-                                <div class="form-group {% if form.missing_amount.errors %}has-error{% endif %}">
-                                    {% if form.missing_amount.help_text %}
-                                        <span class="help-block">{{ form.missing_amount.help_text }}</span>
-                                    {% endif %}
-                                    {% if form.missing_amount.errors %}
-                                        <span class="help-block">{{ form.missing_amount.errors|join:"<br \>" }}</span>
-                                    {% endif %}
-                                    {{ form.missing_amount|add_class:"form-control" }}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group {% if form.missing_amount.errors %}has-error{% endif %}">
+                                            {% if form.missing_amount.help_text %}
+                                                <span class="help-block">{{ form.missing_amount.help_text }}</span>
+                                            {% endif %}
+                                            {% if form.missing_amount.errors %}
+                                                <span class="help-block">{{ form.missing_amount.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            {{ form.missing_amount|add_class:"form-control" }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group {% if form.missing_amount_currency.errors %}has-error{% endif %}">
+                                            {% if form.missing_amount_currency.help_text %}
+                                                <span class="help-block">{{ form.missing_amount_currency.help_text }}</span>
+                                            {% endif %}
+                                            {% if form.missing_amount_currency.errors %}
+                                                <span class="help-block">{{ form.missing_amount_currency.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            {{ form.missing_amount_currency|add_class:"form-control" }}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
