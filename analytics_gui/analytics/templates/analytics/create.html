@@ -179,15 +179,19 @@
                             </div>
                             <div class="col-md-6 change-image text-center">
                                 {% if form.instance and form.instance.picture %}
-                                    <img src="{{ form.instance.picture.url }}" class="img-circle img-responsive">
+                                    <img id="id_picture_container" src="{{ form.instance.picture.url }}"
+                                         class="img-circle img-responsive">
                                 {% elif company.logo %}
-                                    <img src="{{ company.logo.url }}" class="img-circle img-responsive">
+                                    <img id="id_picture_container" src="{{ company.logo.url }}"
+                                         class="img-circle img-responsive">
                                 {% else %}
-                                    <img src="{% static "images/default_avatar.png" %}"
+                                    <img id="id_picture_container" src="{% static "images/default_avatar.png" %}"
                                          class="img-circle img-responsive">
                                 {% endif %}
                                 <br>
-                                <span class="btn btn-default btn-xs btn-file">Browse <input type="file"></span>
+                                <span class="btn btn-default btn-xs btn-file">
+                                    Cambiar imagen <input id="id_picture" name="picture" type="file">
+                                </span>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group {% if form.bank.errors %}has-error{% endif %}">
@@ -453,6 +457,21 @@
 
             // init popover (help text)
             $("[data-toggle=popover]").popover();
+
+            // change picture
+            function changeImg(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#id_picture_container").attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#id_picture").change(function () {
+                changeImg(this);
+            });
 
             function deleteATM(selector) {
                 var $parent = $(selector.currentTarget).parent().parent().parent();

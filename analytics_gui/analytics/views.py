@@ -17,7 +17,7 @@ def create(request):
     atm_form_set = CreateAtmFormSet(company=company)
 
     if request.method == 'POST':
-        form = CreateCaseForm(data=request.POST, company=company)
+        form = CreateCaseForm(request.POST, request.FILES, company=company)
         if form.is_valid():
             case = form.save(commit=False)
             case.analyst = request.user.dash_user
@@ -55,7 +55,7 @@ def view_case(request, case_id):
     atm_form_set = CreateAtmFormSet(instance=case, company=company)
 
     if request.method == 'POST':
-        form = CreateCaseForm(data=request.POST, instance=case, company=company)
+        form = CreateCaseForm(request.POST, request.FILES, instance=case, company=company)
         atm_form_set = CreateAtmFormSet(
                 request.POST, request.FILES, instance=case, company=company)
         if form.is_valid() and atm_form_set.is_valid():

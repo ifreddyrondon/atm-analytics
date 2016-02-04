@@ -47,7 +47,7 @@ class CreateCaseForm(forms.ModelForm):
     class Meta:
         model = Case
         fields = (
-            'number', 'name', 'priority', 'status', 'created_date',
+            'picture', 'number', 'name', 'priority', 'status', 'created_date',
             'missing_amount', 'missing_amount_currency', 'bank', 'description',
         )
 
