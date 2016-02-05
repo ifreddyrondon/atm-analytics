@@ -1,7 +1,8 @@
 # coding=utf-8
 from django import forms
+from django.forms import inlineformset_factory
 
-from analytics_gui.companies.models import Company
+from analytics_gui.companies.models import Company, Bank, CompanyAtmLocation
 
 default_errors = {
     u'required': u"Este campo es requerido",
@@ -25,3 +26,37 @@ class ConfigForm(forms.ModelForm):
 
         for key in self.fields:
             self.fields[key].error_messages = default_errors
+
+
+class BankForm(forms.ModelForm):
+    atms_number = forms.IntegerField(min_value=1)
+
+    class Meta:
+        model = Bank
+        fields = ['name', 'atms_number']
+
+
+BankFormSet = inlineformset_factory(
+        Company,
+        Bank,
+        form=BankForm,
+        extra=0,
+        min_num=0,
+        max_num=1,
+)
+
+
+class CompanyAtmLocationForm(forms.ModelForm):
+    class Meta:
+        model = CompanyAtmLocation
+        fields = ['address']
+
+
+CompanyAtmLocationFormSet = inlineformset_factory(
+        Company,
+        CompanyAtmLocation,
+        form=CompanyAtmLocationForm,
+        extra=0,
+        min_num=0,
+        max_num=1,
+)

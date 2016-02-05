@@ -12,7 +12,7 @@
 
         .change-image .img-responsive {
             margin: 0 auto;
-            max-width: 150px;
+            max-width: 180px;
         }
 
         .btn-file {
@@ -98,15 +98,101 @@
                             </div>
                             <div class="col-md-6 change-image text-center">
                                 {% if form.instance and form.instance.logo %}
-                                    <img src="{{ form.instance.logo.url }}" class="img-circle img-responsive">
+                                    <img id="id_logo_container" src="{{ form.instance.logo.url }}"
+                                         class="img-circle img-responsive">
                                 {% else %}
-                                    <img src="{% static "images/default_avatar.png" %}"
+                                    <img id="id_logo_container" src="{% static "images/default_avatar.png" %}"
                                          class="img-circle img-responsive">
                                 {% endif %}
                                 <br>
-                                <span class="btn btn-default btn-xs btn-file">Cambiar <input type="file"></span>
+                                <span class="btn btn-default btn-xs btn-file">
+                                    Cambiar logo <input id="id_logo" name="logo" type="file">
+                                </span>
                             </div>
                             <div class="col-md-12">
+                                <hr>
+                                <div id="form_bank_set_container"
+                                     class="form-group well {% if bank_form_set.non_form_errors %}has-error{% endif %}">
+                                    <h5>Bancos</h5>
+                                    <span class="help-block">{{ bank_form_set.non_form_errors|join:"<br \>" }}</span>
+
+                                    <table id="form_bank_set_table" class="table table-condensed">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Nombre del banco</th>
+                                            <th scope="col">Cantidad de ATMs</th>
+                                            <th scope="col">Eliminar</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for form in bank_form_set.forms %}
+                                            <tr id="{{ form.prefix }}-row" class="dynamic-form form-group">
+                                                <td class="form-group">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {{ form.name|add_class:"form-control" }}
+                                                    <div class="help-block">{{ form.name.errors|join:"<br \>" }}</div>
+                                                </td>
+                                                <td class="form-group">
+                                                    {{ form.atms_number|add_class:"form-control" }}
+                                                    <div class="help-block">{{ form.atms_number.errors|join:"<br \>" }}</div>
+                                                </td>
+                                                <td>
+                                                    {% if form.instance.pk %}
+                                                        {{ form.DELETE }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <a href="javascript:void(0)" class="add-bank-row btn btn-default">Añadir</a>
+                                    {{ bank_form_set.management_form }}
+                                </div>
+                                <div id="form_address_set_container"
+                                     class="form-group well {% if atm_location_form_set.non_form_errors %}has-error{% endif %}">
+                                    <h5>Dirección de ATMs</h5>
+                                    <span class="help-block">{{ atm_location_form_set.non_form_errors|join:"<br \>" }}</span>
+
+                                    <table id="form_address_set_table" class="table table-condensed">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Dirección</th>
+                                            <th scope="col">Eliminar</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for form in atm_location_form_set.forms %}
+                                            <tr id="{{ form.prefix }}-row" class="dynamic-form form-group">
+                                                <td class="form-group">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {{ form.address|add_class:"form-control" }}
+                                                    <div class="help-block">{{ form.address.errors|join:"<br \>" }}</div>
+                                                </td>
+                                                </td>
+                                                <td>
+                                                    {% if form.instance.pk %}
+                                                        {{ form.DELETE }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <a href="javascript:void(0)" class="add-address-row btn btn-default">Añadir</a>
+                                    <hr>
+                                    <div class="form-group">
+                                        <h5>O Subir direcciones en CSV <a href="javascript: void (0)"
+                                                                          data-toggle="popover"
+                                                                          class="pull-right" data-placement="left"
+                                                                          data-trigger="hover" title="Texto de Ayuda"
+                                                                          data-content='El formato del archivo debe ser CSV y la cabecera debe ser <direccion>.'>
+                                            <i class="fa fa-question-circle fa-2x"></i>
+                                        </a></h5>
+                                        <input id="id_address_csv" name="address_csv" type="file">
+                                    </div>
+
+                                    {{ atm_location_form_set.management_form }}
+                                </div>
                                 <hr>
                                 <div class="form-group">
                                     <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
@@ -125,7 +211,49 @@
     {{ block.super }}
     <script>
         $(function () {
+            // change picture
+            function changeImg(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#id_logo_container").attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
 
+            $("#id_logo").change(function () {
+                changeImg(this);
+            });
+
+            // init popover (help text)
+            $("[data-toggle=popover]").popover();
+
+            // function to clone form
+            function cloneMore(selector, type) {
+                var newElement = $(selector).clone(false);
+                var total = $('#id_' + type + '-TOTAL_FORMS').val();
+                newElement.find(':input').each(function () {
+                    var name = $(this).attr('name').replace('-' + (total - 1) + '-', '-' + total + '-');
+                    var id = 'id_' + name;
+                    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+                });
+                newElement.find('label').each(function () {
+                    var newFor = $(this).attr('for').replace('-' + (total - 1) + '-', '-' + total + '-');
+                    $(this).attr('for', newFor);
+                });
+                total++;
+                $('#id_' + type + '-TOTAL_FORMS').val(total);
+                $(selector).after(newElement);
+            }
+
+            $('.add-bank-row').click(function () {
+                cloneMore('#form_bank_set_table tbody tr:last', 'banks');
+            });
+
+            $('.add-address-row').click(function () {
+                cloneMore('#form_address_set_table tbody tr:last', 'companyatmlocation_set');
+            });
         })
     </script>
 {% endblock %}
