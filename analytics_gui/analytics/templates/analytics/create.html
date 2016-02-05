@@ -34,7 +34,6 @@
             cursor: inherit;
             display: block;
         }
-
     </style>
 {% endblock %}
 
@@ -203,8 +202,25 @@
                                     {% endif %}
                                     {{ form.bank|add_class:"form-control select2-bank" }}
                                 </div>
-
+                                <!-- ****************************************************************************************** -->
                                 <hr>
+
+                                <div id="add-atms-container" class="form-inline {% if not create %}hidden{% endif %}">
+                                    <span class="help-block">Cuantos ATMs quieres agregar</span>
+                                    <div id="atms-to-append-container" class="form-group">
+                                        <label class="sr-only" for="atms-to-append">ATMs</label>
+                                        <input type="number" min="1" class="form-control" id="atms-to-append"
+                                               placeholder="ATMs">
+                                    </div>
+                                    <div class="form-group">
+                                        <button id="add-atms" class="btn btn-default">Agregar</button>
+                                    </div>
+                                    <br>
+                                    <div class="form-group has-error">
+                                        <span class="help-block errors"></span>
+                                    </div>
+                                </div>
+
                                 <div id="atms-accordion" role="tablist" aria-multiselectable="true"
                                      class="panel-group form-group">
 
@@ -378,7 +394,7 @@
 
                                 </div>
 
-                                <div class="form-group">
+                                <div id="add-atm-container" class="form-group {% if create %}hidden{% endif %}">
                                     <a id="add-atm" href="javascript:void(0)" class="btn btn-default btn-lg">Agregar
                                         ATM</a>
                                 </div>
@@ -414,14 +430,43 @@
     {{ block.super }}
     <script>
         $(function () {
+            var create = "{{ create }}" == "True";
+            if (create) {
+                $("#add-atms").click(function (evt) {
+                    evt.preventDefault();
+                    var atms2append = $("#atms-to-append").val();
+                    if (atms2append < 1 || "") {
+                        $("#atms-to-append-container").addClass("has-error");
+                        $("#atms-to-append-container").parent().find(".errors").html("Debe introducir el número de ATMs")
+                    } else {
+                        $("#atms-to-append-container").removeClass("has-error");
+                        $("#atms-to-append-container").parent().find(".errors").html("");
+                        $("#atms-accordion").removeClass("hidden");
+                        $("#add-atm-container").removeClass("hidden");
+                        $("#add-atms-container").addClass("hidden");
+                        if (atms2append > 1) {
+                            var i = 0;
+                            while (i < atms2append - 1) {
+                                cloneMore('div.atm-form:last', 'atms');
+                                i++
+                            }
+                        }
+                    }
+                })
+            }
+
             // init main form
             $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
             // init select2
             $(".select2-bank").select2({placeholder: "Seleccione un banco"});
             $(".select2-location").select2({
-                placeholder: "Seleccione una Localización, puede comenzar escribiendo para filtrar"
+                placeholder: "Seleccione una localización, puede comenzar escribiendo para filtrar",
             });
+            // FIX: hide the atms container after init select2
+            if (create) {
+                $("#atms-accordion").addClass("hidden")
+            }
 
             // init input multiple for journal virtual
             $(".atm-form").each(function () {
@@ -554,15 +599,16 @@
                 $(selector).after(newElement);
                 // init select2
                 $(selector).find(".select2-location").select2({
-                    placeholder: "Seleccione una Localización, puede comenzar escribiendo para filtrar"
+                    placeholder: "Seleccione una localización, puede comenzar escribiendo para filtrar",
+                    width: '100%',
                 });
-                // show the new collapse panel
-                $(selector).find(".panel-collapse").collapse('show');
             }
 
             // add ATM
             $('#add-atm').click(function () {
                 cloneMore('div.atm-form:last', 'atms');
+                // show the new collapse panel
+                $(".panel-collapse").last().collapse('show');
             });
 
             // delete ATM
