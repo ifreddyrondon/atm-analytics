@@ -308,6 +308,12 @@
                                                                 aria-controls="collapseExample">
                                                             Usted cuenta con los logs de Microsoft EventViewer
                                                         </button>
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="focus" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseMicrosoftEventViewer">
                                                             <br>
@@ -327,6 +333,12 @@
                                                             del
                                                             efectivo
                                                         </button>
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="focus" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         <div class="collapse"
                                                              id="{{ atm_form.prefix }}-collapseCashReplacementSchedule">
                                                             <br>
@@ -369,6 +381,12 @@
                                                         {% if atm_form.other_log.help_text %}
                                                             <span class="help-block">{{ atm_form.other_log.help_text }}</span>
                                                         {% endif %}
+                                                        <a href="javascript: void (0)" data-toggle="popover"
+                                                           class="pull-right" data-placement="left"
+                                                           data-trigger="focus" title="Texto de Ayuda"
+                                                           data-content="Here's some amazing content.">
+                                                            <i class="fa fa-question-circle fa-2x"></i>
+                                                        </a>
                                                         {% if atm_form.other_log.errors %}
                                                             <span class="help-block errors">{{ atm_form.other_log.errors|join:"<br \>" }}</span>
                                                         {% endif %}
@@ -595,6 +613,8 @@
                 // remove old data of select2
                 newElement.find(".select2-location").next().remove();
                 newElement.find(".select2-location").removeClass("select2-hidden-accessible");
+                // init helper text
+                newElement.find("[data-toggle=popover]").popover();
                 // add element to dom
                 $(selector).after(newElement);
                 // init select2
