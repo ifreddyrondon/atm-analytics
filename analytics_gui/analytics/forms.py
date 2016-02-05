@@ -99,5 +99,6 @@ CreateAtmFormSet = inlineformset_factory(
         formset=BaseAtmFormSet,
         form=CreateAtmForm,
         extra=0,
-        min_num=0
+        min_num=0,
+        max_num=1,
 )

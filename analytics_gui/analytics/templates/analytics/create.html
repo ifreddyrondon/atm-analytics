@@ -547,16 +547,17 @@
                 newElement.find(".help-block.errors").text("");
                 newElement.find(".has-error").removeClass("has-error");
                 $totalContainer.val(total);
-                // init select2
-                newElement.find(".select2").next().remove();
-                newElement.find(".select2").removeClass("select2-hidden-accessible");
+                // remove old data of select2
+                newElement.find(".select2-location").next().remove();
+                newElement.find(".select2-location").removeClass("select2-hidden-accessible");
                 // add element to dom
                 $(selector).after(newElement);
-                // show the new collapse panel
-                $(selector).find(".panel-collapse").collapse('show');
-                $(selector).find(".select2").select2({
+                // init select2
+                $(selector).find(".select2-location").select2({
                     placeholder: "Seleccione una Localización, puede comenzar escribiendo para filtrar"
                 });
+                // show the new collapse panel
+                $(selector).find(".panel-collapse").collapse('show');
             }
 
             // add ATM
