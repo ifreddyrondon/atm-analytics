@@ -4,6 +4,7 @@ import os
 from django.db import models
 from django.utils import timezone
 
+from analytics_gui.analytics.choices import CURRENCY_CHOICES
 from analytics_gui.authentication.models import UserDashboard
 from analytics_gui.companies.models import Bank, CompanyAtmLocation
 
@@ -31,13 +32,6 @@ class Case(models.Model):
     STATUS_CHOICES = (
         (STATUS_OPEN, "abierto"),
         (STATUS_CLOSE, "cerrado"),
-    )
-
-    CURRENCY_USD = '0'
-    CURRENCY_EURO = '1'
-    CURRENCY_CHOICES = (
-        (CURRENCY_USD, "dolar US"),
-        (CURRENCY_EURO, "euro"),
     )
 
     number = models.IntegerField(
@@ -71,7 +65,7 @@ class Case(models.Model):
     )
 
     missing_amount_currency = models.CharField(
-            max_length=1,
+            max_length=3,
             choices=CURRENCY_CHOICES,
             help_text='Divisa'
     )
