@@ -50,8 +50,8 @@
                                  role="tabpanel"
                                  aria-labelledby="heading-{{ forloop.counter }}">
                                 <div class="panel-body">
-                                    <div id="atm-chart-{{ forloop.counter }}"
-                                         style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                    <svg id="atm-chart-{{ forloop.counter }}"
+                                         style="width: 100%; height: 400px; margin: 0 auto"></svg>
                                     <div id="atm-timeline-{{ forloop.counter }}"
                                          style="min-width: 310px; margin: 0 auto"></div>
                                 </div>
@@ -70,41 +70,31 @@
     <script>
         $(function () {
             var chartsCount = Number("{{ atms.count }}"),
-                    color = d3.scale.category20(),
-                    chartOptions = {
-                        chart: {zoomType: 'x'},
-                        title: {text: '', style: {display: 'none'}},
-                        subtitle: {text: '', style: {display: 'none'}},
-                        xAxis: {type: 'datetime'},
-                        yAxis: {title: {text: 'Incidentes'}},
-                        legend: {enabled: false},
-                        plotOptions: {
-                            area: {
-                                fillColor: {
-                                    linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
-                                    stops: [
-                                        [0, Highcharts.getOptions().colors[0]],
-                                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                                    ]
-                                },
-                                marker: {radius: 2},
-                                lineWidth: 1,
-                                states: {hover: {lineWidth: 1}},
-                                threshold: null
-                            }
-                        }
-                    };
+                    color = d3.scale.category20();
 
             for (var i = 0; i < chartsCount; i++) {
                 // AREA CHART *****************************************************
-                chartOptions = _.extend(chartOptions, {
-                    series: [{
-                        type: 'area',
-                        name: 'USD to EUR',
-                        data: areaData
-                    }]
+                var chart = c3.generate({
+                    bindto: '#atm-chart-' + (i + 1),
+                    data: {
+                        type: 'bar',
+                        x: 'x',
+                        columns: [
+                            ['x', Date.UTC(2013, 5, 2), Date.UTC(2013, 5, 3), Date.UTC(2013, 5, 4), Date.UTC(2013, 5, 5), Date.UTC(2013, 5, 6), Date.UTC(2013, 5, 7)],
+                            ['data1', 30, 200, 100, 400, 150, 250],
+                            ['data2', 130, 340, 200, 500, 250, 350]
+                        ]
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                format: '%Y-%m-%d'
+                            }
+                        }
+                    }
                 });
-                $('#atm-chart-' + (i + 1)).highcharts(chartOptions);
+
                 // EVENTS GRAPH *****************************************************
                 // create chart function
                 var eventDropsChart = d3.chart.eventDrops()
@@ -114,8 +104,6 @@
                         })
                         .start(new Date(startTime))
                         .end(new Date(endTime));
-
-                console.log();
 
                 var $container = $('#atm-timeline-' + (i + 1));
                 $container.height((eventsData.length * 55) + 'px');
