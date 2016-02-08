@@ -287,9 +287,9 @@
                                                             Usted cuenta con los manuales de errores
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="focus" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
+                                                           class="pull-right" data-placement="left" data-html="true"
+                                                           data-trigger="focus" title="Manual de errores"
+                                                           data-content="El manual de errores, es el documento proporcionado por el fabricante el cual identifica el error que se crea en el Journal (log de operaciones XFS)  del que proviene de las operaciones del hardware del ATM, recomendamos  que si tienen alguna nueva versión de hardware o software para los ATMS en producción introducir el Journal en Formato PDF o alguna configuración especifica que este plasmada en formato PDF para cualquiera de las marcas de ATMs como NCR, Wincor Nixdorf , Diebold, Triton , Nautilus   puede adjuntarla al caso.">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         <div class="collapse"
@@ -309,9 +309,9 @@
                                                             Usted cuenta con los logs de Microsoft EventViewer
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="focus" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
+                                                           class="pull-right" data-placement="left" data-html="true"
+                                                           data-trigger="focus" title="Microsoft Event viewer"
+                                                           data-content="Para los ATMs que estén en XP, Windows 7 y Windows 8, Microsoft cuenta con un sistema de logs interno que nos permitirá identificar si el error o faltante proviene de una mala operación del fabricante o de un operario de soporte.<br><br>Si usted no está directamente involucrado con las operaciones del ATM recomendamos leer el siguiente manual para poder extraer los logs del Microsoft sobre el rango de fechas que se detectó el faltante.<br><br>Como extraer logs Event Viewer Microsoft (<a target='blank' href='https://kb.acronis.com/content/8859'>https://kb.acronis.com/content/8859</a>)">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         <div class="collapse"
@@ -334,9 +334,9 @@
                                                             efectivo
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="focus" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
+                                                           class="pull-right" data-placement="left" data-html="true"
+                                                           data-trigger="focus" title="Horario programado de reposición"
+                                                           data-content="Aceptamos el archivo en formato Excel (XLS) o CVS el cual debe estar contener las siguientes columnas en este orden.<br><br><u>Banco, Calle ATM, Horario de reposición(M:H-DD:MM:YYYY), Empresa de reposición, Nombre del Operario1, Identificación1, Nombre del Operario2, Identificación2</u><br><br>Esto nos permitirá identificar posibles errores que estén ocurriendo después del proceso de reposición de efectivo.">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         <div class="collapse"
@@ -382,9 +382,9 @@
                                                             <span class="help-block">{{ atm_form.other_log.help_text }}</span>
                                                         {% endif %}
                                                         <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left"
-                                                           data-trigger="focus" title="Texto de Ayuda"
-                                                           data-content="Here's some amazing content.">
+                                                           class="pull-right" data-placement="left" data-html="true"
+                                                           data-trigger="focus" title="Otro Tipo de logs"
+                                                           data-content="Si usted o su red cuenta con el Software de seguridad como Cyttek SDAX para la protección de los cajeros automáticos puede suministrar el log del agente para poder identificar problemas que el cajero pueda tener en mayor profundidad y delimitar así el problema de faltante mas especifico.">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         {% if atm_form.other_log.errors %}
