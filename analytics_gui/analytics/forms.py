@@ -102,3 +102,17 @@ CreateAtmFormSet = inlineformset_factory(
         min_num=0,
         max_num=1,
 )
+
+
+class AnalyticForm(forms.ModelForm):
+    class Meta:
+        model = Case
+        fields = ('resolution', )
+
+    def __init__(self, *args, **kwargs):
+        super(AnalyticForm, self).__init__(*args, **kwargs)
+
+        for key in self.fields:
+            self.fields[key].error_messages = default_errors
+
+        self.fields['resolution'].required = True

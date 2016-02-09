@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
-from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet
+from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
 from analytics_gui.analytics.parsers import parse_log_file
 from analytics_gui.companies.models import Company
@@ -87,6 +87,7 @@ def view_case(request, case_id):
 def analyze_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
+    form = AnalyticForm(instance=case)
 
     # from pprint import pprint
 
@@ -95,9 +96,18 @@ def analyze_case(request, case_id):
             trace = parse_log_file(journal_file.file.file)
             # pprint(trace)
 
+    if request.method == 'POST':
+        form = AnalyticForm(request.POST, instance=case)
+        if form.is_valid():
+            case = form.save(commit=False)
+            if 'close' in request.POST:
+                case.status = Case.STATUS_CLOSE
+            case.save()
+
     return render(request, 'analytics/results.html', {
         'case': case,
-        'atms': atms
+        'atms': atms,
+        'form': form,
     })
 
 
