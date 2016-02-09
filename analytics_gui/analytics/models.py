@@ -75,6 +75,8 @@ class Case(models.Model):
             help_text="Breve descripción extra del caso"
     )
 
+    resolution = models.TextField(null=True, blank=True)
+
     bank = models.ForeignKey(
             Bank, related_name="bank_cases", help_text="Banco")
     analyst = models.ForeignKey(UserDashboard, related_name="analyst_cases")
