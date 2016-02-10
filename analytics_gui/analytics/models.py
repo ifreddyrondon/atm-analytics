@@ -256,10 +256,10 @@ class AtmJournal(models.Model):
         return self.filename
 
 
-class AtmError(models.Model):
+class AtmErrorXFS(models.Model):
     class Meta:
-        verbose_name = "Error de ATM"
-        verbose_name_plural = "Errores de ATMs"
+        verbose_name = "Error XFS"
+        verbose_name_plural = "Errores XFS"
 
     ERROR_COLOR_GREEN = '0'
     ERROR_COLOR_RED = '1'
@@ -361,6 +361,58 @@ class AtmError(models.Model):
     color = models.CharField(
             "Color",
             max_length=1,
+            choices=ERRORS_COLORS_CHOICES,
+            help_text="Color del error",
+    )
+
+
+class AtmErrorEventViewer(models.Model):
+    class Meta:
+        verbose_name = "Error de EventViewer"
+        verbose_name_plural = "Errores de EventViewer"
+
+    ERROR_COLOR_GREEN = '#008000'
+    ERROR_COLOR_RED = '#FF0000'
+    ERROR_COLOR_ORANGE = '#FF9300'
+    ERRORS_COLORS_CHOICES = (
+        (ERROR_COLOR_GREEN, "verde"),
+        (ERROR_COLOR_RED, "rojo"),
+        (ERROR_COLOR_ORANGE, "naranja"),
+    )
+
+    OS_WINDOWS_XP = '0'
+    OS_WINDOWS_7 = '1'
+    OS_WINDOWS_8 = '2'
+    OS_CHOICES = (
+        (OS_WINDOWS_XP, "Windows XP"),
+        (OS_WINDOWS_7, "Windows 7"),
+        (OS_WINDOWS_8, "Windows 8"),
+    )
+
+    identifier = models.CharField(
+            "Identificador",
+            max_length=255,
+            unique=True,
+            db_index=True,
+            help_text="Identificador único del error",
+    )
+
+    description = models.CharField(
+            "Descripción",
+            max_length=255,
+            help_text="Descripción del error",
+    )
+
+    operating_system = models.CharField(
+            "Sistema Operativo",
+            max_length=1,
+            choices=OS_CHOICES,
+            help_text="Sistema Operativo del ATM",
+    )
+
+    color = models.CharField(
+            "Color",
+            max_length=7,
             choices=ERRORS_COLORS_CHOICES,
             help_text="Color del error",
     )
