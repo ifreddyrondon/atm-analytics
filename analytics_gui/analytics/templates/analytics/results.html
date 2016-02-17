@@ -185,8 +185,13 @@
                     </div>
 
                     <div class="form-group">
-                        <input class="btn btn-default btn-lg pull-left" name="close" type="submit"
-                               value="Cerrar"/>
+                        {% if case.status == case.STATUS_OPEN %}
+                            <input class="btn btn-default btn-lg pull-left" name="close-status" type="submit" value="Cerrar"/>
+                        {% else %}
+                            <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit" value="Abrir"/>
+                        {% endif %}
+
+
                         <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
                                value="Guardar" style="margin-left: 20px"/>
                         <a href="javascript: void(0)" class="btn btn-default btn-lg pull-right">PDF</a>

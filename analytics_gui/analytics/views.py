@@ -100,9 +100,12 @@ def analyze_case(request, case_id):
         form = AnalyticForm(request.POST, instance=case)
         if form.is_valid():
             case = form.save(commit=False)
-            if 'close' in request.POST:
+            if 'close-status' in request.POST:
                 case.status = Case.STATUS_CLOSE
-            case.save()
+                case.save()
+            if 'open-status' in request.POST:
+                case.status = Case.STATUS_OPEN
+                case.save()
 
     return render(request, 'analytics/results.html', {
         'case': case,
