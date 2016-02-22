@@ -152,3 +152,5 @@ db.sqlite3
 analytics_gui/settings/local.py
 
 analytics_gui/media/*
+
+*.pdf

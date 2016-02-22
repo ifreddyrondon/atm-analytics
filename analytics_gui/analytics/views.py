@@ -2,15 +2,14 @@ import base64
 import json
 import os
 
+import pdfkit
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from django.template import RequestContext
-from django.template.loader import get_template
+from django.template.loader import render_to_string
 from django.utils import timezone
-from weasyprint import HTML, CSS
 
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
@@ -128,30 +127,44 @@ def delete_case(request, case_id):
 
 def generate_pdf(request, case_id):
     args = None
-    CSS_ROOT = os.path.join(settings.BASE_DIR, 'base', 'static', 'css')
 
+    bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
+    base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
+    image_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'images/')
+
+    html_template = 'analytics/pdf_template.html'
+
+    images = dict()
     if request.is_ajax():
         args = dict(request.POST.iterlists())
         for key in args.keys():
-            print key
+            if 'chart' in key:
+                image_data = base64.b64decode(args[key][0])
+                filename = key + ".svg"
+                with open(image_root + filename, 'w') as f:
+                    f.write(image_data)
+                    images[key.replace('-', '_')] = image_root + filename
 
     case = get_object_or_404(Case, id=case_id)
 
+    args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
 
-    html_template = get_template('analytics/pdf_template.html')
+    rendered_html = render_to_string(html_template, args)
 
-    rendered_html = html_template \
-        .render(RequestContext(request, args)) \
-        .encode(encoding="UTF-8")
+    style_list = [bootstrap, base]
 
-    style_list = []
-    for style in os.listdir(CSS_ROOT):
-        style_list.append(CSS(os.path.join(CSS_ROOT, style)))
+    try:
+        pdfkit.from_string(rendered_html, 'report.pdf', css=style_list)
+    except Exception as e:
+        if "code 1" in e:
+            pass
 
-    pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=style_list)
+    for image in images.values():
+        os.remove(image)
 
-    return HttpResponse(
-        json.dumps({'file': base64.b64encode(pdf_file)}),
-        content_type="application/pdf")
+    with open('report.pdf', 'rb') as pdf_file:
+        return HttpResponse(
+            json.dumps({'file': base64.b64encode(pdf_file.read())}),
+            content_type="application/pdf")
