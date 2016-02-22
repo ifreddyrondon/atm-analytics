@@ -73,10 +73,13 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
             [AtmErrorXFS.ERROR_COLOR_ORANGE, AtmErrorXFS.ERROR_COLOR_RED])
 
         event_type = "Sin error"
+        class_name = "green"
         if color == AtmErrorXFS.ERROR_COLOR_ORANGE:
             event_type = "Error importante"
+            class_name = "orange"
         elif color == AtmErrorXFS.ERROR_COLOR_RED:
             event_type = "Error critico"
+            class_name = "red"
 
         if len(errors) == 0:
             errors.append("Sin Errores")
@@ -84,6 +87,7 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         trace.update({
             "has_errors": False if len(errors) == 0 else True,
             "color": color,
+            "className": class_name,
             "event_type": event_type,
             "errors": errors,
             "atm_index": atm_index,
