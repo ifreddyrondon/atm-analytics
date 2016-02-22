@@ -22,7 +22,7 @@ def create(request):
             case = form.save(commit=False)
             case.analyst = request.user.dash_user
             atm_form_set = CreateAtmFormSet(
-                    request.POST, request.FILES, instance=case, company=company)
+                request.POST, request.FILES, instance=case, company=company)
             if atm_form_set.is_valid():
                 case.save()
                 atms = atm_form_set.save()
@@ -57,7 +57,7 @@ def view_case(request, case_id):
     if request.method == 'POST':
         form = CreateCaseForm(request.POST, request.FILES, instance=case, company=company)
         atm_form_set = CreateAtmFormSet(
-                request.POST, request.FILES, instance=case, company=company)
+            request.POST, request.FILES, instance=case, company=company)
         if form.is_valid() and atm_form_set.is_valid():
             case.save()
             atm_form_set.save()
@@ -115,3 +115,7 @@ def delete_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
     return HttpResponseRedirect(reverse("base:dashboard"))
+
+
+def generate_pdf(request, case_id):
+    pass
