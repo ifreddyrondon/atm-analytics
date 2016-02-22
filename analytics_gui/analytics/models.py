@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -261,9 +262,9 @@ class AtmErrorXFS(models.Model):
         verbose_name = "Error XFS"
         verbose_name_plural = "Errores XFS"
 
-    ERROR_COLOR_GREEN = '0'
-    ERROR_COLOR_RED = '1'
-    ERROR_COLOR_ORANGE = '2'
+    ERROR_COLOR_GREEN = settings.COLOR_GREEN
+    ERROR_COLOR_RED = settings.COLOR_RED
+    ERROR_COLOR_ORANGE = settings.COLOR_ORANGE
     ERRORS_COLORS_CHOICES = (
         (ERROR_COLOR_GREEN, "verde"),
         (ERROR_COLOR_RED, "rojo"),
@@ -371,9 +372,9 @@ class AtmErrorEventViewer(models.Model):
         verbose_name = "Error de EventViewer"
         verbose_name_plural = "Errores de EventViewer"
 
-    ERROR_COLOR_GREEN = '#008000'
-    ERROR_COLOR_RED = '#FF0000'
-    ERROR_COLOR_ORANGE = '#FF9300'
+    ERROR_COLOR_GREEN = settings.COLOR_GREEN
+    ERROR_COLOR_RED = settings.COLOR_RED
+    ERROR_COLOR_ORANGE = settings.COLOR_ORANGE
     ERRORS_COLORS_CHOICES = (
         (ERROR_COLOR_GREEN, "verde"),
         (ERROR_COLOR_RED, "rojo"),
