@@ -1,7 +1,16 @@
+import base64
+import json
+import os
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.template import RequestContext
+from django.template.loader import get_template
+from django.utils import timezone
+from weasyprint import HTML, CSS
 
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
@@ -118,4 +127,31 @@ def delete_case(request, case_id):
 
 
 def generate_pdf(request, case_id):
-    pass
+    args = None
+    CSS_ROOT = os.path.join(settings.BASE_DIR, 'base', 'static', 'css')
+
+    if request.is_ajax():
+        args = dict(request.POST.iterlists())
+        for key in args.keys():
+            print key
+
+    case = get_object_or_404(Case, id=case_id)
+
+    args['case'] = case
+    args['date'] = timezone.now()
+
+    html_template = get_template('analytics/pdf_template.html')
+
+    rendered_html = html_template \
+        .render(RequestContext(request, args)) \
+        .encode(encoding="UTF-8")
+
+    style_list = []
+    for style in os.listdir(CSS_ROOT):
+        style_list.append(CSS(os.path.join(CSS_ROOT, style)))
+
+    pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=style_list)
+
+    return HttpResponse(
+        json.dumps({'file': base64.b64encode(pdf_file)}),
+        content_type="application/pdf")
