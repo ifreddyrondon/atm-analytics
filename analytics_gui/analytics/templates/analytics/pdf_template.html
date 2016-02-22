@@ -17,13 +17,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="breadcrumb">
-                <span>LOGO</span>
-                <span class="pull-right">{{ date }}</span>
+                <img src="{{ logo }}" width="80">
+                <span style="margin: 6px auto;" class="pull-right">Fecha de emisión: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
                 <span class="pull-right" style="padding: 70px;">
                     LOGO BANCO
                 </span>
-            <h3>Análisis del Caso</h3>
+            <h2>Análisis del Caso</h2>
             <p><b>Nombre:</b> {{ case.name }}</p>
             <p><b>ID:</b> {{ case.id }}</p>
             <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
@@ -33,7 +33,7 @@
             <br>
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Archivos logs</h3>
+                    <h2 class="panel-title">Archivos logs</h2>
                 </div>
                 <div class="panel-body">
                     <table class="table table-hover" id="error-table">
@@ -56,7 +56,7 @@
                     </table>
                 </div>
             </div>
-            <h3>Reporte Ejecutivo</h3>
+            <h2>Reporte Ejecutivo</h2>
             <div class="col-md-4 col-xs-4">
                 <h6>Logs XFS
                     <a href="javascript: void (0)" data-toggle="popover"
@@ -148,7 +148,7 @@
                 <div class="well text-center" style="font-size: 36px;">5%</div>
             </div>
             <br>
-            <h3>Reporte Técnico</h3>
+            <h2>Reporte Técnico</h2>
             <h4>Nombre del analista</h4>
             {% if resolution %}
             <p><b>Resolución:</b></p>
