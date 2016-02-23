@@ -95,8 +95,8 @@ def analyze_case(request, case_id):
 
     for index, atm in enumerate(atms):
         # Microsoft Event Viewer
-        if atm.microsoft_event_viewer:
-            parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        # if atm.microsoft_event_viewer:
+        #     parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
             traces.append(parse_log_file(journal_file.file.file, index))
