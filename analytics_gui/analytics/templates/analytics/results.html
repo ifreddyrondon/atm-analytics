@@ -118,7 +118,24 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <h3>Timeline</h3>
+                        <h3>
+                            Timeline
+                            <div class="btn-group text-center" data-toggle="buttons">
+                                <label class="btn btn-primary active">
+                                    <input id="timeline-filter-critical-erros" type="checkbox" autocomplete="off"
+                                           checked> Error critico
+                                </label>
+                                <label class="btn btn-primary active">
+                                    <input id="timeline-filter-important-erros" type="checkbox" autocomplete="off"
+                                           checked> Error importante
+                                </label>
+                                <label class="btn btn-primary active">
+                                    <input id="timeline-filter-no-erros" type="checkbox" autocomplete="off" checked> Sin
+                                    errores
+                                </label>
+                            </div>
+                        </h3>
+
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
                     </div>
                     <hr>
@@ -385,12 +402,13 @@
                 operationTable.search($(this).val()).draw();
             });
 
-            // CHARTS *********************************************************
-
+            // CHARTS ***********************************************************
             // TIMELINE *********************************************************
-            function fillTimelineTable(data) {
+            window.timelineData = data;
+
+            function fillTimelineTable(items) {
                 timelineTable.clear();
-                _.each(data, function (item) {
+                _.each(items, function (item) {
                     timelineTable.row.add(["<input type='checkbox'></td>", item.date, item.errors, item.amount]);
                 });
                 timelineTable.draw();
@@ -401,17 +419,51 @@
                 max: maxDate,
                 min: minDate
             };
-            var timeline = new vis.Timeline(timelineContainer, data, options);
-            fillTimelineTable(data);
+            var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
+            fillTimelineTable(window.timelineData);
             timeline.on("rangechanged", function (properties) {
                 var tableData = [];
                 _.each(this.getVisibleItems(), function (id) {
-                    var item = _.filter(data, function (item) {
+                    var itemID = _.filter(window.timelineData, function (item) {
                         return item.id == id;
                     });
-                    tableData.push(item[0]);
+                    tableData.push(itemID[0]);
                 });
                 fillTimelineTable(_.sortBy(tableData, 'date'));
+            });
+
+            function filterTimeline(items){
+                if(!$("#timeline-filter-critical-erros").is(":checked")){
+                    items = _.filter(items, function (item) {
+                        return item.color != "{{ COLOR_RED }}";
+                    });
+                }
+
+                if(!$("#timeline-filter-important-erros").is(":checked")){
+                    items = _.filter(items, function (item) {
+                        return item.color != "{{ COLOR_ORANGE }}";
+                    });
+                }
+
+                if(!$("#timeline-filter-no-erros").is(":checked")){
+                    items = _.filter(items, function (item) {
+                        return item.color != "{{ COLOR_GREEN }}";
+                    });
+                }
+
+                timeline.setItems(items);
+                timeline.fit();
+                fillTimelineTable(items);
+            }
+
+            $("#timeline-filter-critical-erros").change(function(evt){
+                filterTimeline(window.timelineData);
+            });
+            $("#timeline-filter-important-erros").change(function(evt){
+                filterTimeline(window.timelineData);
+            });
+            $("#timeline-filter-no-erros").change(function(evt){
+                filterTimeline(window.timelineData);
             });
 
             // CROSSFILTER ******************************************************
@@ -428,9 +480,11 @@
                         })
                     });
             atmIndexChart.on("filtered", function (chart, filter) {
-                timeline.setItems(atmsDim.top(Infinity));
+                window.timelineData = atmsDim.top(Infinity);
+                timeline.setItems(window.timelineData);
                 timeline.fit();
-                fillTimelineTable(atmsDim.top(Infinity));
+                fillTimelineTable(window.timelineData);
+                filterTimeline(window.timelineData);
             });
 
             totalOperationsReportChart
