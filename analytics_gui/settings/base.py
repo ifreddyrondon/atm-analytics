@@ -96,3 +96,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+COLOR_GREEN = '#008000'
+COLOR_RED = '#FF0000'
+COLOR_ORANGE = '#FF9300'

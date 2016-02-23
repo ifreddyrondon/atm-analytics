@@ -1,8 +1,9 @@
 import base64
 import json
 import os
-
 import pdfkit
+import itertools
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -13,7 +14,7 @@ from django.utils import timezone
 
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
-from analytics_gui.analytics.parsers import parse_log_file
+from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
 from analytics_gui.companies.models import Company
 
 
@@ -97,25 +98,37 @@ def analyze_case(request, case_id):
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
 
-    # from pprint import pprint
+    traces = []
 
-    for atm in atms:
+    for index, atm in enumerate(atms):
+        # Microsoft Event Viewer
+        if atm.microsoft_event_viewer:
+            parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        # Journals Virtual
         for journal_file in atm.journals.all():
-            trace = parse_log_file(journal_file.file.file)
-            # pprint(trace)
+            traces.append(parse_log_file(journal_file.file.file, index))
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
         if form.is_valid():
             case = form.save(commit=False)
-            if 'close' in request.POST:
+            if 'close-status' in request.POST:
                 case.status = Case.STATUS_CLOSE
-            case.save()
+                case.save()
+            if 'open-status' in request.POST:
+                case.status = Case.STATUS_OPEN
+                case.save()
+
+    traces = list(itertools.chain(*traces))
 
     return render(request, 'analytics/results.html', {
         'case': case,
         'atms': atms,
         'form': form,
+        'traces': traces,
+        'COLOR_GREEN': settings.COLOR_GREEN,
+        'COLOR_RED': settings.COLOR_RED,
+        'COLOR_ORANGE': settings.COLOR_ORANGE,
     })
 
 

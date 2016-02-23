@@ -1,29 +1,27 @@
 {% extends "base/base.html" %}
 {% load staticfiles %}
 {% load bootstrap %}
-{% load widget_tweaks %}
+{% load json_filters %}
 
 {% block css %}
     {{ block.super }}
     <style>
-        .zoom {
-            fill: transparent;
-            cursor: pointer;
-        }
-
-        .y-axis g line {
-            stroke: grey;
-            fill: none;
-            stroke-width: 1px;
-        }
-
-        .graph-body .line {
-            height: 20px;
-            padding: 10px;
-        }
-
         .percent-result {
             font-size: 40px;
+        }
+
+        .vis-item.green {
+            background-color: {{ COLOR_GREEN }};
+            border-color: {{ COLOR_GREEN }};
+        }
+
+        .vis-item.orange {
+            background-color: {{ COLOR_ORANGE }};
+            border-color: {{ COLOR_ORANGE }};
+        }
+        .vis-item.red {
+            background-color: {{ COLOR_RED }};
+            border-color: {{ COLOR_RED }};
         }
     </style>
 {% endblock %}
@@ -38,284 +36,468 @@
                     <li><a href="{% url "analytics:view_case" case.id %}">caso</a></li>
                     <li class="active">resultados</li>
                 </ol>
-                <h3>
-                    Reporte
-                    <span class="pull-right">
-                        Estado del caso
-                        <span class="label label-{% if case.status == case.STATUS_OPEN %}success{% else %}danger{% endif %}">{{ case.get_status_display }}</span>
-                    </span>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#report" role="tab"
+                                                              data-toggle="tab">Reporte</a></li>
+                    <li role="presentation"><a href="#timeline" role="tab" data-toggle="tab">Timeline</a>
+                    </li>
+                </ul>
 
-                </h3>
-                <br>
-                <form method="post" action="" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="col-md-4 col-xs-12">
-                        <h4>Errores Criticos</h4>
-                        <svg id="chart-critical-errors" style="width: 100%; height: 300px; margin: 0 auto"></svg>
-                    </div>
-                    <div class="col-md-4 col-xs-12">
-                        <h4>Errores Importantes</h4>
-                        <svg id="chart-important-errors" style="width: 100%; height: 300px; margin: 0 auto"></svg>
-                    </div>
-                    <div class="col-md-4 col-xs-12">
-                        <h4>Transacciones sin problemas</h4>
-                        <svg id="chart-no-problem" style="width: 100%; height: 300px; margin: 0 auto"></svg>
-                    </div>
-                    <h3>Reporte de Operaciones</h3>
-                    <svg id="chart-operations-report" style="width: 100%; height: 400px; margin: 0 auto"></svg>
-                    <br><br>
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Errores</h3>
-                            <div class="pull-right">
-                            <span class="clickable filter" data-toggle="tooltip" title="Filtro de tabla"
-                                  data-container="body">
-                                <i class="glyphicon glyphicon-filter"></i>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="report">
+                        <h3>
+                            Reporte
+                            <span class="pull-right">
+                                Estado del caso
+                                <span class="label label-{% if case.status == case.STATUS_OPEN %}success{% else %}danger{% endif %}">{{ case.get_status_display }}</span>
                             </span>
+                        </h3>
+                        <hr>
+                        <form method="post" action="" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 col-xs-12">
+                                    <svg id="atm-index-chart" style="width: 100%; height: 250px; margin: 0 auto"></svg>
+                                </div>
+                                <div class="col-md-6 col-xs-12">
+                                    <svg id="total-operations-report-chart"
+                                         style="width: 100%; height: 250px; margin: 0 auto"></svg>
+                                </div>
                             </div>
-                        </div>
-                        <div class="panel-body">
-                            <input type="text" class="form-control" id="error-table-filter" data-action="filter"
-                                   data-filters="#error-table" placeholder="Filtar errores"/>
-                        </div>
-                        <table class="table table-hover" id="error-table">
-                            <thead>
-                            <tr>
-                                <th>Selector</th>
-                                <th>Fecha</th>
-                                <th>Error</th>
-                                <th>Monto</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2013-06-02</td>
-                                <td>Fallo foo</td>
-                                <td>10 usd</td>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2013-06-03</td>
-                                <td>Fallo faa</td>
-                                <td>300 usd</td>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2013-06-04</td>
-                                <td>Fallo fii</td>
-                                <td>150 usd</td>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2013-06-05</td>
-                                <td>Fallo fuu</td>
-                                <td>200 usd</td>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <br>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4 col-xs-12">
+                                    <h4>Errores Criticos</h4>
+                                    <svg id="critical-errors-chart"
+                                         style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <h4>Errores Importantes</h4>
+                                    <svg id="important-errors-chart"
+                                         style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <h4>Transacciones sin problemas</h4>
+                                    <svg id="no-errors-chart" style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <h3>Reporte de Operaciones</h3>
+                                <svg id="operations-report-chart"
+                                     style="width: 100%; height: 300px; margin: 0 auto"></svg>
 
-                    <h3>Reporte Cronológico Multiples logs</h3>
-                    <svg id="chart-events" style="width: 100%; height: 220px; margin: 0 auto"></svg>
-                    <div class="text-center">
-                        {% for atm in atms %}
-                            <input type="checkbox" checked> ATM {{ forloop.counter }}
-                        {% endfor %}
-                    </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <svg id="errors-report-chart"
+                                     style="width: 100%; height: 300px; margin: 0 auto"></svg>
 
+                            </div>
+                            <hr>
+                            <div class="panel panel-primary row">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Operaciones</h3>
+                                    <div class="pull-right">
+                                <span class="clickable filter"
+                                      data-toggle="tooltip"
+                                      title="Filtro de tabla"
+                                      data-container="body">
+                                    <i class="glyphicon glyphicon-filter"></i>
+                                </span>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <input type="text" class="form-control" id="operations-table-filter"
+                                           data-action="filter"
+                                           data-filters="#operations-table" placeholder="Filtar operaciones"/>
+                                </div>
+                                <table class="table table-hover" id="operations-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Selector</th>
+                                        <th>Fecha</th>
+                                        <th>Error</th>
+                                        <th>Monto</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <h3>Reporte Cronológico Multiples logs</h3>
+                                <div id="chart-events-drop" style="width: 100%; height: 220px; margin: 0 auto"></div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <h3>Análisis Automático</h3>
+                                <div class="col-md-4 col-xs-12">
+                                    <h5>Logs Journal
+                                        <a href="javascript: void (0)" data-toggle="popover"
+                                           data-placement="left" data-html="true"
+                                           data-trigger="focus" title="Title"
+                                           data-content="Body">
+                                            <i class="fa fa-question-circle"></i>
+                                        </a>
+                                    </h5>
 
-                    <h3>Análisis Automático</h3>
-                    <div class="col-md-4 col-xs-12">
-                        <h5>Logs Journal
-                            <a href="javascript: void (0)" data-toggle="popover"
-                               data-placement="left" data-html="true"
-                               data-trigger="focus" title="Title"
-                               data-content="Body">
-                                <i class="fa fa-question-circle"></i>
-                            </a>
-                        </h5>
+                                    <div class="well percent-result text-center">33%</div>
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <h5>Logs Windows
+                                        <a href="javascript: void (0)" data-toggle="popover"
+                                           data-placement="left" data-html="true"
+                                           data-trigger="focus" title="Title"
+                                           data-content="Body">
+                                            <i class="fa fa-question-circle"></i>
+                                        </a>
+                                    </h5>
+                                    <div class="well percent-result text-center">100%</div>
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <h5>Estimación del caso
+                                        <a href="javascript: void (0)" data-toggle="popover"
+                                           data-placement="left" data-html="true"
+                                           data-trigger="focus" title="Title"
+                                           data-content="Body">
+                                            <i class="fa fa-question-circle"></i>
+                                        </a>
+                                    </h5>
+                                    <div class="well percent-result text-center">98%</div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <h3>Análisis del Caso</h3>
+                                <p><b>Nombre:</b> {{ case.name }}</p>
+                                <p><b>ID:</b> {{ case.id }}</p>
+                                <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
+                                <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
+                                <p><b>Fecha:</b> {{ case.created_date }}</p>
+                                <p><b>Cliente:</b> {{ case.bank }}</p>
+                                <p><b>Resolución:</b></p>
+                                <div class="form-group {% if form.resolution.errors %}has-error{% endif %}">
+                                    {% if form.resolution.help_text %}
+                                        <span class="help-block">{{ form.resolution.help_text }}</span>
+                                    {% endif %}
+                                    {% if form.resolution.errors %}
+                                        <span class="help-block">{{ form.resolution.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.resolution|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="form-group">
+                                    {% if case.status == case.STATUS_OPEN %}
+                                        <input class="btn btn-default btn-lg pull-left" name="close-status"
+                                               type="submit"
+                                               value="Cerrar"/>
+                                    {% else %}
+                                        <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit"
+                                               value="Abrir"/>
+                                    {% endif %}
 
-                        <div class="well percent-result text-center">33%</div>
+                                    <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
+                                           value="Guardar" style="margin-left: 20px"/>
+                                    <a href="javascript: void(0)" class="btn btn-default btn-lg pull-right">PDF</a>
+                                    <br>
+                                    <br>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-md-4 col-xs-12">
-                        <h5>Logs Windows
-                            <a href="javascript: void (0)" data-toggle="popover"
-                               data-placement="left" data-html="true"
-                               data-trigger="focus" title="Title"
-                               data-content="Body">
-                                <i class="fa fa-question-circle"></i>
-                            </a>
-                        </h5>
-                        <div class="well percent-result text-center">100%</div>
-                    </div>
-                    <div class="col-md-4 col-xs-12">
-                        <h5>Estimación del caso
-                            <a href="javascript: void (0)" data-toggle="popover"
-                               data-placement="left" data-html="true"
-                               data-trigger="focus" title="Title"
-                               data-content="Body">
-                                <i class="fa fa-question-circle"></i>
-                            </a>
-                        </h5>
-                        <div class="well percent-result text-center">98%</div>
-                    </div>
-
-                    <h3>Análisis del Caso</h3>
-                    <p><b>Nombre:</b> {{ case.name }}</p>
-                    <p><b>ID:</b> {{ case.id }}</p>
-                    <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
-                    <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
-                    <p><b>Fecha:</b> {{ case.created_date }}</p>
-                    <p><b>Cliente:</b> {{ case.bank }}</p>
-                    <p><b>Resolución:</b></p>
-                    <div class="form-group {% if form.resolution.errors %}has-error{% endif %}">
-                        {% if form.resolution.help_text %}
-                            <span class="help-block">{{ form.resolution.help_text }}</span>
-                        {% endif %}
-                        {% if form.resolution.errors %}
-                            <span class="help-block">{{ form.resolution.errors|join:"<br \>" }}</span>
-                        {% endif %}
-                        {{ form.resolution|add_class:"form-control" }}
-                    </div>
-
-                    <div class="form-group">
-                        <input class="btn btn-default btn-lg pull-left" name="close" type="submit"
-                               value="Cerrar"/>
-                        <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
-                               value="Guardar" style="margin-left: 20px"/>
-                        <a id="generate-pdf" href="#" class="btn btn-default btn-lg pull-right">PDF</a>
                         <br>
-                        <br>
+                        <div class="row">
+                            <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <form method="post" action="" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    {% if case.status == case.STATUS_OPEN %}
+                                        <input class="btn btn-default btn-lg pull-left" name="close-status"
+                                               type="submit"
+                                               value="Cerrar"/>
+                                    {% else %}
+                                        <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit"
+                                               value="Abrir"/>
+                                    {% endif %}
+
+                                    <a id="generate-pdf" href="#" class="btn btn-default btn-lg pull-right">PDF</a>
+                                    <br>
+                                    <br>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 {% endblock content %}
 
 {% block js %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static "data/fakeData.js" %}"></script>
     <script>
         $(function () {
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var chartsCount = Number("{{ atms.count }}"),
-                    color = d3.scale.category20(),
-                    chartOptions = {
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                }
-                            }
-                        },
-                        data: {
-                            type: 'bar',
-                            x: 'x'
-                        },
-                        legend: {
-                            show: false
-                        },
-                        zoom: {
-                            enabled: true
-                        }
-                    };
+            var data = {{ traces | jsonify }};
+            var transformed = {};
 
-            // AREA CHART *****************************************************
-            var chartCriticalErrorsOptions = _.extend(chartOptions, {bindto: '#chart-critical-errors'});
-            chartCriticalErrorsOptions.data['columns'] = [
-                ['x', Date.UTC(2013, 5, 2), Date.UTC(2013, 5, 3), Date.UTC(2013, 5, 4), Date.UTC(2013, 5, 5), Date.UTC(2013, 5, 6), Date.UTC(2013, 5, 7)],
-                ['data', 30, 200, 100, 400, 150, 250]
-            ];
-            chartCriticalErrorsOptions.data['colors'] = {data: '#ff0000'};
-            var chartCriticalErrors = c3.generate(chartCriticalErrorsOptions);
+            var atmIndexChart = dc.pieChart("#atm-index-chart");
+            var errorsReportChart = dc.pieChart("#errors-report-chart");
+            var criticalErrorsChart = dc.barChart("#critical-errors-chart");
+            var importantErrorsChart = dc.barChart("#important-errors-chart");
+            var noErrorsChart = dc.barChart("#no-errors-chart");
+            var operationsReportChart = dc.barChart("#operations-report-chart");
+            var totalOperationsReportChart = dc.pieChart("#total-operations-report-chart");
+            var dataTable = dc.dataTable("#operations-table");
 
-            var chartImportantErrorsOptions = _.extend(chartOptions, {bindto: '#chart-important-errors'});
-            chartImportantErrorsOptions.data['columns'] = [
-                ['x', Date.UTC(2013, 5, 2), Date.UTC(2013, 5, 3), Date.UTC(2013, 5, 4), Date.UTC(2013, 5, 5), Date.UTC(2013, 5, 6), Date.UTC(2013, 5, 7)],
-                ['data', 130, 340, 200, 500, 250, 20]
-            ];
-            chartImportantErrorsOptions.data['colors'] = {data: '#FF9300'};
-            var chartImportantErrors = c3.generate(chartImportantErrorsOptions);
+            var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
 
-            var chartNoProblemOptions = _.extend(chartOptions, {bindto: '#chart-no-problem'});
-            chartNoProblemOptions.data['columns'] = [
-                ['x', Date.UTC(2013, 5, 2), Date.UTC(2013, 5, 3), Date.UTC(2013, 5, 4), Date.UTC(2013, 5, 5), Date.UTC(2013, 5, 6), Date.UTC(2013, 5, 7)],
-                ['data', 51, 43, 12, 500, 230, 150]
-            ];
-            chartNoProblemOptions.data['colors'] = {data: '#008000'};
-            var chartNoProblem = c3.generate(chartNoProblemOptions);
+            data.forEach(function (d) {
+                d.date = dtgFormat.parse(d.date);
+                var amount = d.amount.match(/\d/g);
+                d.amount = amount != null ? +amount.join("") : 0;
+                d.start = d.date;
+                d.errors = d.errors.join(", ");
+                d.content = d.has_errors ? d.errors : 'Sin errores';
+                transformed[d.date] = d;
+            });
 
+            var ndx = crossfilter(data);
 
-            var chart = c3.generate({
-                bindto: '#chart-operations-report',
-                axis: {
-                    x: {
-                        type: 'timeseries',
-                        tick: {
-                            format: '%Y-%m-%d'
-                        }
-                    }
-                },
-                data: {
-                    type: 'bar',
-                    x: 'x',
-                    columns: [
-                        ['x', Date.UTC(2013, 5, 2), Date.UTC(2013, 5, 3), Date.UTC(2013, 5, 4), Date.UTC(2013, 5, 5), Date.UTC(2013, 5, 6), Date.UTC(2013, 5, 7)],
-                        ['data1', 30, 200, 200, 400, 150, 250],
-                        ['data2', 130, 100, 100, 200, 150, 50],
-                        ['data3', 230, 200, 200, 300, 250, 250]
-                    ],
-                    groups: [
-                        ['data1', 'data2', 'data3']
-                    ],
-                    colors: {
-                        data1: '#ff0000',
-                        data2: '#FF9300',
-                        data3: '#008000'
-                    },
-                    names: {
-                        data1: 'Errores Criticos',
-                        data2: 'Errores Importantes',
-                        data3: 'Transacciones sin problemas'
-                    }
-                },
-                zoom: {
-                    enabled: true
+            // Dimensions and groups
+            var atmsDim = ndx.dimension(function (d) {
+                return d.atm_index;
+            });
+            var countATMsIndex = atmsDim.group().reduceCount(function (d) {
+                return d.atm_index;
+            });
+
+            var dateDim = ndx.dimension(function (d) {
+                return d.date;
+            });
+            // range for x axis. Get the min and max date value in data
+            var minDate = dateDim.bottom(1)[0].date;
+            var maxDate = dateDim.top(1)[0].date;
+
+            var amountGroupCriticalErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_RED }}") {
+                    return d.amount;
                 }
             });
 
+            var amountGroupImportantErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_ORANGE }}") {
+                    return d.amount;
+                }
+            });
+
+            var amountGroupNoErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_GREEN }}") {
+                    return d.amount;
+                }
+            });
+
+            var typeDim = ndx.dimension(function (d) {
+                return d.event_type;
+            });
+
+            var typeErrorsGroupCount = typeDim.group().reduceCount(function (d) {
+                return d;
+            });
+
+            var errorsDim = ndx.dimension(function (d) {
+                return d.errors;
+            });
+            var errorsGroupCount = errorsDim.group().reduceCount(function (d) {
+                return d;
+            });
+
+            var amount = dateDim.group().reduceSum(function (d) {
+                return d.amount;
+            });
+
+            atmIndexChart
+                    .height(250)
+                    .dimension(atmsDim)
+                    .group(countATMsIndex)
+                    .transitionDuration(100)
+                    .on('pretransition', function (chart) {
+                        chart.selectAll('text.pie-slice').text(function (d) {
+                            var percentage = dc.utils.printSingleValue((d.endAngle - d.startAngle) / (2 * Math.PI) * 100);
+                            percentage = Number(percentage).toFixed(1);
+                            return "ATM" + (+d.data.key + 1) + ': ' + percentage + '%';
+                        })
+                    });
+            atmIndexChart.on("filtered", function (chart, filter) {
+                //window.timeline.setItems(atmsDim.top(Infinity));
+            });
+
+            totalOperationsReportChart
+                    .dimension(typeDim)
+                    .group(typeErrorsGroupCount)
+                    .innerRadius(30)
+                    .transitionDuration(100)
+                    .on('pretransition', function (chart) {
+                        chart.selectAll('text.pie-slice').text(function (d) {
+                            var percentage = dc.utils.printSingleValue((d.endAngle - d.startAngle) / (2 * Math.PI) * 100);
+                            percentage = Number(percentage).toFixed(0);
+                            return d.data.key + ' ' + percentage + '%';
+                        })
+                    });
+            totalOperationsReportChart.ordinalColors(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]);
+
+            criticalErrorsChart
+                    .margins({top: 10, right: 10, bottom: 30, left: 50})
+                    .dimension(dateDim)
+                    .group(amountGroupCriticalErrors)
+                    .mouseZoomable(true)
+                    .brushOn(false)
+                    .transitionDuration(100)
+                    .centerBar(true)
+                    .gap(65)
+                    .x(d3.time.scale().domain([minDate, maxDate]))
+                    .elasticY(true)
+                    .xAxis().tickFormat();
+            criticalErrorsChart.on("renderlet", function (chart) {
+                chart.selectAll('rect.bar').each(function (d) {
+                    d3.select(this).attr("style", "fill: {{ COLOR_RED }}");
+                });
+            });
+
+            importantErrorsChart
+                    .margins({top: 10, right: 10, bottom: 30, left: 50})
+                    .dimension(dateDim)
+                    .group(amountGroupImportantErrors)
+                    .mouseZoomable(true)
+                    .brushOn(false)
+                    .transitionDuration(100)
+                    .centerBar(true)
+                    .gap(65)
+                    .x(d3.time.scale().domain([minDate, maxDate]))
+                    .elasticY(true)
+                    .xAxis().tickFormat();
+            importantErrorsChart.on("renderlet", function (chart) {
+                chart.selectAll('rect.bar').each(function (d) {
+                    d3.select(this).attr("style", "fill: {{ COLOR_ORANGE }}");
+                });
+            });
+
+            noErrorsChart
+                    .margins({top: 10, right: 10, bottom: 30, left: 50})
+                    .dimension(dateDim)
+                    .group(amountGroupNoErrors)
+                    .mouseZoomable(true)
+                    .brushOn(false)
+                    .transitionDuration(100)
+                    .centerBar(true)
+                    .gap(65)
+                    .x(d3.time.scale().domain([minDate, maxDate]))
+                    .elasticY(true)
+                    .xAxis().tickFormat();
+            noErrorsChart.on("renderlet", function (chart) {
+                chart.selectAll('rect.bar').each(function (d) {
+                    d3.select(this).attr("style", "fill: {{ COLOR_GREEN }}");
+                });
+            });
+
+            operationsReportChart
+                    .margins({top: 10, right: 10, bottom: 30, left: 50})
+                    .dimension(dateDim)
+                    .group(amount)
+                    .mouseZoomable(true)
+                    .brushOn(false)
+                    .transitionDuration(100)
+                    .x(d3.time.scale().domain([minDate, maxDate]));
+            operationsReportChart
+                    .colors(d3.scale.ordinal().domain(["red", "orange", "green"]).range(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]))
+                    .colorAccessor(function (d) {
+                        if (transformed[d.key].color == "{{ COLOR_RED }}") {
+                            return "red"
+                        } else if (transformed[d.key].color == "{{ COLOR_ORANGE }}") {
+                            return "orange"
+                        } else if (transformed[d.key].color == "{{ COLOR_GREEN }}") {
+                            return "green"
+                        }
+                    });
+
+            errorsReportChart
+                    .dimension(errorsDim)
+                    .group(errorsGroupCount)
+                    .renderLabel(false)
+                    .legend(dc.legend());
+
+            dataTable
+                    .dimension(dateDim)
+                    .group(function (d) {
+                        return ""
+                    })
+                    .showGroups(false)
+                    .columns([
+                        function (d) {
+                            return '<input type="checkbox"></td>'
+                        },
+                        function (d) {
+                            return d.date;
+                        },
+                        function (d) {
+                            return d.errors;
+                        },
+                        function (d) {
+                            return d.amount;
+                        }
+                    ])
+                    .sortBy(function (d) {
+                        return d.date;
+                    })
+                    .order(d3.ascending);
+
+            dc.renderAll();
+
+            // TIMELINE *********************************************************
+            var timelineContainer = document.getElementById('chart-events-timeline');
+            var items = new vis.DataSet(data);
+            var options = {};
+            // Create a Timeline
+            var timeline = new vis.Timeline(timelineContainer, items, {});
+
             // EVENTS GRAPH *****************************************************
-            // create 10 events
+            var chartsCount = Number("{{ atms.count }}"),
+                    color = d3.scale.category20();
+
             var eventsData = [];
             for (var i = 0; i < chartsCount; i++) {
-                eventsData.push(createEvent("ATM " + (i + 1) + " XFS"));
-                eventsData.push(createEvent("ATM " + (i + 1) + " Microsoft"));
+                var filter = atmsDim.filter(i);
+                var events_dates = _.map(filter.top(Infinity), function (item) {
+                    return item.date;
+                });
+                eventsData.push({
+                    name: "ATM " + (i + 1) + " XFS",
+                    dates: events_dates
+                });
             }
 
             var eventDropsChart = d3.chart.eventDrops()
                     .eventLineColor(function (datum, index) {
                         return color(index);
                     })
-                    .start(new Date(startTime))
-                    .end(new Date(endTime));
+                    .start(minDate)
+                    .end(maxDate);
 
-            d3.select('#chart-events')
+            d3.select('#chart-events-drop')
                     .datum(eventsData)
                     .call(eventDropsChart);
+            d3.select('#chart-events-drop').selectAll('svg').style("width", "100%");
 
             // TABLES *****************************************************
-            var oTable = $("#error-table").DataTable({
+            var operationTable = $("#operations-table").DataTable({
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
@@ -341,10 +523,9 @@
                     }
                 }
             });
-            $('#error-table-filter').keyup(function () {
-                oTable.search($(this).val()).draw();
+            $('#operations-table-filter').keyup(function () {
+                operationTable.search($(this).val()).draw();
             });
-
         })
     </script>
     <script type="text/javascript" src="{% static "js/svgAsBase64.js" %}"></script>
