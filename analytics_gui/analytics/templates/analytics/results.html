@@ -19,6 +19,7 @@
             background-color: {{ COLOR_ORANGE }};
             border-color: {{ COLOR_ORANGE }};
         }
+
         .vis-item.red {
             background-color: {{ COLOR_RED }};
             border-color: {{ COLOR_RED }};
@@ -36,207 +37,171 @@
                     <li><a href="{% url "analytics:view_case" case.id %}">caso</a></li>
                     <li class="active">resultados</li>
                 </ol>
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#report" role="tab"
-                                                              data-toggle="tab">Reporte</a></li>
-                    <li role="presentation"><a href="#timeline" role="tab" data-toggle="tab">Timeline</a>
-                    </li>
-                </ul>
 
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="report">
-                        <h3>
-                            Reporte
+                <h3>
+                    Reporte
                             <span class="pull-right">
                                 Estado del caso
                                 <span class="label label-{% if case.status == case.STATUS_OPEN %}success{% else %}danger{% endif %}">{{ case.get_status_display }}</span>
                             </span>
-                        </h3>
-                        <hr>
-                        <form method="post" action="" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-md-6 col-xs-12">
-                                    <svg id="atm-index-chart" style="width: 100%; height: 250px; margin: 0 auto"></svg>
-                                </div>
-                                <div class="col-md-6 col-xs-12">
-                                    <svg id="total-operations-report-chart"
-                                         style="width: 100%; height: 250px; margin: 0 auto"></svg>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-4 col-xs-12">
-                                    <h4>Errores Criticos</h4>
-                                    <svg id="critical-errors-chart"
-                                         style="width: 100%; height: 240px; margin: 0 auto"></svg>
-                                </div>
-                                <div class="col-md-4 col-xs-12">
-                                    <h4>Errores Importantes</h4>
-                                    <svg id="important-errors-chart"
-                                         style="width: 100%; height: 240px; margin: 0 auto"></svg>
-                                </div>
-                                <div class="col-md-4 col-xs-12">
-                                    <h4>Transacciones sin problemas</h4>
-                                    <svg id="no-errors-chart" style="width: 100%; height: 240px; margin: 0 auto"></svg>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <h3>Reporte de Operaciones</h3>
-                                <svg id="operations-report-chart"
-                                     style="width: 100%; height: 300px; margin: 0 auto"></svg>
+                </h3>
+                <hr>
+                <form method="post" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12">
+                            <svg id="atm-index-chart" style="width: 100%; height: 250px; margin: 0 auto"></svg>
+                        </div>
+                        <div class="col-md-6 col-xs-12">
+                            <svg id="total-operations-report-chart"
+                                 style="width: 100%; height: 250px; margin: 0 auto"></svg>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4 col-xs-12">
+                            <h4>Errores Criticos</h4>
+                            <svg id="critical-errors-chart"
+                                 style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h4>Errores Importantes</h4>
+                            <svg id="important-errors-chart"
+                                 style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h4>Transacciones sin problemas</h4>
+                            <svg id="no-errors-chart" style="width: 100%; height: 240px; margin: 0 auto"></svg>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <h3>Reporte de Operaciones</h3>
+                        <svg id="operations-report-chart"
+                             style="width: 100%; height: 300px; margin: 0 auto"></svg>
 
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <svg id="errors-report-chart"
-                                     style="width: 100%; height: 300px; margin: 0 auto"></svg>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <svg id="errors-report-chart"
+                             style="width: 100%; height: 300px; margin: 0 auto"></svg>
 
-                            </div>
-                            <hr>
-                            <div class="panel panel-primary row">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Operaciones</h3>
-                                    <div class="pull-right">
+                    </div>
+                    <hr>
+                    <div class="panel panel-primary row">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Operaciones</h3>
+                            <div class="pull-right">
                                 <span class="clickable filter"
                                       data-toggle="tooltip"
                                       title="Filtro de tabla"
                                       data-container="body">
                                     <i class="glyphicon glyphicon-filter"></i>
                                 </span>
-                                    </div>
-                                </div>
-                                <div class="panel-body">
-                                    <input type="text" class="form-control" id="operations-table-filter"
-                                           data-action="filter"
-                                           data-filters="#operations-table" placeholder="Filtar operaciones"/>
-                                </div>
-                                <table class="table table-hover" id="operations-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Selector</th>
-                                        <th>Fecha</th>
-                                        <th>Error</th>
-                                        <th>Monto</th>
-                                    </tr>
-                                    </thead>
-                                </table>
                             </div>
-                            <hr>
-                            <div class="row">
-                                <h3>Reporte Cronológico Multiples logs</h3>
-                                <div id="chart-events-drop" style="width: 100%; height: 220px; margin: 0 auto"></div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <h3>Análisis Automático</h3>
-                                <div class="col-md-4 col-xs-12">
-                                    <h5>Logs Journal
-                                        <a href="javascript: void (0)" data-toggle="popover"
-                                           data-placement="left" data-html="true"
-                                           data-trigger="focus" title="Title"
-                                           data-content="Body">
-                                            <i class="fa fa-question-circle"></i>
-                                        </a>
-                                    </h5>
-
-                                    <div class="well percent-result text-center">33%</div>
-                                </div>
-                                <div class="col-md-4 col-xs-12">
-                                    <h5>Logs Windows
-                                        <a href="javascript: void (0)" data-toggle="popover"
-                                           data-placement="left" data-html="true"
-                                           data-trigger="focus" title="Title"
-                                           data-content="Body">
-                                            <i class="fa fa-question-circle"></i>
-                                        </a>
-                                    </h5>
-                                    <div class="well percent-result text-center">100%</div>
-                                </div>
-                                <div class="col-md-4 col-xs-12">
-                                    <h5>Estimación del caso
-                                        <a href="javascript: void (0)" data-toggle="popover"
-                                           data-placement="left" data-html="true"
-                                           data-trigger="focus" title="Title"
-                                           data-content="Body">
-                                            <i class="fa fa-question-circle"></i>
-                                        </a>
-                                    </h5>
-                                    <div class="well percent-result text-center">98%</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <h3>Análisis del Caso</h3>
-                                <p><b>Nombre:</b> {{ case.name }}</p>
-                                <p><b>ID:</b> {{ case.id }}</p>
-                                <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
-                                <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
-                                <p><b>Fecha:</b> {{ case.created_date }}</p>
-                                <p><b>Cliente:</b> {{ case.bank }}</p>
-                                <p><b>Resolución:</b></p>
-                                <div class="form-group {% if form.resolution.errors %}has-error{% endif %}">
-                                    {% if form.resolution.help_text %}
-                                        <span class="help-block">{{ form.resolution.help_text }}</span>
-                                    {% endif %}
-                                    {% if form.resolution.errors %}
-                                        <span class="help-block">{{ form.resolution.errors|join:"<br \>" }}</span>
-                                    {% endif %}
-                                    {{ form.resolution|add_class:"form-control" }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="form-group">
-                                    {% if case.status == case.STATUS_OPEN %}
-                                        <input class="btn btn-default btn-lg pull-left" name="close-status"
-                                               type="submit"
-                                               value="Cerrar"/>
-                                    {% else %}
-                                        <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit"
-                                               value="Abrir"/>
-                                    {% endif %}
-
-                                    <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
-                                           value="Guardar" style="margin-left: 20px"/>
-                                    <a href="javascript: void(0)" class="btn btn-default btn-lg pull-right">PDF</a>
-                                    <br>
-                                    <br>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="timeline">
-                        <br>
-                        <div class="row">
-                            <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
                         </div>
-                        <hr>
-                        <div class="row">
-                            <form method="post" action="" enctype="multipart/form-data">
-                                <div class="form-group">
-                                    {% if case.status == case.STATUS_OPEN %}
-                                        <input class="btn btn-default btn-lg pull-left" name="close-status"
-                                               type="submit"
-                                               value="Cerrar"/>
-                                    {% else %}
-                                        <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit"
-                                               value="Abrir"/>
-                                    {% endif %}
+                        <div class="panel-body">
+                            <input type="text" class="form-control" id="operations-table-filter"
+                                   data-action="filter"
+                                   data-filters="#operations-table" placeholder="Filtar operaciones"/>
+                        </div>
+                        <table class="table table-hover" id="operations-table">
+                            <thead>
+                            <tr>
+                                <th>Selector</th>
+                                <th>Fecha</th>
+                                <th>Error</th>
+                                <th>Monto</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <h3>Timeline</h3>
+                        <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <h3>Análisis Automático</h3>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Logs Journal
+                                <a href="javascript: void (0)" data-toggle="popover"
+                                   data-placement="left" data-html="true"
+                                   data-trigger="focus" title="Title"
+                                   data-content="Body">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </h5>
 
-                                    <a href="javascript: void(0)" class="btn btn-default btn-lg pull-right">PDF</a>
-                                    <br>
-                                    <br>
-                                </div>
-                            </form>
+                            <div class="well percent-result text-center">33%</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Logs Windows
+                                <a href="javascript: void (0)" data-toggle="popover"
+                                   data-placement="left" data-html="true"
+                                   data-trigger="focus" title="Title"
+                                   data-content="Body">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </h5>
+                            <div class="well percent-result text-center">100%</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Estimación del caso
+                                <a href="javascript: void (0)" data-toggle="popover"
+                                   data-placement="left" data-html="true"
+                                   data-trigger="focus" title="Title"
+                                   data-content="Body">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </h5>
+                            <div class="well percent-result text-center">98%</div>
                         </div>
                     </div>
-                </div>
+                    <hr>
+                    <div class="row">
+                        <h3>Análisis del Caso</h3>
+                        <p><b>Nombre:</b> {{ case.name }}</p>
+                        <p><b>ID:</b> {{ case.id }}</p>
+                        <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
+                        <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
+                        <p><b>Fecha:</b> {{ case.created_date }}</p>
+                        <p><b>Cliente:</b> {{ case.bank }}</p>
+                        <p><b>Resolución:</b></p>
+                        <div class="form-group {% if form.resolution.errors %}has-error{% endif %}">
+                            {% if form.resolution.help_text %}
+                                <span class="help-block">{{ form.resolution.help_text }}</span>
+                            {% endif %}
+                            {% if form.resolution.errors %}
+                                <span class="help-block">{{ form.resolution.errors|join:"<br \>" }}</span>
+                            {% endif %}
+                            {{ form.resolution|add_class:"form-control" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="form-group">
+                            {% if case.status == case.STATUS_OPEN %}
+                                <input class="btn btn-default btn-lg pull-left" name="close-status"
+                                       type="submit"
+                                       value="Cerrar"/>
+                            {% else %}
+                                <input class="btn btn-default btn-lg pull-left" name="open-status" type="submit"
+                                       value="Abrir"/>
+                            {% endif %}
+
+                            <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
+                                   value="Guardar" style="margin-left: 20px"/>
+                            <a href="javascript: void(0)" class="btn btn-default btn-lg pull-right">PDF</a>
+                            <br>
+                            <br>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
     </div>
 {% endblock content %}
 
@@ -271,6 +236,16 @@
                 transformed[d.date] = d;
             });
 
+            // TIMELINE *********************************************************
+            var timelineContainer = document.getElementById('chart-events-timeline');
+            var items = new vis.DataSet(data);
+            var options = {
+                max: maxDate,
+                min: minDate
+            };
+            var timeline = new vis.Timeline(timelineContainer, items, options);
+
+            // CROSSFILTER ******************************************************
             var ndx = crossfilter(data);
 
             // Dimensions and groups
@@ -338,7 +313,8 @@
                         })
                     });
             atmIndexChart.on("filtered", function (chart, filter) {
-                //window.timeline.setItems(atmsDim.top(Infinity));
+                timeline.setItems(atmsDim.top(Infinity));
+                timeline.fit();
             });
 
             totalOperationsReportChart
@@ -461,41 +437,6 @@
                     .order(d3.ascending);
 
             dc.renderAll();
-
-            // TIMELINE *********************************************************
-            var timelineContainer = document.getElementById('chart-events-timeline');
-            var items = new vis.DataSet(data);
-            var options = {};
-            // Create a Timeline
-            var timeline = new vis.Timeline(timelineContainer, items, {});
-
-            // EVENTS GRAPH *****************************************************
-            var chartsCount = Number("{{ atms.count }}"),
-                    color = d3.scale.category20();
-
-            var eventsData = [];
-            for (var i = 0; i < chartsCount; i++) {
-                var filter = atmsDim.filter(i);
-                var events_dates = _.map(filter.top(Infinity), function (item) {
-                    return item.date;
-                });
-                eventsData.push({
-                    name: "ATM " + (i + 1) + " XFS",
-                    dates: events_dates
-                });
-            }
-
-            var eventDropsChart = d3.chart.eventDrops()
-                    .eventLineColor(function (datum, index) {
-                        return color(index);
-                    })
-                    .start(minDate)
-                    .end(maxDate);
-
-            d3.select('#chart-events-drop')
-                    .datum(eventsData)
-                    .call(eventDropsChart);
-            d3.select('#chart-events-drop').selectAll('svg').style("width", "100%");
 
             // TABLES *****************************************************
             var operationTable = $("#operations-table").DataTable({
