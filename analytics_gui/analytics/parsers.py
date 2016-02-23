@@ -1,6 +1,9 @@
 import random
 import re
 
+from Evtx.Evtx import FileHeader
+from Evtx.Views import evtx_file_xml_view
+
 from analytics_gui.analytics.models import AtmErrorXFS
 
 
@@ -98,17 +101,29 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
 
 
 def parse_window_event_viewer(file_2_parse):
-    pass
-    # file_2_parse.open(mode='rb')
-    # data = file_2_parse.read()
-    # xml = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>"
-    # xml += "<Events>"
-    # fh = FileHeader(data, 0x0)
-    # for xml_line, record in evtx_file_xml_view(fh):
-    #     print("############################################")
-    #     print(xml_line)
-    # xml += xml_line
-    # xml += "</Events>"
-    # xml_dict = dict(xmltodict.parse(xml))
-    # from pprint import pprint
-    # pprint(xml_dict)
+    file_2_parse.open(mode='rb')
+    data = file_2_parse.read()
+
+    traces = []
+
+    fh = FileHeader(data, 0x0)
+    for xml_line, record in evtx_file_xml_view(fh):
+        trace = {}
+        # get date
+        match = re.search(r'<TimeCreated SystemTime=\".*\"', xml_line)
+        if not match:
+            continue
+        match = re.search(r'\d{2,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', match.group())
+        if not match:
+            continue
+        trace["date"] = match.group()
+        # event record id
+        match = re.search(r'<EventRecordID>\d*', xml_line)
+        if not match:
+            continue
+        match = re.search(r'\d+', match.group())
+        trace["record_id"] = match.group()
+        trace["context"] = xml_line
+        traces.append(trace)
+
+    return traces
