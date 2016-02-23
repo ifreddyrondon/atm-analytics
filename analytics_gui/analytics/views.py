@@ -1,9 +1,9 @@
 import base64
+import itertools
 import json
 import os
-import pdfkit
-import itertools
 
+import pdfkit
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
-from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
+from analytics_gui.analytics.parsers import parse_log_file
 from analytics_gui.companies.models import Company
 
 
@@ -102,8 +102,8 @@ def analyze_case(request, case_id):
 
     for index, atm in enumerate(atms):
         # Microsoft Event Viewer
-        if atm.microsoft_event_viewer:
-            parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        # if atm.microsoft_event_viewer:
+        #     parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
             traces.append(parse_log_file(journal_file.file.file, index))
@@ -151,9 +151,13 @@ def generate_pdf(request, case_id):
     if request.is_ajax():
         args = dict(request.POST.iterlists())
         for key in args.keys():
+            print key
             if 'chart' in key:
                 image_data = base64.b64decode(args[key][0])
-                filename = key + ".svg"
+                if 'timeline' in key:
+                    filename = key + ".png"
+                else:
+                    filename = key + ".svg"
                 with open(image_root + filename, 'w') as f:
                     f.write(image_data)
                     images[key.replace('-', '_')] = image_root + filename

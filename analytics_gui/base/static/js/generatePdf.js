@@ -1,18 +1,25 @@
-var svgList = document.getElementsByTagName("svg");
-
 d3.select("#generate-pdf").on("click", function() {
-    generatePdf(svgList);
+    var svgList = document.getElementsByTagName("svg");
+    var time_line = document.getElementById("chart-events-timeline");
+    var array = Array.prototype.slice.call(svgList);
+    array.push(time_line);
+    generatePdf(array);
 });
 
-generatePdf = function(svgList) {
+generatePdf = function(array) {
     data = {}
+    var time_line_name = ""
+    var time_line_data = ""
     resolution = d3.select("#id_resolution")[0][0].value;
 
-    for (var i = 0; i < svgList.length; i++) {
-        if (svgList[i].id !== '') {
-            data[svgList[i].id] = svgAsBase64(svgList[i]);
+    for (var i = 0; i < array.length; i++) {
+        if (array[i].id !== '' && array[i].tagName.toLowerCase() == 'svg') {
+            data[array[i].id] = svgAsBase64(array[i]);
+        } else if(array[i].tagName.toLowerCase() == 'div') {
+            data[array[i].id] = getImageData(array[i]);
         }
     }
+
     if (resolution != '') {
         data['resolution'] = resolution;
     }
@@ -24,8 +31,7 @@ generatePdf = function(svgList) {
         // handle a successful response
         success: function(json) {
             file_content = JSON.parse(json)["file"];
-            // console.log(atob(file_content));
-            convertBase64ToPDF("record.pdf", file_content);
+            convertBase64ToPDF("report.pdf", file_content);
         },
         // handle a non-successful response
         error: function(xhr, errmsg, err) {
@@ -123,4 +129,12 @@ convertBase64ToPDF = function (name, base64) {
     a.download = name;
     a.click();
     document.body.removeChild(a);
+}
+
+getImageData = function(element) {
+    var html2obj = html2canvas(element);
+    var queue = html2obj.parse();
+    var canvas = html2obj.render(queue);
+    var data = canvas.toDataURL('image/png');
+    return data.split(",")[1];
 }
