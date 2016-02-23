@@ -122,6 +122,35 @@
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
                     </div>
                     <hr>
+                    <div class="panel panel-primary row">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Timeline</h3>
+                            <div class="pull-right">
+                                <span data-toggle="tooltip"
+                                      title="Filtro de tabla"
+                                      data-container="body">
+                                    <i class="glyphicon glyphicon-filter"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <input type="text" class="form-control" id="timeline-table-filter"
+                                   data-action="filter"
+                                   data-filters="#timeline-table" placeholder="Filtar timeline"/>
+                        </div>
+                        <table class="table table-hover" id="timeline-table">
+                            <thead>
+                            <tr>
+                                <th>Selector</th>
+                                <th>Fecha</th>
+                                <th>Error</th>
+                                <th>Monto</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <hr>
                     <div class="row">
                         <h3>Análisis Automático</h3>
                         <div class="col-md-4 col-xs-12">
@@ -236,19 +265,14 @@
                 transformed[d.date] = d;
             });
 
-            // TIMELINE *********************************************************
-            var timelineContainer = document.getElementById('chart-events-timeline');
-            var items = new vis.DataSet(data);
-            var options = {
-                max: maxDate,
-                min: minDate
-            };
-            var timeline = new vis.Timeline(timelineContainer, items, options);
-
             // CROSSFILTER ******************************************************
             var ndx = crossfilter(data);
 
             // Dimensions and groups
+            var idDim = ndx.dimension(function (d) {
+                return d.id;
+            });
+
             var atmsDim = ndx.dimension(function (d) {
                 return d.atm_index;
             });
@@ -300,6 +324,97 @@
                 return d.amount;
             });
 
+            // TABLES *****************************************************
+            var operationTable = $("#operations-table").DataTable({
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+            $('#operations-table-filter').keyup(function () {
+                operationTable.search($(this).val()).draw();
+            });
+
+            var timelineTable = $("#timeline-table").DataTable({
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+            $('#timeline-table-filter').keyup(function () {
+                operationTable.search($(this).val()).draw();
+            });
+
+            // CHARTS *********************************************************
+
+            // TIMELINE *********************************************************
+            function fillTimelineTable(data) {
+                timelineTable.clear();
+                _.each(data, function (item) {
+                    timelineTable.row.add(["<input type='checkbox'></td>", item.date, item.errors, item.amount]);
+                });
+                timelineTable.draw();
+            }
+
+            var timelineContainer = document.getElementById('chart-events-timeline');
+            var options = {
+                max: maxDate,
+                min: minDate
+            };
+            var timeline = new vis.Timeline(timelineContainer, data, options);
+            fillTimelineTable(data);
+            timeline.on("rangechanged", function (properties) {
+                var tableData = [];
+                _.each(this.getVisibleItems(), function (id) {
+                    var item = _.filter(data, function (item) {
+                        return item.id == id;
+                    });
+                    tableData.push(item[0]);
+                });
+                fillTimelineTable(_.sortBy(tableData, 'date'));
+            });
+
+            // CROSSFILTER ******************************************************
             atmIndexChart
                     .height(250)
                     .dimension(atmsDim)
@@ -437,37 +552,6 @@
                     .order(d3.ascending);
 
             dc.renderAll();
-
-            // TABLES *****************************************************
-            var operationTable = $("#operations-table").DataTable({
-                "language": {
-                    "sProcessing": "Procesando...",
-                    "sLengthMenu": "Mostrar _MENU_ registros",
-                    "sZeroRecords": "No se encontraron resultados",
-                    "sEmptyTable": "Ningún dato disponible en esta tabla",
-                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sSearch": "Buscar:",
-                    "sUrl": "",
-                    "sInfoThousands": ",",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst": "Primero",
-                        "sLast": "Último",
-                        "sNext": "Siguiente",
-                        "sPrevious": "Anterior"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                    }
-                }
-            });
-            $('#operations-table-filter').keyup(function () {
-                operationTable.search($(this).val()).draw();
-            });
         })
     </script>
 {% endblock %}
