@@ -430,6 +430,7 @@
             atmIndexChart.on("filtered", function (chart, filter) {
                 timeline.setItems(atmsDim.top(Infinity));
                 timeline.fit();
+                fillTimelineTable(atmsDim.top(Infinity));
             });
 
             totalOperationsReportChart
