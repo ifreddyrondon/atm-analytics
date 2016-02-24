@@ -474,7 +474,9 @@
 
                 // filter by errors
                 var selectedErrors = $("#timeline-filter-errors").val();
-                if (selectedErrors[0] != "all") {
+                if (selectedErrors == null || selectedErrors.length == 0) {
+                    $("#timeline-filter-errors").val(["all"]).change();
+                } else if (selectedErrors[0] != "all") {
                     items = _.filter(items, function (item) {
                         return _.intersection(item.errors, selectedErrors).length > 0;
                     });
@@ -535,10 +537,12 @@
             });
             $("#timeline-filter-errors").on("select2:select", function (evt) {
                 var selectedErrors = $("#timeline-filter-errors").val();
-                if(evt.params.data.id != "all" && selectedErrors[0] == "all"){
-                    $("#timeline-filter-errors").val(selectedErrors.slice(1, selectedErrors.length)).change();
-                } else if(evt.params.data.id == "all"){
-                    $("#timeline-filter-errors").val(["all"]).change();
+                if (selectedErrors.length > 0) {
+                    if (evt.params.data.id != "all" && selectedErrors[0] == "all") {
+                        $("#timeline-filter-errors").val(selectedErrors.slice(1, selectedErrors.length)).change();
+                    } else if (evt.params.data.id == "all") {
+                        $("#timeline-filter-errors").val(["all"]).change();
+                    }
                 }
             });
 
