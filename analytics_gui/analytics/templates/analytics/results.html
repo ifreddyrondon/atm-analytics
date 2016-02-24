@@ -123,24 +123,34 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <h3>
-                            Timeline
-                            <div class="btn-group text-center" data-toggle="buttons">
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-critical-erros" type="checkbox" autocomplete="off"
-                                           checked> Error critico
-                                </label>
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-important-erros" type="checkbox" autocomplete="off"
-                                           checked> Error importante
-                                </label>
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-no-erros" type="checkbox" autocomplete="off" checked> Sin
-                                    errores
-                                </label>
+                        <h3>Timeline</h3>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <div class="btn-group text-center" data-toggle="buttons">
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-critical-erros" type="checkbox" autocomplete="off"
+                                               checked> Error critico
+                                    </label>
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-important-erros" type="checkbox" autocomplete="off"
+                                               checked> Error importante
+                                    </label>
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-no-erros" type="checkbox" autocomplete="off" checked>
+                                        Sin
+                                        errores
+                                    </label>
+                                </div>
                             </div>
-                        </h3>
-
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"
+                                                                         aria-hidden="true"></span></div>
+                                    <input type="text" id="timeline-calendar-picker" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
                     </div>
                     <hr>
@@ -413,9 +423,9 @@
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
             window.timelineData = journalData;
-{#            console.log(eventViewerData.length);#}
-{#            window.timelineData = eventViewerData.slice(0, eventViewerData.length / 2);#}
-{#            console.log(window.timelineData);#}
+            {#            console.log(eventViewerData.length);#}
+            {#            window.timelineData = eventViewerData.slice(0, eventViewerData.length / 2);#}
+            {#            console.log(window.timelineData);#}
 
             function fillTimelineTable(items) {
                 timelineTable.clear();
@@ -443,20 +453,27 @@
                 fillTimelineTable(_.sortBy(tableData, 'date'));
             });
 
-            function filterTimeline(items){
-                if(!$("#timeline-filter-critical-erros").is(":checked")){
+            function filterTimeline(items) {
+                var startDate =$('#timeline-calendar-picker').data('daterangepicker').startDate._d;
+                var endDate =$('#timeline-calendar-picker').data('daterangepicker').endDate._d;
+
+                items = _.filter(items, function(item){
+                    return item.date >= startDate && item.date <= endDate;
+                });
+                
+                if (!$("#timeline-filter-critical-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_RED }}";
                     });
                 }
 
-                if(!$("#timeline-filter-important-erros").is(":checked")){
+                if (!$("#timeline-filter-important-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_ORANGE }}";
                     });
                 }
 
-                if(!$("#timeline-filter-no-erros").is(":checked")){
+                if (!$("#timeline-filter-no-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_GREEN }}";
                     });
@@ -467,13 +484,31 @@
                 fillTimelineTable(items);
             }
 
-            $("#timeline-filter-critical-erros").change(function(evt){
+            // init timeline calendar
+            $("#timeline-calendar-picker").daterangepicker({
+                "timePicker": true,
+                "timePicker24Hour": true,
+                "timePickerSeconds": true,
+                "locale": {
+                    "format": "DD/MM/YYYY",
+                    "separator": " / "
+                },
+                "alwaysShowCalendars": true,
+                "startDate": minDate,
+                "endDate": maxDate,
+                "minDate": minDate,
+                "maxDate": maxDate
+            }, function (start, end, label) {
+                filterTimeline(window.timelineData)
+            });
+
+            $("#timeline-filter-critical-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
-            $("#timeline-filter-important-erros").change(function(evt){
+            $("#timeline-filter-important-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
-            $("#timeline-filter-no-erros").change(function(evt){
+            $("#timeline-filter-no-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
 
