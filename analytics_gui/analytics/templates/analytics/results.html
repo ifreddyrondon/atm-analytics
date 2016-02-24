@@ -146,7 +146,7 @@
                                 <div class="input-group">
                                     <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"
                                                                          aria-hidden="true"></span></div>
-                                    <input type="text" id="timeline-calendar-picker" class="form-control">
+                                    <input size="23" type="text" id="timeline-calendar-picker" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -460,7 +460,7 @@
                 items = _.filter(items, function(item){
                     return item.date >= startDate && item.date <= endDate;
                 });
-                
+
                 if (!$("#timeline-filter-critical-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_RED }}";
