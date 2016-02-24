@@ -3,6 +3,7 @@ import re
 
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
+from django.conf import settings
 
 from analytics_gui.analytics.models import AtmErrorXFS
 
@@ -100,6 +101,17 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
     return traces
 
 
+def parse_date_event_viewer(date):
+    just_date = date.split(" ")[0]
+    hour = date.split(" ")[1]
+
+    day = just_date.split("-")[2]
+    month = just_date.split("-")[1]
+    year = just_date.split("-")[0]
+
+    return "{}/{}/{} {}".format(day, month, year, hour)
+
+
 def parse_window_event_viewer(file_2_parse):
     file_2_parse.open(mode='rb')
     data = file_2_parse.read()
@@ -116,7 +128,7 @@ def parse_window_event_viewer(file_2_parse):
         match = re.search(r'\d{2,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', match.group())
         if not match:
             continue
-        trace["date"] = match.group()
+        trace["date"] = parse_date_event_viewer(match.group())
         # event record id
         match = re.search(r'<EventRecordID>\d*', xml_line)
         if not match:
@@ -124,6 +136,8 @@ def parse_window_event_viewer(file_2_parse):
         match = re.search(r'\d+', match.group())
         trace["record_id"] = match.group()
         trace["context"] = xml_line
+        trace["className"] = "window-event"
+        trace["color"] = settings.COLOR_BLUE
         traces.append(trace)
 
     return traces
