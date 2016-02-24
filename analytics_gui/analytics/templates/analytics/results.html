@@ -258,7 +258,7 @@
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var data = {{ traces | jsonify }};
+            var journalData = {{ traces | jsonify }};
             var transformed = {};
 
             var atmIndexChart = dc.pieChart("#atm-index-chart");
@@ -272,7 +272,7 @@
 
             var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
 
-            data.forEach(function (d) {
+            _.map(journalData, function (d) {
                 d.date = dtgFormat.parse(d.date);
                 var amount = d.amount.match(/\d/g);
                 d.amount = amount != null ? +amount.join("") : 0;
@@ -283,7 +283,7 @@
             });
 
             // CROSSFILTER ******************************************************
-            var ndx = crossfilter(data);
+            var ndx = crossfilter(journalData);
 
             // Dimensions and groups
             var idDim = ndx.dimension(function (d) {
@@ -404,7 +404,7 @@
 
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
-            window.timelineData = data;
+            window.timelineData = journalData;
 
             function fillTimelineTable(items) {
                 timelineTable.clear();
