@@ -1,4 +1,5 @@
 import itertools
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -24,7 +25,7 @@ def create(request):
             case = form.save(commit=False)
             case.analyst = request.user.dash_user
             atm_form_set = CreateAtmFormSet(
-                    request.POST, request.FILES, instance=case, company=company)
+                request.POST, request.FILES, instance=case, company=company)
             if atm_form_set.is_valid():
                 case.save()
                 atms = atm_form_set.save()
@@ -59,7 +60,7 @@ def view_case(request, case_id):
     if request.method == 'POST':
         form = CreateCaseForm(request.POST, request.FILES, instance=case, company=company)
         atm_form_set = CreateAtmFormSet(
-                request.POST, request.FILES, instance=case, company=company)
+            request.POST, request.FILES, instance=case, company=company)
         if form.is_valid() and atm_form_set.is_valid():
             case.save()
             atm_form_set.save()
@@ -91,15 +92,16 @@ def analyze_case(request, case_id):
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
 
-    traces = []
+    journal_traces = []
+    event_viewer_traces = []
 
     for index, atm in enumerate(atms):
         # Microsoft Event Viewer
         # if atm.microsoft_event_viewer:
-        #     parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
-            traces.append(parse_log_file(journal_file.file.file, index))
+            journal_traces.append(parse_log_file(journal_file.file.file, index))
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -112,16 +114,18 @@ def analyze_case(request, case_id):
                 case.status = Case.STATUS_OPEN
                 case.save()
 
-    traces = list(itertools.chain(*traces))
+    journal_traces = list(itertools.chain(*journal_traces))
 
     return render(request, 'analytics/results.html', {
         'case': case,
         'atms': atms,
         'form': form,
-        'traces': traces,
+        'journal_traces': journal_traces,
+        'event_viewer_traces': event_viewer_traces,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,
+        'COLOR_BLUE': settings.COLOR_BLUE,
     })
 
 

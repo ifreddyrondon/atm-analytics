@@ -24,6 +24,11 @@
             background-color: {{ COLOR_RED }};
             border-color: {{ COLOR_RED }};
         }
+
+        .vis-item.window-event {
+            background-color: {{ COLOR_BLUE }};
+            border-color: {{ COLOR_BLUE }};
+        }
     </style>
 {% endblock %}
 
@@ -258,7 +263,8 @@
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var journalData = {{ traces | jsonify }};
+            var journalData = {{ journal_traces | jsonify }};
+            var eventViewerData = {{ event_viewer_traces | jsonify }};
             var transformed = {};
 
             var atmIndexChart = dc.pieChart("#atm-index-chart");
@@ -282,14 +288,16 @@
                 transformed[d.date] = d;
             });
 
+            _.map(eventViewerData, function (d) {
+                d.date = dtgFormat.parse(d.date);
+                d.start = d.date;
+                d.content = d.record_id;
+            });
+
             // CROSSFILTER ******************************************************
             var ndx = crossfilter(journalData);
 
             // Dimensions and groups
-            var idDim = ndx.dimension(function (d) {
-                return d.id;
-            });
-
             var atmsDim = ndx.dimension(function (d) {
                 return d.atm_index;
             });
@@ -405,6 +413,9 @@
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
             window.timelineData = journalData;
+{#            console.log(eventViewerData.length);#}
+{#            window.timelineData = eventViewerData.slice(0, eventViewerData.length / 2);#}
+{#            console.log(window.timelineData);#}
 
             function fillTimelineTable(items) {
                 timelineTable.clear();
