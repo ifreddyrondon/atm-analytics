@@ -94,6 +94,9 @@ def analyze_case(request, case_id):
 
     journal_traces = []
     event_viewer_traces = []
+    errors = {
+        "names": []
+    }
 
     for index, atm in enumerate(atms):
         # Microsoft Event Viewer
@@ -101,7 +104,12 @@ def analyze_case(request, case_id):
         #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
-            journal_traces.append(parse_log_file(journal_file.file.file, index))
+            trace, in_errors_names = parse_log_file(journal_file.file.file, index)
+            journal_traces.append(trace)
+            # save only new errors names
+            in_all_errors_names = set(errors["names"])
+            in_errors_names_but_not_in_all = in_errors_names - in_all_errors_names
+            errors["names"] = errors["names"] + list(in_errors_names_but_not_in_all)
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -122,6 +130,7 @@ def analyze_case(request, case_id):
         'form': form,
         'journal_traces': journal_traces,
         'event_viewer_traces': event_viewer_traces,
+        'errors': errors,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,

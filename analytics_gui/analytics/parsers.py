@@ -45,6 +45,7 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
     data = data.split(separator)
 
     traces = []
+    errors_names = []
 
     for item in data[0:-1]:
         trace = {}
@@ -59,16 +60,22 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         match = re.search(r'M-\d*', item)
         if match:
             errors.append(match.group())
+            if match.group() not in errors_names:
+                errors_names.append(match.group())
         # get R- errors
         match = re.search(r'R-\d*', item)
         if match:
             errors.append(match.group())
+            if match.group() not in errors_names:
+                errors_names.append(match.group())
         lines = item.split("\n")
         # delete the lines that start with " " and empty lines
         lines = [x for x in lines if not x.startswith(" ") and x]
         # if last line start with number is error
         if lines[-1].split(" ")[0].isdigit():
             errors.append(lines[-1])
+            if lines[-1] not in errors_names:
+                errors_names.append(lines[-1])
         # get amount
         match = re.search(r'RETIRO:.*', item)
         trace["amount"] = match.group().split(":")[1].strip() if match else ""
@@ -98,7 +105,7 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         })
         traces.append(trace)
 
-    return traces
+    return traces, set(errors_names)
 
 
 def parse_date_event_viewer(date):

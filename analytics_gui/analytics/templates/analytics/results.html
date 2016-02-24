@@ -149,6 +149,11 @@
                                     <input size="23" type="text" id="timeline-calendar-picker" class="form-control">
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <select id="timeline-filter-errors" class="form-control" multiple="multiple">
+                                    <option value="all" selected>Todos</option>
+                                </select>
+                            </div>
                         </div>
                         <br>
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
@@ -275,7 +280,12 @@
 
             var journalData = {{ journal_traces | jsonify }};
             var eventViewerData = {{ event_viewer_traces | jsonify }};
+            var errorsMeta = {{ errors | jsonify }};
             var transformed = {};
+
+            errorsMeta.names = _.map(errorsMeta.names, function (item) {
+                return {id: item, text: item};
+            });
 
             var atmIndexChart = dc.pieChart("#atm-index-chart");
             var errorsReportChart = dc.pieChart("#errors-report-chart");
@@ -293,7 +303,7 @@
                 var amount = d.amount.match(/\d/g);
                 d.amount = amount != null ? +amount.join("") : 0;
                 d.start = d.date;
-                d.errors = d.errors.join(", ");
+                d.printedErrors = d.errors.join(", ");
                 d.content = d.has_errors ? d.errors : 'Sin errores';
                 transformed[d.date] = d;
             });
@@ -348,10 +358,10 @@
                 return d;
             });
 
-            var errorsDim = ndx.dimension(function (d) {
-                return d.errors;
+            var printedErrorsDim = ndx.dimension(function (d) {
+                return d.printedErrors;
             });
-            var errorsGroupCount = errorsDim.group().reduceCount(function (d) {
+            var printedErrorsGroupCount = printedErrorsDim.group().reduceCount(function (d) {
                 return d;
             });
 
@@ -454,25 +464,37 @@
             });
 
             function filterTimeline(items) {
-                var startDate =$('#timeline-calendar-picker').data('daterangepicker').startDate._d;
-                var endDate =$('#timeline-calendar-picker').data('daterangepicker').endDate._d;
+                var startDate = $('#timeline-calendar-picker').data('daterangepicker').startDate._d;
+                var endDate = $('#timeline-calendar-picker').data('daterangepicker').endDate._d;
 
-                items = _.filter(items, function(item){
+                // filter dates
+                items = _.filter(items, function (item) {
                     return item.date >= startDate && item.date <= endDate;
                 });
 
+                // filter by errors
+                var selectedErrors = $("#timeline-filter-errors").val();
+                if (selectedErrors[0] != "all") {
+                    items = _.filter(items, function (item) {
+                        return _.intersection(item.errors, selectedErrors).length > 0;
+                    });
+                }
+
+                // filter critical errors
                 if (!$("#timeline-filter-critical-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_RED }}";
                     });
                 }
 
+                // filter important errors
                 if (!$("#timeline-filter-important-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_ORANGE }}";
                     });
                 }
 
+                // filter no errors
                 if (!$("#timeline-filter-no-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_GREEN }}";
@@ -500,6 +522,24 @@
                 "maxDate": maxDate
             }, function (start, end, label) {
                 filterTimeline(window.timelineData)
+            });
+
+            // init errors filter
+            $("#timeline-filter-errors").select2({
+                data: errorsMeta.names
+            });
+            $("#timeline-filter-errors").change(function (evt) {
+                if ($("#timeline-filter-errors").val() != "all") {
+                    filterTimeline(window.timelineData);
+                }
+            });
+            $("#timeline-filter-errors").on("select2:select", function (evt) {
+                var selectedErrors = $("#timeline-filter-errors").val();
+                if(evt.params.data.id != "all" && selectedErrors[0] == "all"){
+                    $("#timeline-filter-errors").val(selectedErrors.slice(1, selectedErrors.length)).change();
+                } else if(evt.params.data.id == "all"){
+                    $("#timeline-filter-errors").val(["all"]).change();
+                }
             });
 
             $("#timeline-filter-critical-erros").change(function (evt) {
@@ -622,8 +662,8 @@
                     });
 
             errorsReportChart
-                    .dimension(errorsDim)
-                    .group(errorsGroupCount)
+                    .dimension(printedErrorsDim)
+                    .group(printedErrorsGroupCount)
                     .renderLabel(false)
                     .legend(dc.legend());
 
