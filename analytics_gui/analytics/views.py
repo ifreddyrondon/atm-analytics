@@ -12,6 +12,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from analytics_gui.analytics import utils
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal
 from analytics_gui.analytics.parsers import parse_log_file
@@ -151,7 +152,6 @@ def generate_pdf(request, case_id):
     if request.is_ajax():
         args = dict(request.POST.iterlists())
         for key in args.keys():
-            print key
             if 'chart' in key:
                 image_data = base64.b64decode(args[key][0])
                 if 'timeline' in key:
@@ -162,12 +162,26 @@ def generate_pdf(request, case_id):
                     f.write(image_data)
                     images[key.replace('-', '_')] = image_root + filename
 
+    time_line_table = utils.build_table(
+        args['time_line[Fecha][]'],
+        args['time_line[Error][]'],
+        args['time_line[Monto][]']
+    )
+
+    operations_table = utils.build_table(
+        args['operations[Fecha][]'],
+        args['operations[Error][]'],
+        args['operations[Monto][]']
+    )
+
     case = get_object_or_404(Case, id=case_id)
 
     args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
     args['logo'] = logo
+    args['time_line_table'] = time_line_table
+    args['operations_table'] = operations_table
 
     rendered_html = render_to_string(html_template, args)
 

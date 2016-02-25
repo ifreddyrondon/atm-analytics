@@ -8,8 +8,9 @@ d3.select("#generate-pdf").on("click", function() {
 
 generatePdf = function(array) {
     data = {}
-    var time_line_name = ""
-    var time_line_data = ""
+
+    operations_table = readTable('operations-table');
+    time_line_table = readTable('timeline-table');
     resolution = d3.select("#id_resolution")[0][0].value;
 
     for (var i = 0; i < array.length; i++) {
@@ -24,6 +25,9 @@ generatePdf = function(array) {
         data['resolution'] = resolution;
     }
 
+    data['time_line'] = time_line_table;
+    data['operations'] = operations_table;
+
     $.ajax({
         url: "generate_pdf/",
         type: "POST",
@@ -35,8 +39,6 @@ generatePdf = function(array) {
         },
         // handle a non-successful response
         error: function(xhr, errmsg, err) {
-            /*$('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom*/
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         }
     });
@@ -137,4 +139,45 @@ getImageData = function(element) {
     var canvas = html2obj.render(queue);
     var data = canvas.toDataURL('image/png');
     return data.split(",")[1];
+}
+
+readTable = function(id) {
+    var table = document.getElementById(id);
+    var data = {}
+    var date = []
+    var error = []
+    var mount = []
+    //gets rows of table
+    var rowLength = table.rows.length;
+
+    //loops through rows
+    for (i = 1; i < rowLength; i++) {
+
+        //gets cells of current row
+        var cells = table.rows.item(i).cells;
+
+        //gets amount of cells of current row
+        var cellLength = cells.length;
+
+        //loops through each cell in current row
+        for(var j = 1; j < cellLength; j++) {
+            switch(j) {
+                case 1: // Date
+                    date.push(cells.item(j).innerHTML);
+                    break;
+                case 2: // Error
+                    error.push(cells.item(j).innerHTML);
+                    break;
+                case 3: // Mount
+                    mount.push(cells.item(j).innerHTML);
+                    break;
+            }
+        }
+    }
+
+    data['Fecha'] = date;
+    data['Error'] = error;
+    data['Monto'] = mount;
+
+    return data;
 }
