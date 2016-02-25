@@ -154,3 +154,5 @@ analytics_gui/settings/local.py
 analytics_gui/media/*
 
 *.pdf
+*.svg
+chart-events-timeline.png

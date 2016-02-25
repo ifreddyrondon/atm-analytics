@@ -61,96 +61,28 @@
                     </table>
                 </div>
             </div>
-            <h2>Reporte Ejecutivo</h2>
-            <div class="col-md-4 col-xs-4">
-                <h6>Logs XFS
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">30%</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6><br>
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">99%</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Culpa usuario
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">98%</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Cantidad de errores criticos
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">1123</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Errores importantes
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">200</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Total transacciones
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">3000</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Transacciones correctas
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">1150000$</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Total faltante
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">1550$</div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Transacciones erroneas
-                    <a href="javascript: void (0)" data-toggle="popover"
-                       data-placement="left" data-html="true"
-                       data-trigger="focus" title="Title"
-                       data-content="Body">
-                    </a>
-                </h6>
-                <div class="well text-center" style="font-size: 36px;">5%</div>
+            <div class="row">
+                <h2>Reporte Ejecutivo</h2>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 10px;">Cantidad de transacciones</h5>
+                    <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 10px;">Monto total de transacciones validas</h5>
+                    <div class="well percent-result text-center">{{ meta.amount.valid_transactions }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 10px;">Transacciones con errores críticos</h5>
+                    <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 10px;">Porcentaje transacciones de errores críticos</h5>
+                    <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 10px;">Monto total de transacciones con errores</h5>
+                    <div class="well percent-result text-center">{{ meta.amount.errors_transactions }}</div>
+                </div>
             </div>
             <br>
             <h2>Reporte Técnico</h2>

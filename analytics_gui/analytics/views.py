@@ -167,14 +167,46 @@ def delete_case(request, case_id):
 
 def generate_pdf(request, case_id):
     args = None
-
+    case = get_object_or_404(Case, id=case_id)
+    atms = case.atms.all()
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
     image_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'images/')
     logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
     html_template = 'analytics/pdf_template.html'
-
     images = dict()
+
+    meta = {
+        "transactions_number": 0,
+        "amount": {
+            "valid_transactions": 0,
+            "errors_transactions": 0,
+        },
+        "errors": {
+            "critics_number": 0,
+            "names": []
+        }
+    }
+
+    for index, atm in enumerate(atms):
+        # Microsoft Event Viewer
+        # if atm.microsoft_event_viewer:
+        #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        # Journals Virtual
+        for journal_file in atm.journals.all():
+            trace, meta_journal = parse_log_file(journal_file.file.file, index)
+            # save only new errors names
+            in_all_errors_names = set(meta["errors"]["names"])
+            in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
+            meta["errors"]["names"] = meta["errors"]["names"] + list(in_errors_names_but_not_in_all)
+            # save meta
+            meta["transactions_number"] += meta_journal["transactions_number"]
+            meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
+            meta["amount"]["errors_transactions"] += meta_journal["amount"]["errors_transactions"]
+            meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+
+    meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+
     if request.is_ajax():
         args = dict(request.POST.iterlists())
         for key in args.keys():
@@ -200,14 +232,13 @@ def generate_pdf(request, case_id):
         args['operations[Monto][]']
     )
 
-    case = get_object_or_404(Case, id=case_id)
-
     args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
     args['logo'] = logo
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
+    args['meta'] = meta
 
     rendered_html = render_to_string(html_template, args)
 
