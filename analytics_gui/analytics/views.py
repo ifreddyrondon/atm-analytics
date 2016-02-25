@@ -2,8 +2,8 @@ import base64
 import itertools
 import json
 import os
-import pdfkit
 
+import pdfkit
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -173,6 +173,7 @@ def generate_pdf(request, case_id):
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
     image_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'images/')
     logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
+    default_avatar = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'default_avatar.png')
     html_template = 'analytics/pdf_template.html'
     images = dict()
 
@@ -239,7 +240,11 @@ def generate_pdf(request, case_id):
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
     args['meta'] = meta
-
+    args['default_avatar'] = default_avatar
+    args['analyst_name'] = \
+        request.user.first_name + " " + request.user.last_name \
+            if request.user.first_name != '' \
+            else request.user.username
     rendered_html = render_to_string(html_template, args)
 
     style_list = [bootstrap, base]

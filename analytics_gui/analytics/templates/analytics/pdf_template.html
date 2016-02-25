@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +27,8 @@
                 <span style="margin: 6px auto;" class="pull-right">Fecha de emisión: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
                 <span class="pull-right" style="padding: 70px;">
-                    LOGO BANCO
+                        <img src="{{ default_avatar }}"
+                            class="img-circle img-responsive" width="100px">
                 </span>
             <h2>Análisis del Caso</h2>
             <p><b>Nombre:</b> {{ case.name }}</p>
@@ -86,7 +88,7 @@
             </div>
             <br>
             <h2>Reporte Técnico</h2>
-            <h4>Nombre del analista</h4>
+            <h4>Analista: {{ analyst_name }}</h4>
             {% if resolution %}
             <p><b>Resolución:</b></p>
             <div class="form-group">
