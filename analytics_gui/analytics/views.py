@@ -2,8 +2,8 @@ import base64
 import itertools
 import json
 import os
-
 import pdfkit
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -99,15 +99,37 @@ def analyze_case(request, case_id):
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
 
-    traces = []
+    journal_traces = []
+    event_viewer_traces = []
+    meta = {
+        "transactions_number": 0,
+        "amount": {
+            "valid_transactions": 0,
+            "errors_transactions": 0,
+        },
+        "errors": {
+            "critics_number": 0,
+            "names": []
+        }
+    }
 
     for index, atm in enumerate(atms):
         # Microsoft Event Viewer
         # if atm.microsoft_event_viewer:
-        #     parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
-            traces.append(parse_log_file(journal_file.file.file, index))
+            trace, meta_journal = parse_log_file(journal_file.file.file, index)
+            journal_traces.append(trace)
+            # save only new errors names
+            in_all_errors_names = set(meta["errors"]["names"])
+            in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
+            meta["errors"]["names"] = meta["errors"]["names"] + list(in_errors_names_but_not_in_all)
+            # save meta
+            meta["transactions_number"] += meta_journal["transactions_number"]
+            meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
+            meta["amount"]["errors_transactions"] += meta_journal["amount"]["errors_transactions"]
+            meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -120,16 +142,20 @@ def analyze_case(request, case_id):
                 case.status = Case.STATUS_OPEN
                 case.save()
 
-    traces = list(itertools.chain(*traces))
+    journal_traces = list(itertools.chain(*journal_traces))
+
+    meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
 
     return render(request, 'analytics/results.html', {
         'case': case,
-        'atms': atms,
         'form': form,
-        'traces': traces,
+        'journal_traces': journal_traces,
+        'event_viewer_traces': event_viewer_traces,
+        'meta': meta,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,
+        'COLOR_BLUE': settings.COLOR_BLUE,
     })
 
 

@@ -24,6 +24,11 @@
             background-color: {{ COLOR_RED }};
             border-color: {{ COLOR_RED }};
         }
+
+        .vis-item.window-event {
+            background-color: {{ COLOR_BLUE }};
+            border-color: {{ COLOR_BLUE }};
+        }
     </style>
 {% endblock %}
 
@@ -118,24 +123,39 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <h3>
-                            Timeline
-                            <div class="btn-group text-center" data-toggle="buttons">
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-critical-erros" type="checkbox" autocomplete="off"
-                                           checked> Error critico
-                                </label>
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-important-erros" type="checkbox" autocomplete="off"
-                                           checked> Error importante
-                                </label>
-                                <label class="btn btn-primary active">
-                                    <input id="timeline-filter-no-erros" type="checkbox" autocomplete="off" checked> Sin
-                                    errores
-                                </label>
+                        <h3>Timeline</h3>
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <div class="btn-group text-center" data-toggle="buttons">
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-critical-erros" type="checkbox" autocomplete="off"
+                                               checked> Error critico
+                                    </label>
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-important-erros" type="checkbox" autocomplete="off"
+                                               checked> Error importante
+                                    </label>
+                                    <label class="btn btn-primary active">
+                                        <input id="timeline-filter-no-erros" type="checkbox" autocomplete="off" checked>
+                                        Sin
+                                        errores
+                                    </label>
+                                </div>
                             </div>
-                        </h3>
-
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><span class="glyphicon glyphicon-calendar"
+                                                                         aria-hidden="true"></span></div>
+                                    <input size="23" type="text" id="timeline-calendar-picker" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <select id="timeline-filter-errors" class="form-control" multiple="multiple">
+                                    <option value="all" selected>Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br>
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
                     </div>
                     <hr>
@@ -170,6 +190,27 @@
                     <hr>
                     <div class="row">
                         <h3>Análisis Automático</h3>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de transacciones</h5>
+                            <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto total de transacciones validas</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.valid_transactions }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de transacciones con errores críticos</h5>
+                            <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Porcentaje total de transacciones de errores críticos</h5>
+                            <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto total de transacciones con errores</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.errors_transactions }}</div></div>
+                        </div>
+                        <h4>Estimación de porcentaje de culpa</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Logs Journal
                                 <a href="javascript: void (0)" data-toggle="popover"
@@ -258,8 +299,14 @@
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var data = {{ traces | jsonify }};
+            var journalData = {{ journal_traces | jsonify }};
+            var eventViewerData = {{ event_viewer_traces | jsonify }};
+            var meta = {{ meta | jsonify }};
             var transformed = {};
+
+            meta.errors.names = _.map(meta.errors.names, function (item) {
+                return {id: item, text: item};
+            });
 
             var atmIndexChart = dc.pieChart("#atm-index-chart");
             var errorsReportChart = dc.pieChart("#errors-report-chart");
@@ -272,24 +319,24 @@
 
             var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
 
-            data.forEach(function (d) {
+            _.map(journalData, function (d) {
                 d.date = dtgFormat.parse(d.date);
-                var amount = d.amount.match(/\d/g);
-                d.amount = amount != null ? +amount.join("") : 0;
                 d.start = d.date;
-                d.errors = d.errors.join(", ");
+                d.printedErrors = d.errors.join(", ");
                 d.content = d.has_errors ? d.errors : 'Sin errores';
                 transformed[d.date] = d;
             });
 
-            // CROSSFILTER ******************************************************
-            var ndx = crossfilter(data);
-
-            // Dimensions and groups
-            var idDim = ndx.dimension(function (d) {
-                return d.id;
+            _.map(eventViewerData, function (d) {
+                d.date = dtgFormat.parse(d.date);
+                d.start = d.date;
+                d.content = d.record_id;
             });
 
+            // CROSSFILTER ******************************************************
+            var ndx = crossfilter(journalData);
+
+            // Dimensions and groups
             var atmsDim = ndx.dimension(function (d) {
                 return d.atm_index;
             });
@@ -330,10 +377,10 @@
                 return d;
             });
 
-            var errorsDim = ndx.dimension(function (d) {
-                return d.errors;
+            var printedErrorsDim = ndx.dimension(function (d) {
+                return d.printedErrors;
             });
-            var errorsGroupCount = errorsDim.group().reduceCount(function (d) {
+            var printedErrorsGroupCount = printedErrorsDim.group().reduceCount(function (d) {
                 return d;
             });
 
@@ -404,7 +451,10 @@
 
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
-            window.timelineData = data;
+            window.timelineData = journalData;
+            {#            console.log(eventViewerData.length);#}
+            {#            window.timelineData = eventViewerData.slice(0, eventViewerData.length / 2);#}
+            {#            console.log(window.timelineData);#}
 
             function fillTimelineTable(items) {
                 timelineTable.clear();
@@ -432,20 +482,41 @@
                 fillTimelineTable(_.sortBy(tableData, 'date'));
             });
 
-            function filterTimeline(items){
-                if(!$("#timeline-filter-critical-erros").is(":checked")){
+            function filterTimeline(items) {
+                var startDate = $('#timeline-calendar-picker').data('daterangepicker').startDate._d;
+                var endDate = $('#timeline-calendar-picker').data('daterangepicker').endDate._d;
+
+                // filter dates
+                items = _.filter(items, function (item) {
+                    return item.date >= startDate && item.date <= endDate;
+                });
+
+                // filter by errors
+                var selectedErrors = $("#timeline-filter-errors").val();
+                if (selectedErrors == null || selectedErrors.length == 0) {
+                    $("#timeline-filter-errors").val(["all"]).change();
+                } else if (selectedErrors[0] != "all") {
+                    items = _.filter(items, function (item) {
+                        return _.intersection(item.errors, selectedErrors).length > 0;
+                    });
+                }
+
+                // filter critical errors
+                if (!$("#timeline-filter-critical-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_RED }}";
                     });
                 }
 
-                if(!$("#timeline-filter-important-erros").is(":checked")){
+                // filter important errors
+                if (!$("#timeline-filter-important-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_ORANGE }}";
                     });
                 }
 
-                if(!$("#timeline-filter-no-erros").is(":checked")){
+                // filter no errors
+                if (!$("#timeline-filter-no-erros").is(":checked")) {
                     items = _.filter(items, function (item) {
                         return item.color != "{{ COLOR_GREEN }}";
                     });
@@ -456,13 +527,51 @@
                 fillTimelineTable(items);
             }
 
-            $("#timeline-filter-critical-erros").change(function(evt){
+            // init timeline calendar
+            $("#timeline-calendar-picker").daterangepicker({
+                "timePicker": true,
+                "timePicker24Hour": true,
+                "timePickerSeconds": true,
+                "locale": {
+                    "format": "DD/MM/YYYY",
+                    "separator": " / "
+                },
+                "alwaysShowCalendars": true,
+                "startDate": minDate,
+                "endDate": maxDate,
+                "minDate": minDate,
+                "maxDate": maxDate
+            }, function (start, end, label) {
+                filterTimeline(window.timelineData)
+            });
+
+            // init errors filter
+            $("#timeline-filter-errors").select2({
+                data: meta.errors.names
+            });
+            $("#timeline-filter-errors").change(function (evt) {
+                if ($("#timeline-filter-errors").val() != "all") {
+                    filterTimeline(window.timelineData);
+                }
+            });
+            $("#timeline-filter-errors").on("select2:select", function (evt) {
+                var selectedErrors = $("#timeline-filter-errors").val();
+                if (selectedErrors.length > 0) {
+                    if (evt.params.data.id != "all" && selectedErrors[0] == "all") {
+                        $("#timeline-filter-errors").val(selectedErrors.slice(1, selectedErrors.length)).change();
+                    } else if (evt.params.data.id == "all") {
+                        $("#timeline-filter-errors").val(["all"]).change();
+                    }
+                }
+            });
+
+            $("#timeline-filter-critical-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
-            $("#timeline-filter-important-erros").change(function(evt){
+            $("#timeline-filter-important-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
-            $("#timeline-filter-no-erros").change(function(evt){
+            $("#timeline-filter-no-erros").change(function (evt) {
                 filterTimeline(window.timelineData);
             });
 
@@ -576,8 +685,8 @@
                     });
 
             errorsReportChart
-                    .dimension(errorsDim)
-                    .group(errorsGroupCount)
+                    .dimension(printedErrorsDim)
+                    .group(printedErrorsGroupCount)
                     .renderLabel(false)
                     .legend(dc.legend());
 
