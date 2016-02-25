@@ -1,5 +1,6 @@
 import random
 import re
+from decimal import Decimal
 
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
@@ -38,6 +39,19 @@ def parse_date(date):
     return date
 
 
+def parse_currency(currency_string):
+    if currency_string == "":
+        currency = 0
+    else:
+        currency_string = re.sub(r'[^\d\-.]', '', currency_string)
+        if currency_string[0] == ".":
+            currency = Decimal(currency_string[1:])
+        else:
+            currency = Decimal(currency_string)
+
+    return float(currency)
+
+
 def parse_log_file(file_2_parse, atm_index, separator="------"):
     file_2_parse.open(mode='rb')
     data = file_2_parse.read()
@@ -45,9 +59,20 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
     data = data.split(separator)
 
     traces = []
-    errors_names = []
+    meta = {
+        "transactions_number": 0,
+        "amount": {
+            "valid_transactions": 0,
+            "errors_transactions": 0,
+        },
+        "errors": {
+            "critics_number": 0,
+            "names": []
+        }
+    }
 
     for item in data[0:-1]:
+        meta["transactions_number"] += 1
         trace = {}
         item = item.replace("\r", "")
         # get date
@@ -60,25 +85,26 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         match = re.search(r'M-\d*', item)
         if match:
             errors.append(match.group())
-            if match.group() not in errors_names:
-                errors_names.append(match.group())
+            if match.group() not in meta["errors"]["names"]:
+                meta["errors"]["names"].append(match.group())
         # get R- errors
         match = re.search(r'R-\d*', item)
         if match:
             errors.append(match.group())
-            if match.group() not in errors_names:
-                errors_names.append(match.group())
+            if match.group() not in meta["errors"]["names"]:
+                meta["errors"]["names"].append(match.group())
         lines = item.split("\n")
         # delete the lines that start with " " and empty lines
         lines = [x for x in lines if not x.startswith(" ") and x]
         # if last line start with number is error
         if lines[-1].split(" ")[0].isdigit():
             errors.append(lines[-1])
-            if lines[-1] not in errors_names:
-                errors_names.append(lines[-1])
+            if lines[-1] not in meta["errors"]["names"]:
+                meta["errors"]["names"].append(lines[-1])
         # get amount
         match = re.search(r'RETIRO:.*', item)
         trace["amount"] = match.group().split(":")[1].strip() if match else ""
+        trace["amount"] = parse_currency(trace["amount"])
 
         color = AtmErrorXFS.ERROR_COLOR_GREEN if len(errors) == 0 else random.choice(
             [AtmErrorXFS.ERROR_COLOR_ORANGE, AtmErrorXFS.ERROR_COLOR_RED])
@@ -91,9 +117,13 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         elif color == AtmErrorXFS.ERROR_COLOR_RED:
             event_type = "Error critico"
             class_name = "red"
+            meta["errors"]["critics_number"] += 1
 
         if len(errors) == 0:
             errors.append("Sin Errores")
+            meta["amount"]["valid_transactions"] += trace["amount"]
+        else:
+            meta["amount"]["errors_transactions"] += trace["amount"]
 
         trace.update({
             "has_errors": False if len(errors) == 0 else True,
@@ -105,7 +135,8 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         })
         traces.append(trace)
 
-    return traces, set(errors_names)
+    meta["errors"]["names"] = set(meta["errors"]["names"])
+    return traces, meta
 
 
 def parse_date_event_viewer(date):

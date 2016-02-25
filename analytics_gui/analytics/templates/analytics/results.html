@@ -191,6 +191,27 @@
                     <div class="row">
                         <h3>Análisis Automático</h3>
                         <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de transacciones</h5>
+                            <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto total de transacciones validas</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.valid_transactions }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de transacciones con errores críticos</h5>
+                            <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Porcentaje total de transacciones de errores críticos</h5>
+                            <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto total de transacciones con errores</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.errors_transactions }}</div></div>
+                        </div>
+                        <h4>Estimación de porcentaje de culpa</h4>
+                        <div class="col-md-4 col-xs-12">
                             <h5>Logs Journal
                                 <a href="javascript: void (0)" data-toggle="popover"
                                    data-placement="left" data-html="true"
@@ -280,10 +301,10 @@
 
             var journalData = {{ journal_traces | jsonify }};
             var eventViewerData = {{ event_viewer_traces | jsonify }};
-            var errorsMeta = {{ errors | jsonify }};
+            var meta = {{ meta | jsonify }};
             var transformed = {};
 
-            errorsMeta.names = _.map(errorsMeta.names, function (item) {
+            meta.errors.names = _.map(meta.errors.names, function (item) {
                 return {id: item, text: item};
             });
 
@@ -300,8 +321,6 @@
 
             _.map(journalData, function (d) {
                 d.date = dtgFormat.parse(d.date);
-                var amount = d.amount.match(/\d/g);
-                d.amount = amount != null ? +amount.join("") : 0;
                 d.start = d.date;
                 d.printedErrors = d.errors.join(", ");
                 d.content = d.has_errors ? d.errors : 'Sin errores';
@@ -528,7 +547,7 @@
 
             // init errors filter
             $("#timeline-filter-errors").select2({
-                data: errorsMeta.names
+                data: meta.errors.names
             });
             $("#timeline-filter-errors").change(function (evt) {
                 if ($("#timeline-filter-errors").val() != "all") {
