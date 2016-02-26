@@ -168,6 +168,13 @@ def delete_case(request, case_id):
 def generate_pdf(request, case_id):
     args = None
     case = get_object_or_404(Case, id=case_id)
+    case_picture = None
+    company_logo = None
+    if case.picture:
+        case_picture = settings.BASE_DIR + case.picture.url
+    elif case.bank.company.logo:
+        company_logo = settings.BASE_DIR + case.bank.company.logo.url
+
     atms = case.atms.all()
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
@@ -240,6 +247,8 @@ def generate_pdf(request, case_id):
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
     args['meta'] = meta
+    args['case_picture'] = case_picture
+    args['company_logo'] = company_logo
     args['default_avatar'] = default_avatar
     args['analyst_name'] = \
         request.user.first_name + " " + request.user.last_name \

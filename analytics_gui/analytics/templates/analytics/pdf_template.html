@@ -27,8 +27,16 @@
                 <span style="margin: 6px auto;" class="pull-right">Fecha de emisión: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
                 <span class="pull-right" style="padding: 70px;">
-                        <img src="{{ default_avatar }}"
-                            class="img-circle img-responsive" width="100px">
+                        {% if case.picture %}
+                            <img src="{{ case_picture }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% elif case.bank.company.logo %}
+                            <img src="{{ company_logo }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% else %}
+                            <img src="{{ default_avatar }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% endif %}
                 </span>
             <h2>Análisis del Caso</h2>
             <p><b>Nombre:</b> {{ case.name }}</p>
