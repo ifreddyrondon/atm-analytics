@@ -105,7 +105,8 @@ def analyze_case(request, case_id):
         "transactions_number": 0,
         "amount": {
             "valid_transactions": 0,
-            "errors_transactions": 0,
+            "critical_errors_transactions": 0,
+            "important_errors_transactions": 0,
         },
         "errors": {
             "critics_number": 0,
@@ -128,7 +129,8 @@ def analyze_case(request, case_id):
             # save meta
             meta["transactions_number"] += meta_journal["transactions_number"]
             meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["errors_transactions"] += meta_journal["amount"]["errors_transactions"]
+            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
+            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
             meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
 
     if request.method == 'POST':
@@ -145,6 +147,8 @@ def analyze_case(request, case_id):
     journal_traces = list(itertools.chain(*journal_traces))
 
     meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+    currency = case.get_missing_amount_currency_display()
+    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
 
     return render(request, 'analytics/results.html', {
         'case': case,
@@ -152,6 +156,7 @@ def analyze_case(request, case_id):
         'journal_traces': journal_traces,
         'event_viewer_traces': event_viewer_traces,
         'meta': meta,
+        'currency': currency,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,
@@ -168,27 +173,29 @@ def delete_case(request, case_id):
 def generate_pdf(request, case_id):
     args = None
     case = get_object_or_404(Case, id=case_id)
+    atms = case.atms.all()
+    images = dict()
     case_picture = None
     company_logo = None
+
     if case.picture:
         case_picture = settings.BASE_DIR + case.picture.url
     elif case.bank.company.logo:
         company_logo = settings.BASE_DIR + case.bank.company.logo.url
 
-    atms = case.atms.all()
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
     image_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'images/')
     logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
     default_avatar = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'default_avatar.png')
     html_template = 'analytics/pdf_template.html'
-    images = dict()
 
     meta = {
         "transactions_number": 0,
         "amount": {
             "valid_transactions": 0,
-            "errors_transactions": 0,
+            "critical_errors_transactions": 0,
+            "important_errors_transactions": 0,
         },
         "errors": {
             "critics_number": 0,
@@ -210,10 +217,13 @@ def generate_pdf(request, case_id):
             # save meta
             meta["transactions_number"] += meta_journal["transactions_number"]
             meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["errors_transactions"] += meta_journal["amount"]["errors_transactions"]
+            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
+            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
             meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
 
     meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+    currency = case.get_missing_amount_currency_display()
+    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
 
     if request.is_ajax():
         args = dict(request.POST.iterlists())
@@ -246,14 +256,16 @@ def generate_pdf(request, case_id):
     args['logo'] = logo
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
+    args['currency'] = currency
     args['meta'] = meta
     args['case_picture'] = case_picture
     args['company_logo'] = company_logo
     args['default_avatar'] = default_avatar
     args['analyst_name'] = \
-        request.user.first_name + " " + request.user.last_name \
-            if request.user.first_name != '' \
-            else request.user.username
+        request.user.first_name + \
+        " " + \
+        request.user.last_name if request.user.first_name != '' else request.user.username
+
     rendered_html = render_to_string(html_template, args)
 
     style_list = [bootstrap, base]

@@ -79,7 +79,8 @@
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 10px;">Monto total de transacciones validas</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.valid_transactions }}</div>
+                    <div class="well percent-result text-center">{{ meta.amount.valid_transactions }} {{ currency }}
+                    </div>
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 10px;">Transacciones con errores críticos</h5>
@@ -90,8 +91,29 @@
                     <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
                 </div>
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Monto total de transacciones con errores</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.errors_transactions }}</div>
+                    <h5 style="font-size: 10px;">Monto transacciones con errores criticos</h5>
+                    <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }} {{ currency }}
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5 style="font-size: 9px;">Monto transacciones con errores importantes</h5>
+                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h3>Estimación de porcentaje de culpa</h3>
+                <div class="col-md-4 col-xs-4">
+                    <h5>Logs Journal</h5>
+                    <div class="well percent-result text-center">33%</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5>Logs Windows</h5>
+                    <div class="well percent-result text-center">100%</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5>Estimación del caso</h5>
+                    <div class="well percent-result text-center">98%</div>
                 </div>
             </div>
             <br>
@@ -100,8 +122,8 @@
             {% if resolution %}
             <p><b>Resolución:</b></p>
             <div class="form-group">
-                    <textarea readonly>
-                        {{ resolution }}
+                    <textarea class="form-control" readonly>
+                        {{ resolution|first }}
                     </textarea>
             </div>
             {% endif %}

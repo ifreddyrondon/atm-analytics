@@ -1,4 +1,5 @@
-$("#generate-pdf").click(function() {
+$("#generate-pdf").click(function(event) {
+    event.preventDefault();
     $("#wait").show();
     var svgList = document.getElementsByTagName("svg");
     var time_line = document.getElementById("chart-events-timeline");

@@ -63,7 +63,8 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         "transactions_number": 0,
         "amount": {
             "valid_transactions": 0,
-            "errors_transactions": 0,
+            "critical_errors_transactions": 0,
+            "important_errors_transactions": 0,
         },
         "errors": {
             "critics_number": 0,
@@ -114,16 +115,16 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         if color == AtmErrorXFS.ERROR_COLOR_ORANGE:
             event_type = "Error importante"
             class_name = "orange"
+            meta["amount"]["important_errors_transactions"] += trace["amount"]
         elif color == AtmErrorXFS.ERROR_COLOR_RED:
             event_type = "Error critico"
             class_name = "red"
             meta["errors"]["critics_number"] += 1
+            meta["amount"]["critical_errors_transactions"] += trace["amount"]
 
         if len(errors) == 0:
             errors.append("Sin Errores")
             meta["amount"]["valid_transactions"] += trace["amount"]
-        else:
-            meta["amount"]["errors_transactions"] += trace["amount"]
 
         trace.update({
             "has_errors": False if len(errors) == 0 else True,
