@@ -196,7 +196,7 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones validas</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.valid_transactions }}</div>
+                            <div class="well percent-result text-center">{{ meta.amount.valid_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones con errores críticos</h5>
@@ -209,11 +209,11 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores criticos</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }}</div>
+                            <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores importantes</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }}</div>
+                            <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}</div>
                         </div>
                         <h4>Estimación de porcentaje de culpa</h4>
                         <div class="col-md-4 col-xs-12">
@@ -464,7 +464,7 @@
             function fillTimelineTable(items) {
                 timelineTable.clear();
                 _.each(items, function (item) {
-                    timelineTable.row.add(["<input type='checkbox'></td>", item.date, item.errors, item.amount]);
+                    timelineTable.row.add(["<input type='checkbox'></td>", item.date, item.errors, item.amount + " " + "{{ currency }}"]);
                 });
                 timelineTable.draw();
             }
@@ -712,7 +712,7 @@
                             return d.errors;
                         },
                         function (d) {
-                            return d.amount;
+                            return d.amount + " " + "{{ currency }}";
                         }
                     ])
                     .sortBy(function (d) {

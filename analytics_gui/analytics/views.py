@@ -140,6 +140,8 @@ def analyze_case(request, case_id):
     journal_traces = list(itertools.chain(*journal_traces))
 
     meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+    currency = case.get_missing_amount_currency_display()
+    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
 
     return render(request, 'analytics/results.html', {
         'case': case,
@@ -147,6 +149,7 @@ def analyze_case(request, case_id):
         'journal_traces': journal_traces,
         'event_viewer_traces': event_viewer_traces,
         'meta': meta,
+        'currency': currency,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,
