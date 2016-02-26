@@ -1,4 +1,5 @@
-d3.select("#generate-pdf").on("click", function() {
+$("#generate-pdf").click(function() {
+    $("#wait").show();
     var svgList = document.getElementsByTagName("svg");
     var time_line = document.getElementById("chart-events-timeline");
     var array = Array.prototype.slice.call(svgList);
@@ -35,11 +36,13 @@ generatePdf = function(array) {
         // handle a successful response
         success: function(json) {
             file_content = JSON.parse(json)["file"];
+            $("#wait").hide();
             convertBase64ToPDF("report.pdf", file_content);
         },
         // handle a non-successful response
         error: function(xhr, errmsg, err) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            $("#wait").hide();
         }
     });
 };
