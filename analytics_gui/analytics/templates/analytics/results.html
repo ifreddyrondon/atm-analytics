@@ -204,11 +204,16 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Porcentaje total de transacciones de errores críticos</h5>
-                            <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
+                            <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }}%
+                            </div>
                         </div>
                         <div class="col-md-4 col-xs-12">
-                            <h5>Monto total de transacciones con errores</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.errors_transactions }}</div></div>
+                            <h5>Monto total de transacciones con errores criticos</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }}</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto total de transacciones con errores importantes</h5>
+                            <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }}</div>
                         </div>
                         <h4>Estimación de porcentaje de culpa</h4>
                         <div class="col-md-4 col-xs-12">

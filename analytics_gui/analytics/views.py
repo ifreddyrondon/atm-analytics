@@ -98,7 +98,8 @@ def analyze_case(request, case_id):
         "transactions_number": 0,
         "amount": {
             "valid_transactions": 0,
-            "errors_transactions": 0,
+            "critical_errors_transactions": 0,
+            "important_errors_transactions": 0,
         },
         "errors": {
             "critics_number": 0,
@@ -121,7 +122,8 @@ def analyze_case(request, case_id):
             # save meta
             meta["transactions_number"] += meta_journal["transactions_number"]
             meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["errors_transactions"] += meta_journal["amount"]["errors_transactions"]
+            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
+            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
             meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
 
     if request.method == 'POST':
