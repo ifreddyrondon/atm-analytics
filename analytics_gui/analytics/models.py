@@ -417,3 +417,18 @@ class AtmErrorEventViewer(models.Model):
             choices=ERRORS_COLORS_CHOICES,
             help_text="Color del error",
     )
+
+
+class AtmEventViewerEvent(models.Model):
+    class Meta:
+        ordering = ['event_date']
+
+    atm = models.ForeignKey(AtmCase, related_name="event_viewer_errors")
+
+    event_id = models.CharField(max_length=255)
+
+    event_record_id = models.CharField(max_length=255)
+
+    event_date = models.DateTimeField("Fecha del evento")
+
+    context = models.TextField()
