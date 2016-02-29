@@ -92,12 +92,14 @@
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 10px;">Monto transacciones con errores criticos</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }} {{ currency }}
+                    <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }}
+                        {{ currency }}
                     </div>
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 9px;">Monto transacciones con errores importantes</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}
+                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{
+                        currency }}
                     </div>
                 </div>
             </div>
@@ -158,6 +160,17 @@
             </div>
             {% endif %}
             <br>
+            <h5>Gráficas:</h5>
+            <div class="row" style="padding-top: 35px; padding-bottom: 70px;">
+                <div class="col-md-6 col-xs-6">
+                    <img src="{{ atm_index_chart }}"
+                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                    <img src="{{ total_operations_report_chart }}"
+                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+            </div>
             <div class="col-md-4 col-xs-4">
                 <h6>Errores Criticos</h6>
                 <img src="{{ critical_errors_chart }}"

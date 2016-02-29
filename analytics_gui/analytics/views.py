@@ -185,7 +185,7 @@ def generate_pdf(request, case_id):
 
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
-    image_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'images/')
+    image_root = os.path.join(settings.BASE_DIR, 'media/')
     logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
     default_avatar = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'default_avatar.png')
     html_template = 'analytics/pdf_template.html'
@@ -271,7 +271,7 @@ def generate_pdf(request, case_id):
     style_list = [bootstrap, base]
 
     try:
-        pdfkit.from_string(rendered_html, 'report.pdf', css=style_list)
+        pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list)
     except Exception as e:
         if "code 1" in e:
             pass
@@ -279,7 +279,7 @@ def generate_pdf(request, case_id):
     for image in images.values():
         os.remove(image)
 
-    with open('report.pdf', 'rb') as pdf_file:
+    with open(image_root + 'report.pdf', 'rb') as pdf_file:
         return HttpResponse(
             json.dumps({'file': base64.b64encode(pdf_file.read())}),
             content_type="application/pdf")
