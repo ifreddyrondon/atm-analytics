@@ -59,14 +59,12 @@
                         </tr>
                         </thead>
                         <tbody>
+                        {% for journal_file in journal_files %}
                         <tr>
-                            <td>archivo1</td>
-                            <td>2013-06-02</td>
+                            <td>{{ journal_file.filename }}</td>
+                            <td>{{ journal_file.date }}</td>
                         </tr>
-                        <tr>
-                            <td>archivo2</td>
-                            <td>2013-06-02</td>
-                        </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>

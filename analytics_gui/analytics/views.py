@@ -175,6 +175,7 @@ def generate_pdf(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
     images = dict()
+    journal_files = []
     case_picture = None
     company_logo = None
 
@@ -209,7 +210,12 @@ def generate_pdf(request, case_id):
         #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
         # Journals Virtual
         for journal_file in atm.journals.all():
+            tmp = {}
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
+            tmp['filename'] = journal_file.filename
+            tmp['date'] = journal_file.file.name.split(os.sep)[len(journal_file.file.name.split(os.sep)) - 2]
+            journal_files.append(tmp)
+
             # save only new errors names
             in_all_errors_names = set(meta["errors"]["names"])
             in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
@@ -261,6 +267,7 @@ def generate_pdf(request, case_id):
     args['case_picture'] = case_picture
     args['company_logo'] = company_logo
     args['default_avatar'] = default_avatar
+    args['journal_files'] = journal_files
     args['analyst_name'] = \
         request.user.first_name + \
         " " + \
