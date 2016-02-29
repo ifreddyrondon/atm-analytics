@@ -490,7 +490,11 @@
             function fillTimelineTable(items) {
                 timelineTable.clear();
                 _.each(items, function (item) {
-                    timelineTable.row.add(["<input type='checkbox'></td>", item.date, item.errors ? item.errors : item.content, item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
+                    timelineTable.row.add([
+                        "<input type='checkbox'></td>",
+                        moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
+                        item.errors ? item.errors : item.content,
+                        item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
                 });
                 timelineTable.draw();
             }
@@ -804,7 +808,7 @@
                             return '<input type="checkbox"></td>'
                         },
                         function (d) {
-                            return d.date;
+                            return moment(d.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ");
                         },
                         function (d) {
                             return d.errors;
