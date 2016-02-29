@@ -152,7 +152,8 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <select id="timeline-filter-errors" class="form-control" multiple="multiple">
+                                <select id="timeline-filter-errors" class="form-control" multiple="multiple"
+                                        style="width:100%">
                                     <option value="all" selected>Todos</option>
                                 </select>
                             </div>
@@ -167,7 +168,8 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <select id="timeline-filter-windows-errors" class="form-control" multiple="multiple">
+                                    <select id="timeline-filter-windows-errors" class="form-control" multiple="multiple"
+                                            style="width:100%">
                                         <option value="all" selected>Todos</option>
                                     </select>
                                 </div>
@@ -407,6 +409,12 @@
 
             // TABLES *****************************************************
             var operationTable = $("#operations-table").DataTable({
+                "columns": [
+                    {"width": "20px"},
+                    null,
+                    null,
+                    null
+                ],
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
@@ -437,6 +445,12 @@
             });
 
             var timelineTable = $("#timeline-table").DataTable({
+                "columns": [
+                    {"width": "20px"},
+                    null,
+                    null,
+                    null
+                ],
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
@@ -462,6 +476,7 @@
                     }
                 }
             });
+
             $('#timeline-table-filter').keyup(function () {
                 operationTable.search($(this).val()).draw();
             });
@@ -614,7 +629,8 @@
 
             // init errors filter
             $("#timeline-filter-errors").select2({
-                data: meta.errors.names
+                data: meta.errors.names,
+                width: 'element'
             });
             $("#timeline-filter-errors").change(function (evt) {
                 if ($("#timeline-filter-errors").val() != "all") {
@@ -643,7 +659,8 @@
             });
 
             $("#timeline-filter-windows-errors").select2({
-                data: windows_events.keys
+                data: windows_events.keys,
+                width: '100%'
             });
             $("#timeline-filter-windows-errors").change(function (evt) {
                 if ($("#timeline-filter-windows-errors").val() != "all") {
