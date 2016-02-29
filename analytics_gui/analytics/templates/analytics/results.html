@@ -357,7 +357,7 @@
 
             // Dimensions and groups
             var atmsDim = ndx.dimension(function (d) {
-                return d.atm_index;
+                return "ATM " + (d.atm_index + 1);
             });
             var countATMsIndex = atmsDim.group().reduceCount(function (d) {
                 return d.atm_index;
@@ -687,12 +687,9 @@
                     .dimension(atmsDim)
                     .group(countATMsIndex)
                     .transitionDuration(100)
-                    .on('pretransition', function (chart) {
-                        chart.selectAll('text.pie-slice').text(function (d) {
-                            var percentage = dc.utils.printSingleValue((d.endAngle - d.startAngle) / (2 * Math.PI) * 100);
-                            percentage = Number(percentage).toFixed(1);
-                            return "ATM" + (+d.data.key + 1) + ': ' + percentage + '%';
-                        })
+                    .legend(dc.legend())
+                    .label(function (d) {
+                        return (d.value / ndx.groupAll().reduceCount().value() * 100).toFixed(2) + "%";
                     });
             atmIndexChart.on("filtered", function (chart, filter) {
                 window.timelineData = atmsDim.top(Infinity);
@@ -708,12 +705,9 @@
                     .group(typeErrorsGroupCount)
                     .innerRadius(30)
                     .transitionDuration(100)
-                    .on('pretransition', function (chart) {
-                        chart.selectAll('text.pie-slice').text(function (d) {
-                            var percentage = dc.utils.printSingleValue((d.endAngle - d.startAngle) / (2 * Math.PI) * 100);
-                            percentage = Number(percentage).toFixed(0);
-                            return d.data.key + ' ' + percentage + '%';
-                        })
+                    .legend(dc.legend())
+                    .label(function (d) {
+                        return (d.value / ndx.groupAll().reduceCount().value() * 100).toFixed(2) + "%";
                     });
             totalOperationsReportChart.ordinalColors(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]);
 
