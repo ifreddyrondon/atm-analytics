@@ -1,10 +1,11 @@
+
 import random
 import re
 from decimal import Decimal
 
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
-from django.conf import settings
+from datetime import datetime
 
 from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
 
@@ -35,7 +36,6 @@ def parse_date(date):
         year = "20{}".format(year)
         date = "{}/{}/{} {}".format(day, month, year, hour)
 
-    # return datetime.datetime.strptime(date, '%d/%m/%Y %H:%M:%S')
     return date
 
 
@@ -61,6 +61,10 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
     traces = []
     meta = {
         "transactions_number": 0,
+        "dates": {
+            "min": None,
+            "max": None,
+        },
         "amount": {
             "valid_transactions": 0,
             "critical_errors_transactions": 0,
@@ -81,6 +85,12 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         if not match:
             continue
         trace["date"] = parse_date(match.group())
+        # min and max dates
+        meta_date = datetime.strptime(trace["date"], '%d/%m/%Y %H:%M:%S')
+        if not meta["dates"]["min"] or meta["dates"]["min"] > meta_date:
+            meta["dates"]["min"] = meta_date
+        if not meta["dates"]["max"] or meta["dates"]["max"] < meta_date:
+            meta["dates"]["max"] = meta_date
         errors = []
         # get M- or R- errors
         match = re.search(r'M-\d*', item)

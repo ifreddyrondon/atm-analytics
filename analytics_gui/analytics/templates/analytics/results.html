@@ -501,12 +501,17 @@
             }
 
             var timelineContainer = document.getElementById('chart-events-timeline');
+            if (windows_events.are_there) {
+                windows_events.min_date = moment(windows_events.min_date);
+                windows_events.max_date = moment(windows_events.max_date);
+            }
             var options = {
-                max: maxDate,
-                min: minDate
+                min: windows_events.min_date && windows_events.min_date < minDate  ? windows_events.min_date : minDate,
+                max: windows_events.max_date && windows_events.max_date > maxDate  ? windows_events.max_date : maxDate,
             };
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
             fillTimelineTable(window.timelineData);
+            timeline.fit();
             timeline.on("rangechanged", function (properties) {
                 var tableData = [];
                 var items = window.timelineData.concat(window.windowsEventsData);
@@ -607,10 +612,10 @@
                         "separator": " / "
                     },
                     "alwaysShowCalendars": true,
-                    "minDate": new Date(windows_events.min_date),
-                    "maxDate": new Date(windows_events.max_date),
-                    "startDate": new Date(windows_events.min_date),
-                    "endDate": new Date(windows_events.max_date)
+                    "minDate": windows_events.min_date,
+                    "maxDate": windows_events.max_date,
+                    "startDate": windows_events.min_date,
+                    "endDate": windows_events.max_date
                 }, function (start, end, label) {
                     $.ajax({
                                 method: "POST",
@@ -805,6 +810,7 @@
                 }
                 return false;
             }
+
             operationsReportChart.focusCharts = function (chartlist) {
                 if (!arguments.length) {
                     return this._focusCharts;
