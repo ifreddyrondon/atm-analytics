@@ -1,6 +1,5 @@
 import itertools
 
-import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -105,6 +104,10 @@ def analyze_case(request, case_id):
     }
     meta = {
         "transactions_number": 0,
+        "dates": {
+            "min": None,
+            "max": None,
+        },
         "amount": {
             "valid_transactions": 0,
             "critical_errors_transactions": 0,
@@ -147,6 +150,10 @@ def analyze_case(request, case_id):
             meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
             meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
             meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+            if not meta["dates"]["min"] or meta["dates"]["min"] > meta_journal["dates"]["min"]:
+                meta["dates"]["min"] = meta_journal["dates"]["min"]
+            if not meta["dates"]["max"] or meta["dates"]["max"] < meta_journal["dates"]["max"]:
+                meta["dates"]["max"] = meta_journal["dates"]["max"]
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -181,11 +188,14 @@ def analyze_case(request, case_id):
     # get the currency
     currency = case.get_missing_amount_currency_display()
     currency = currency[currency.index("-") + 1:currency.index("|")].strip()
-    # serialize the min and max dates
 
+    # serialize the min and max dates
     if windows_events["min_date"] is not None and windows_events["max_date"] is not None:
         windows_events["min_date"] = windows_events["min_date"].strftime("%Y-%m-%d %H:%M:%S")
         windows_events["max_date"] = windows_events["max_date"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["dates"]["min"] is not None and meta["dates"]["max"] is not None:
+        meta["dates"]["min"] = meta["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["dates"]["max"] = meta["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
 
     return render(request, 'analytics/results.html', {
         'case': case,
