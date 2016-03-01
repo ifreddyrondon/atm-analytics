@@ -6,7 +6,7 @@ from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
 from django.conf import settings
 
-from analytics_gui.analytics.models import AtmErrorXFS
+from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
 
 
 def parse_date(date):
@@ -140,26 +140,12 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
     return traces, meta
 
 
-def parse_date_event_viewer(date):
-    just_date = date.split(" ")[0]
-    hour = date.split(" ")[1]
-
-    day = just_date.split("-")[2]
-    month = just_date.split("-")[1]
-    year = just_date.split("-")[0]
-
-    return "{}/{}/{} {}".format(day, month, year, hour)
-
-
-def parse_window_event_viewer(file_2_parse):
-    file_2_parse.open(mode='rb')
-    data = file_2_parse.read()
-
-    traces = []
+def parse_window_event_viewer(atm):
+    atm.microsoft_event_viewer.file.open(mode='rb')
+    data = atm.microsoft_event_viewer.file.read()
 
     fh = FileHeader(data, 0x0)
     for xml_line, record in evtx_file_xml_view(fh):
-        trace = {}
         # get date
         match = re.search(r'<TimeCreated SystemTime=\".*\"', xml_line)
         if not match:
@@ -167,16 +153,23 @@ def parse_window_event_viewer(file_2_parse):
         match = re.search(r'\d{2,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', match.group())
         if not match:
             continue
-        trace["date"] = parse_date_event_viewer(match.group())
+        date = match.group()
         # event record id
         match = re.search(r'<EventRecordID>\d*', xml_line)
         if not match:
             continue
         match = re.search(r'\d+', match.group())
-        trace["record_id"] = match.group()
-        trace["context"] = xml_line
-        trace["className"] = "window-event"
-        trace["color"] = settings.COLOR_BLUE
-        traces.append(trace)
-
-    return traces
+        event_record_id = match.group()
+        # event id
+        match = re.search(r'<EventID Qualifiers="(\d+)?">\d+', xml_line)
+        if not match:
+            continue
+        event_id = match.group().split(">")[1]
+        context = xml_line
+        AtmEventViewerEvent.objects.get_or_create(
+            atm=atm,
+            event_date=date,
+            event_id=event_id,
+            event_record_id=event_record_id,
+            context=context
+        )

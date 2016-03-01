@@ -7,15 +7,18 @@ import pdfkit
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from analytics_gui.analytics import utils
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
-from analytics_gui.analytics.models import Case, AtmJournal
-from analytics_gui.analytics.parsers import parse_log_file
+from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
+from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
 from analytics_gui.companies.models import Company
 
 
@@ -101,6 +104,12 @@ def analyze_case(request, case_id):
 
     journal_traces = []
     event_viewer_traces = []
+    windows_events = {
+        "are_there": False,
+        "min_date": None,
+        "max_date": None,
+        "keys": []
+    }
     meta = {
         "transactions_number": 0,
         "amount": {
@@ -115,9 +124,22 @@ def analyze_case(request, case_id):
     }
 
     for index, atm in enumerate(atms):
-        # Microsoft Event Viewer
-        # if atm.microsoft_event_viewer:
-        #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        # windows events
+        if atm.microsoft_event_viewer:
+            windows_events["are_there"] = True
+            # get the min and max dates for filter
+            if not windows_events["min_date"] \
+                    or windows_events["min_date"] > atm.event_viewer_errors.first().event_date:
+                windows_events["min_date"] = atm.event_viewer_errors.first().event_date
+            if not windows_events["max_date"] \
+                    or windows_events["max_date"] < atm.event_viewer_errors.last().event_date:
+                windows_events["max_date"] = atm.event_viewer_errors.last().event_date
+            # get the keys of records id
+            event_id_keys = set(atm.event_viewer_errors.values_list('event_id', flat=True).distinct())
+            in_all_events_keys = set(windows_events["keys"])
+            in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
+            windows_events["keys"] = windows_events["keys"] + list(in_record_id_keys_but_not_in_all)
+
         # Journals Virtual
         for journal_file in atm.journals.all():
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
@@ -144,11 +166,33 @@ def analyze_case(request, case_id):
                 case.status = Case.STATUS_OPEN
                 case.save()
 
+        if 'event_start_date_timeline' in request.POST and 'event_end_date_timeline' in request.POST:
+            start_date = request.POST['event_start_date_timeline']
+            end_date = request.POST['event_end_date_timeline']
+            events = AtmEventViewerEvent.objects.filter(event_date__range=(start_date, end_date))
+            events_response = []
+            for event in events:
+                events_response.append({
+                    "date": event.event_date.strftime("%Y-%m-%d %H:%M:%S"),
+                    "eventId": event.event_id,
+                    "eventRecordId": event.event_record_id,
+                    "context": event.context,
+                    "className": "window-event",
+                    "color": settings.COLOR_BLUE
+                })
+            return JsonResponse(events_response, safe=False, status=200)
+
     journal_traces = list(itertools.chain(*journal_traces))
 
     meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+    # get the currency
     currency = case.get_missing_amount_currency_display()
     currency = currency[currency.index("-") + 1:currency.index("|")].strip()
+    # serialize the min and max dates
+
+    if windows_events["min_date"] is not None and windows_events["max_date"] is not None:
+        windows_events["min_date"] = windows_events["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        windows_events["max_date"] = windows_events["max_date"].strftime("%Y-%m-%d %H:%M:%S")
 
     return render(request, 'analytics/results.html', {
         'case': case,
@@ -156,6 +200,7 @@ def analyze_case(request, case_id):
         'journal_traces': journal_traces,
         'event_viewer_traces': event_viewer_traces,
         'meta': meta,
+        'windows_events': windows_events,
         'currency': currency,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
@@ -290,3 +335,9 @@ def generate_pdf(request, case_id):
         return HttpResponse(
             json.dumps({'file': base64.b64encode(pdf_file.read())}),
             content_type="application/pdf")
+
+
+@receiver(post_save, sender=AtmCase)
+def parse_window_event_errors(sender, **kwargs):
+    if kwargs['instance'].microsoft_event_viewer:
+        parse_window_event_viewer(kwargs['instance'])
