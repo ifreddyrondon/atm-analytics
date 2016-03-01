@@ -55,12 +55,28 @@
                 <form method="post" action="" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
-                        <div class="col-md-6 col-xs-12">
-                            <svg id="atm-index-chart" style="width: 100%; height: 250px; margin: 0 auto"></svg>
+                        <div class="col-md-6 col-xs-12" id='atm-index-chart' style="">
+                            <h4>ATMs
+                                <span>
+                                    <a class="reset"
+                                       href="javascript:atmIndexChart.filterAll();dc.redrawAll();dc.refocusAll();"
+                                       style="display: none;">
+                                        reset
+                                    </a>
+                                </span>
+                            </h4>
                         </div>
-                        <div class="col-md-6 col-xs-12">
-                            <svg id="total-operations-report-chart"
-                                 style="width: 100%; height: 250px; margin: 0 auto"></svg>
+
+                        <div class="col-md-6 col-xs-12" id='total-operations-report-chart' style="height: 250px">
+                            <h4>Tipos de errores
+                                <span>
+                                    <a class="reset"
+                                       href="javascript:errorsReportChart.filterAll();dc.redrawAll();dc.refocusAll();"
+                                       style="display: none;">
+                                        reset
+                                    </a>
+                                </span>
+                            </h4>
                         </div>
                     </div>
                     <hr>
@@ -82,16 +98,31 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <h3>Reporte de Operaciones</h3>
-                        <svg id="operations-report-chart"
-                             style="width: 100%; height: 300px; margin: 0 auto"></svg>
-
+                        <div id="operations-report-chart" style="width:100%; height: 300px; margin: 0 auto 25px">
+                            <h4>Reporte de Operaciones
+                                <span>
+                                    <a class="reset"
+                                       href="javascript:operationsReportChart.filterAll();dc.redrawAll();dc.refocusAll();"
+                                       style="display: none;">
+                                        reset
+                                    </a>
+                                </span>
+                            </h4>
+                        </div>
                     </div>
                     <hr>
                     <div class="row">
-                        <svg id="errors-report-chart"
-                             style="width: 100%; height: 300px; margin: 0 auto"></svg>
-
+                        <div id="errors-report-chart" style="width:100%; height: 300px; margin: 0 auto 35px">
+                            <h4>Errores
+                                <span>
+                                    <a class="reset"
+                                       href="javascript:totalOperationsReportChart.filterAll();dc.redrawAll();dc.refocusAll();"
+                                       style="display: none;">
+                                        reset
+                                    </a>
+                                </span>
+                            </h4>
+                        </div>
                     </div>
                     <hr>
                     <div class="panel panel-primary row">
@@ -332,13 +363,13 @@
                 return {id: item, text: item};
             });
 
-            var atmIndexChart = dc.pieChart("#atm-index-chart");
-            var errorsReportChart = dc.pieChart("#errors-report-chart");
+            atmIndexChart = dc.pieChart("#atm-index-chart");
+            errorsReportChart = dc.pieChart("#errors-report-chart");
             var criticalErrorsChart = dc.barChart("#critical-errors-chart");
             var importantErrorsChart = dc.barChart("#important-errors-chart");
             var noErrorsChart = dc.barChart("#no-errors-chart");
-            var operationsReportChart = dc.barChart("#operations-report-chart");
-            var totalOperationsReportChart = dc.pieChart("#total-operations-report-chart");
+            operationsReportChart = dc.barChart("#operations-report-chart");
+            totalOperationsReportChart = dc.pieChart("#total-operations-report-chart");
             var dataTable = dc.dataTable("#operations-table");
 
             var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
@@ -347,8 +378,7 @@
             _.map(journalData, function (d) {
                 d.date = dtgFormat.parse(d.date);
                 d.start = d.date;
-                d.printedErrors = d.errors.join(", ");
-                d.content = d.has_errors ? d.errors : 'Sin errores';
+                d.content = d.has_errors ? d.error : 'Sin errores';
                 transformed[d.date] = d;
             });
 
@@ -359,10 +389,12 @@
             var atmsDim = ndx.dimension(function (d) {
                 return "ATM " + (d.atm_index + 1);
             });
-            var countATMsIndex = atmsDim.group().reduceCount(function (d) {
-                return d.atm_index;
+            var typeDim = ndx.dimension(function (d) {
+                return d.event_type;
             });
-
+            var errorsDim = ndx.dimension(function (d) {
+                return d.error;
+            });
             var dateDim = ndx.dimension(function (d) {
                 return d.date;
             });
@@ -370,41 +402,33 @@
             var minDate = dateDim.bottom(1)[0].date;
             var maxDate = dateDim.top(1)[0].date;
 
-            var amountGroupCriticalErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_RED }}") {
-                    return d.amount;
-                }
+            var countATMsIndex = atmsDim.group().reduceCount(function (d) {
+                return d.atm_index;
             });
-
-            var amountGroupImportantErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_ORANGE }}") {
-                    return d.amount;
-                }
-            });
-
-            var amountGroupNoErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_GREEN }}") {
-                    return d.amount;
-                }
-            });
-
-            var typeDim = ndx.dimension(function (d) {
-                return d.event_type;
-            });
-
             var typeErrorsGroupCount = typeDim.group().reduceCount(function (d) {
                 return d;
             });
-
-            var printedErrorsDim = ndx.dimension(function (d) {
-                return d.printedErrors;
+            var criticalErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_RED }}") {
+                    return 1;
+                }
             });
-            var printedErrorsGroupCount = printedErrorsDim.group().reduceCount(function (d) {
+            var importantErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_ORANGE }}") {
+                    return 1;
+                }
+            });
+            var noErrors = dateDim.group().reduceSum(function (d) {
+                if (d.color == "{{ COLOR_GREEN }}") {
+                    return 1;
+                }
+            });
+            var errorsCount = dateDim.group().reduceCount(function (d) {
                 return d;
             });
 
-            var amount = dateDim.group().reduceSum(function (d) {
-                return d.amount;
+            var errorsGroupCount = errorsDim.group().reduceCount(function (d) {
+                return d;
             });
 
             // TABLES *****************************************************
@@ -493,7 +517,7 @@
                     timelineTable.row.add([
                         "<input type='checkbox'></td>",
                         moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
-                        item.errors ? item.errors : item.content,
+                        item.error ? item.error : item.content,
                         item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
                 });
                 timelineTable.draw();
@@ -505,8 +529,8 @@
                 windows_events.max_date = moment(windows_events.max_date);
             }
             var options = {
-                min: windows_events.min_date && windows_events.min_date < minDate  ? windows_events.min_date : minDate,
-                max: windows_events.max_date && windows_events.max_date > maxDate  ? windows_events.max_date : maxDate,
+                min: windows_events.min_date && windows_events.min_date < minDate ? windows_events.min_date : minDate,
+                max: windows_events.max_date && windows_events.max_date > maxDate ? windows_events.max_date : maxDate,
             };
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
             fillTimelineTable(window.timelineData);
@@ -540,7 +564,7 @@
                     $("#timeline-filter-errors").val(["all"]).change();
                 } else if (selectedErrors[0] != "all") {
                     itemsJournal = _.filter(itemsJournal, function (item) {
-                        return _.intersection(item.errors, selectedErrors).length > 0;
+                        return _.contains(selectedErrors, item.error);
                     });
                 }
 
@@ -721,12 +745,11 @@
             criticalErrorsChart
                     .margins({top: 10, right: 10, bottom: 30, left: 50})
                     .dimension(dateDim)
-                    .group(amountGroupCriticalErrors)
+                    .group(criticalErrors)
                     .mouseZoomable(true)
                     .brushOn(false)
                     .transitionDuration(100)
                     .centerBar(true)
-                    .gap(65)
                     .x(d3.time.scale().domain([minDate, maxDate]))
                     .elasticY(true)
                     .xAxis().tickFormat();
@@ -739,12 +762,11 @@
             importantErrorsChart
                     .margins({top: 10, right: 10, bottom: 30, left: 50})
                     .dimension(dateDim)
-                    .group(amountGroupImportantErrors)
+                    .group(importantErrors)
                     .mouseZoomable(true)
                     .brushOn(false)
                     .transitionDuration(100)
                     .centerBar(true)
-                    .gap(65)
                     .x(d3.time.scale().domain([minDate, maxDate]))
                     .elasticY(true)
                     .xAxis().tickFormat();
@@ -757,12 +779,11 @@
             noErrorsChart
                     .margins({top: 10, right: 10, bottom: 30, left: 50})
                     .dimension(dateDim)
-                    .group(amountGroupNoErrors)
+                    .group(noErrors)
                     .mouseZoomable(true)
                     .brushOn(false)
                     .transitionDuration(100)
                     .centerBar(true)
-                    .gap(65)
                     .x(d3.time.scale().domain([minDate, maxDate]))
                     .elasticY(true)
                     .xAxis().tickFormat();
@@ -776,11 +797,14 @@
             operationsReportChart
                     .margins({top: 10, right: 10, bottom: 30, left: 50})
                     .dimension(dateDim)
-                    .group(amount)
+                    .group(errorsCount)
                     .mouseZoomable(true)
                     .brushOn(false)
+                    .elasticY(true)
                     .transitionDuration(100)
-                    .x(d3.time.scale().domain([minDate, maxDate]));
+                    .x(d3.time.scale().domain([minDate, maxDate]))
+                    .xAxis().tickFormat();
+
             operationsReportChart
                     .colors(d3.scale.ordinal().domain(["red", "orange", "green"]).range(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]))
                     .colorAccessor(function (d) {
@@ -836,8 +860,8 @@
 
             // PIE CHART ERRORS ROW ---------------------- //
             errorsReportChart
-                    .dimension(printedErrorsDim)
-                    .group(printedErrorsGroupCount)
+                    .dimension(errorsDim)
+                    .group(errorsGroupCount)
                     .renderLabel(false)
                     .legend(dc.legend());
 
@@ -855,7 +879,7 @@
                             return moment(d.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ");
                         },
                         function (d) {
-                            return d.errors;
+                            return d.content;
                         },
                         function (d) {
                             return d.amount + " " + "{{ currency }}";

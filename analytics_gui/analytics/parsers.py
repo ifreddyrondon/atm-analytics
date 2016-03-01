@@ -80,7 +80,7 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         meta["transactions_number"] += 1
         trace = {}
         item = item.replace("\r", "")
-        # get date
+        # GET DATE
         match = re.search(r'\d{2}/\d{2}/\d{2,4}( |  |\*| \n)\d{2}:\d{2}(:\d{2})?', item)
         if not match:
             continue
@@ -91,33 +91,41 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
             meta["dates"]["min"] = meta_date
         if not meta["dates"]["max"] or meta["dates"]["max"] < meta_date:
             meta["dates"]["max"] = meta_date
-        errors = []
-        # get M- or R- errors
-        match = re.search(r'M-\d*', item)
-        if match:
-            errors.append(match.group())
-            if match.group() not in meta["errors"]["names"]:
-                meta["errors"]["names"].append(match.group())
-        # get R- errors
-        match = re.search(r'R-\d*', item)
-        if match:
-            errors.append(match.group())
-            if match.group() not in meta["errors"]["names"]:
-                meta["errors"]["names"].append(match.group())
-        lines = item.split("\n")
+        # GET AMOUNT
+        match = re.search(r'RETIRO:.*', item)
+        trace["amount"] = match.group().split(":")[1].strip() if match else ""
+        # check is consult
+        if trace["amount"] == "":
+            match = re.search(r'CONSULTA', item)
+            if not match:
+                continue
+        trace["amount"] = parse_currency(trace["amount"])
+        # GET ERRORS
+        error = None
         # delete the lines that start with " " and empty lines
+        lines = item.split("\n")
         lines = [x for x in lines if not x.startswith(" ") and x]
         # if last line start with number is error
         if lines[-1].split(" ")[0].isdigit():
-            errors.append(lines[-1])
-            if lines[-1] not in meta["errors"]["names"]:
-                meta["errors"]["names"].append(lines[-1])
-        # get amount
-        match = re.search(r'RETIRO:.*', item)
-        trace["amount"] = match.group().split(":")[1].strip() if match else ""
-        trace["amount"] = parse_currency(trace["amount"])
+            error = lines[-1]
+        # if there are no errors of last line, find M- and R- errors
+        if error is None:
+            match = re.search(r'M-\d+.*', item)
+            if match:
+                error = match.group()
+        # get R- errors
+        if error is None:
+            match = re.search(r'R-\d+.*', item)
+            if match:
+                error = match.group()
+        # clean error
+        if error:
+            error = error.strip()
+        # track errors names
+        if error and error not in meta["errors"]["names"]:
+            meta["errors"]["names"].append(error)
 
-        color = AtmErrorXFS.ERROR_COLOR_GREEN if len(errors) == 0 else random.choice(
+        color = AtmErrorXFS.ERROR_COLOR_GREEN if not error else random.choice(
             [AtmErrorXFS.ERROR_COLOR_ORANGE, AtmErrorXFS.ERROR_COLOR_RED])
 
         event_type = "Sin error"
@@ -132,16 +140,15 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
             meta["errors"]["critics_number"] += 1
             meta["amount"]["critical_errors_transactions"] += trace["amount"]
 
-        if len(errors) == 0:
-            errors.append("Sin Errores")
+        if not error:
             meta["amount"]["valid_transactions"] += trace["amount"]
 
         trace.update({
-            "has_errors": False if len(errors) == 0 else True,
+            "has_errors": False if not error else True,
             "color": color,
             "className": class_name,
             "event_type": event_type,
-            "errors": errors,
+            "error": error,
             "atm_index": atm_index,
         })
         traces.append(trace)
