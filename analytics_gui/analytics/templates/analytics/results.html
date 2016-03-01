@@ -55,6 +55,12 @@
                 <form method="post" action="" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
+                        <div class="col-xs-12">
+                            <div class='dc-data-count'>
+                                <span class='filter-count'></span>
+                                selected out of <span class='total-count'></span> records.
+                            </div>
+                        </div>
                         <div class="col-md-6 col-xs-12" id='atm-index-chart' style="">
                             <h4>ATMs
                                 <span>
@@ -363,6 +369,7 @@
                 return {id: item, text: item};
             });
 
+            var dataCount = dc.dataCount('.dc-data-count');
             atmIndexChart = dc.pieChart("#atm-index-chart");
             errorsReportChart = dc.pieChart("#errors-report-chart");
             var criticalErrorsChart = dc.barChart("#critical-errors-chart");
@@ -384,6 +391,7 @@
 
             // CROSSFILTER ******************************************************
             var ndx = crossfilter(journalData);
+            var all = ndx.groupAll();
 
             // Dimensions and groups
             var atmsDim = ndx.dimension(function (d) {
@@ -711,6 +719,16 @@
                 }
             });
             // CROSSFILTER ******************************************************
+            // DATA COUNT
+            dataCount
+                    .dimension(ndx)
+                    .group(all)
+                    .html({
+                        some: '<strong>%filter-count</strong> seleccionados de <strong>%total-count</strong> registros' +
+                        ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'\'>Reset Todo</a>',
+                        all: 'Todos los registros seleccionados. Por favor haga click en un gráfico para aplicar los filtros.'
+                    });
+
             // PIE CHARTS ROW ---------------------- //
             atmIndexChart
                     .height(250)
