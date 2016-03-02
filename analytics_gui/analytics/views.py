@@ -100,7 +100,8 @@ def analyze_case(request, case_id):
         "are_there": False,
         "min_date": None,
         "max_date": None,
-        "keys": []
+        "keys": [],
+        "count": 0,
     }
     meta = {
         "transactions_number": 0,
@@ -135,6 +136,7 @@ def analyze_case(request, case_id):
             in_all_events_keys = set(windows_events["keys"])
             in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
             windows_events["keys"] = windows_events["keys"] + list(in_record_id_keys_but_not_in_all)
+            windows_events["count"] = atm.event_viewer_errors.count()
 
         # Journals Virtual
         for journal_file in atm.journals.all():

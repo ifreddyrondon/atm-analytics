@@ -7,7 +7,7 @@
     {{ block.super }}
     <style>
         .percent-result {
-            font-size: 35px;
+            font-size: 30px;
         }
 
         .dynamic-analysis {
@@ -306,6 +306,30 @@
                         </div>
                     </div>
                     <div class="row">
+                        <h4>Microsoft Event Viewer</h4>
+                        {% if windows_events.are_there %}
+                            <div class="col-md-4 col-xs-12">
+                                <h5>Total de eventos</h5>
+                                <div class="well percent-result text-center">{{ windows_events.count }}</div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <h5>Total de eventos mostrados en el time line</h5>
+                                <div id="timeline-dynamic-number-windows-events"
+                                     class="well percent-result text-center"></div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <h5>Total de eventos que pueden inducir errores XFS</h5>
+                                <div class="well percent-result text-center">Sin definir</div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <h5>Porcentaje de el total de errores que inducen errores XFS</h5>
+                                <div class="well percent-result text-center">Sin definir</div>
+                            </div>
+                        {% else %}
+                            <div class="well text-center">No se proporcionaron logs para su análisis</div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
                         <h4>Estimación de porcentaje de culpa</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Logs Journal
@@ -557,15 +581,19 @@
                 timelineTable.clear();
                 var missingAmount = 0;
                 var numberOfCriticErrors = 0;
+                var numberOfWindowsEvents = 0;
                 _.each(items, function (item) {
                     timelineTable.row.add([
                         "<input type='checkbox'></td>",
                         moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
                         item.error ? item.error : item.content,
                         item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
-                    missingAmount += item.amount;
+                    missingAmount += item.amount ? item.amount : 0;
                     if (item.color == "{{ COLOR_RED }}") {
                         numberOfCriticErrors += 1;
+                    }
+                    if (item.event_type == "WindowsEventViewer") {
+                        numberOfWindowsEvents += 1;
                     }
                 });
                 timelineTable.draw();
@@ -574,6 +602,8 @@
                 $("#timeline-dynamic-range-dates").html(start.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ") + "<br>" + end.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"));
                 $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ currency }}");
                 $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.errors.critics_number).toFixed(2) + "%");
+
+                $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
             }
 
             var timelineContainer = document.getElementById('chart-events-timeline');
@@ -709,6 +739,7 @@
                                     d.date = dtgFormat2.parse(d.date);
                                     d.start = d.date;
                                     d.content = d.eventId;
+                                    d.event_type = "WindowsEventViewer";
                                 });
                                 window.windowsEventsData = windowsEventsData;
                                 filterTimeline();
