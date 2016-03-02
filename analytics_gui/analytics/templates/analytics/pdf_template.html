@@ -65,10 +65,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for journal_file in journal_files %}
+                        {% for file in files %}
                         <tr>
-                            <td>{{ journal_file.filename }}</td>
-                            <td>{{ journal_file.date }}</td>
+                            <td>{{ file.filename }}</td>
+                            <td>{{ file.date }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>

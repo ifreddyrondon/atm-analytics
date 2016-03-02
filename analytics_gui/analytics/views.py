@@ -2,6 +2,7 @@ import base64
 import itertools
 import json
 import os
+import time
 
 import pdfkit
 from django.conf import settings
@@ -231,7 +232,7 @@ def generate_pdf(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
     images = dict()
-    journal_files = []
+    files = []
     case_picture = None
     company_logo = None
     atm_locations = []
@@ -266,18 +267,27 @@ def generate_pdf(request, case_id):
     }
 
     for index, atm in enumerate(atms):
+        tmp = {}
         for loc in atm.atm_location.all():
             atm_locations.append(loc.address)
         # Microsoft Event Viewer
-        # if atm.microsoft_event_viewer:
-        #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
+        if atm.microsoft_event_viewer:
+            files.append(utils.create_file_element(atm.microsoft_event_viewer.name))
+
+        # Other log
+        if atm.other_log:
+            files.append(utils.create_file_element(atm.other_log.name))
+
+        # Cash replacement schedule
+        if atm.cash_replacement_schedule:
+            files.append(utils.create_file_element(atm.cash_replacement_schedule.name))
+
         # Journals Virtual
         for journal_file in atm.journals.all():
             tmp = {}
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
-            tmp['filename'] = journal_file.filename
-            tmp['date'] = journal_file.file.name.split(os.sep)[len(journal_file.file.name.split(os.sep)) - 2]
-            journal_files.append(tmp)
+            # tmp['date'] = journal_file.file.name.split(os.sep)[len(journal_file.file.name.split(os.sep)) - 2]
+            files.append(utils.create_file_element(journal_file.file.name))
 
             # save only new errors names
             in_all_errors_names = set(meta["errors"]["names"])
@@ -319,8 +329,6 @@ def generate_pdf(request, case_id):
         args['operations[Monto][]']
     )
 
-    print atm_locations
-
     args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
@@ -333,7 +341,7 @@ def generate_pdf(request, case_id):
     args['case_picture'] = case_picture
     args['company_logo'] = company_logo
     args['default_avatar'] = default_avatar
-    args['journal_files'] = journal_files
+    args['files'] = files
     args['analyst_name'] = \
         request.user.first_name + \
         " " + \
