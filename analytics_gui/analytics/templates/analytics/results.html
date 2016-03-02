@@ -7,7 +7,8 @@
     {{ block.super }}
     <style>
         .percent-result {
-            font-size: 30px;
+            font-size: 27px;
+            text-align: center;
         }
 
         .dynamic-analysis {
@@ -255,30 +256,30 @@
                         <h4>Eventos del XFS</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones</h5>
-                            <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
+                            <div class="well percent-result">{{ meta.transactions_number }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones validas</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.valid_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.amount.valid_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones con errores críticos</h5>
-                            <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
+                            <div class="well percent-result">{{ meta.errors.critics_number }}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-xs-12">
                             <h5>Porcentaje total de transacciones de errores críticos</h5>
-                            <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }}%
+                            <div class="well percent-result">{{ meta.errors.critics_number_percentage }}%
                             </div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores criticos</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.amount.critical_errors_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores importantes</h5>
-                            <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.amount.important_errors_transactions }} {{ currency }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -288,21 +289,19 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto faltante analizado en el timeline</h5>
-                            <div id="timeline-dynamic-missing-amount" class="well text-center dynamic-analysis"
-                                 style="font-size: 28px;"></div>
+                            <div id="timeline-dynamic-missing-amount"
+                                 class="well percent-result dynamic-analysis"></div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Efectivo faltante estimado del caso</h5>
-                            <div class="well percent-result dynamic-analysis text-center"
-                                 style="font-size: 28px;">{{ case.missing_amount }} {{ currency }}</div>
+                            <div class="well percent-result dynamic-analysis">{{ case.missing_amount }} {{ currency }}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-xs-12">
                             <h5>Porcentaje de errores críticos identificados como faltante</h5>
                             <div id="timeline-dynamic-critic-errors-vs-critic-errors"
-                                 class="well percent-result dynamic-analysis text-center"
-                                 style="font-size: 28px;"></div>
+                                 class="well percent-result dynamic-analysis"></div>
                         </div>
                     </div>
                     <div class="row">
@@ -310,24 +309,40 @@
                         {% if windows_events.are_there %}
                             <div class="col-md-4 col-xs-12">
                                 <h5>Total de eventos</h5>
-                                <div class="well percent-result text-center">{{ windows_events.count }}</div>
+                                <div class="well percent-result">{{ windows_events.count }}</div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <h5>Total de eventos mostrados en el time line</h5>
                                 <div id="timeline-dynamic-number-windows-events"
-                                     class="well percent-result text-center"></div>
+                                     class="well percent-result"></div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <h5>Total de eventos que pueden inducir errores XFS</h5>
-                                <div class="well percent-result text-center">Sin definir</div>
+                                <div class="well percent-result">Sin definir</div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <h5>Porcentaje de el total de errores que inducen errores XFS</h5>
-                                <div class="well percent-result text-center">Sin definir</div>
+                                <div class="well percent-result">Sin definir</div>
                             </div>
                         {% else %}
                             <div class="well text-center">No se proporcionaron logs para su análisis</div>
                         {% endif %}
+                    </div>
+                    <div class="row">
+                        <h4>Eventos de Reposición de efectivo</h4>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de eventos de reposición de efectivo totales</h5>
+                            <div class="well percent-result">Sin definir</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de eventos de efectivo que involucran la direcciones de los ATMs
+                                analizados</h5>
+                            <div class="well percent-result">Sin definir</div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Cantidad de eventos de Time line que pueden inducir errores de funcionamiento</h5>
+                            <div class="well percent-result">Sin definir</div>
+                        </div>
                     </div>
                     <div class="row">
                         <h4>Estimación de porcentaje de culpa</h4>
