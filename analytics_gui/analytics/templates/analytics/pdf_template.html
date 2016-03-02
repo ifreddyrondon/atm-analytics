@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/base.css" media="screen,projection">
     <style>
         table, tr, td, th, tbody, thead, tfoot {
-        page-break-inside: avoid !important;
+            page-break-inside: avoid !important;
         }
     </style>
 </head>
@@ -24,7 +24,7 @@
         <div class="col-md-12">
             <div class="breadcrumb">
                 <img src="{{ logo }}" width="80">
-                <span style="margin: 6px auto;" class="pull-right">Fecha de emisión: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
+                <span style="margin: 6px auto;" class="pull-right">Fecha de emisión del PDF: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
                 <span class="pull-right" style="padding: 70px;">
                         {% if case.picture %}
@@ -39,12 +39,18 @@
                         {% endif %}
                 </span>
             <h2>Análisis del Caso</h2>
-            <p><b>Nombre:</b> {{ case.name }}</p>
             <p><b>ID:</b> {{ case.id }}</p>
-            <p><b>Monto Faltante:</b> {{ case.missing_amount }}</p>
-            <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
+            <p><b>Nombre del analista:</b> {{ analyst_name }}</p>
             <p><b>Fecha:</b> {{ case.created_date }}</p>
-            <p><b>Cliente:</b> {{ case.bank }}</p>
+            <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
+            <p><b>Monto faltante estimado:</b> {{ case.missing_amount }}</p>
+            <p><b>Entidad bancaria:</b> {{ case.bank }}</p>
+            <p><b>Localizaciones de los ATMs afectados:</b></p>
+            <ul>
+                {% for loc in atm_locations %}
+                    <li>{{ loc }}</li>
+                {% endfor %}
+            </ul>
             <br>
             <div class="panel panel-primary">
                 <div class="panel-heading">

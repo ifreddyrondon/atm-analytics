@@ -234,6 +234,11 @@ def generate_pdf(request, case_id):
     journal_files = []
     case_picture = None
     company_logo = None
+    atm_locations = []
+    options = {
+        'margin-bottom': '0.75in',
+        'footer-right': '[page]'
+    }
 
     if case.picture:
         case_picture = settings.BASE_DIR + case.picture.url
@@ -261,6 +266,8 @@ def generate_pdf(request, case_id):
     }
 
     for index, atm in enumerate(atms):
+        for loc in atm.atm_location.all():
+            atm_locations.append(loc.address)
         # Microsoft Event Viewer
         # if atm.microsoft_event_viewer:
         #     event_viewer_traces = parse_window_event_viewer(atm.microsoft_event_viewer.file)
@@ -312,6 +319,8 @@ def generate_pdf(request, case_id):
         args['operations[Monto][]']
     )
 
+    print atm_locations
+
     args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
@@ -320,6 +329,7 @@ def generate_pdf(request, case_id):
     args['operations_table'] = operations_table
     args['currency'] = currency
     args['meta'] = meta
+    args['atm_locations'] = atm_locations
     args['case_picture'] = case_picture
     args['company_logo'] = company_logo
     args['default_avatar'] = default_avatar
@@ -334,7 +344,7 @@ def generate_pdf(request, case_id):
     style_list = [bootstrap, base]
 
     try:
-        pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list)
+        pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list)  # , options=options)
     except Exception as e:
         if "code 1" in e:
             pass
