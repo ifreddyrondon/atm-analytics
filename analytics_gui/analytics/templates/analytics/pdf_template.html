@@ -1,4 +1,3 @@
-{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,12 +8,21 @@
 
     <title>Analíticas</title>
 
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" media="screen,projection">
-    <link rel="stylesheet" type="text/css" href="/static/css/dataTables.bootstrap.css" media="screen,projection">
-    <link rel="stylesheet" type="text/css" href="/static/css/base.css" media="screen,projection">
     <style>
         table, tr, td, th, tbody, thead, tfoot {
-            page-break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        }
+
+        #page-break {
+        page-break-after: always;
+        }
+
+        #files-table > *{
+            font-size: 9px;
+        }
+
+        #files-table {
+            width: 100%;
         }
     </style>
 </head>
@@ -22,11 +30,15 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <div class="breadcrumb">
-                <img src="{{ logo }}" width="80">
-                <span style="margin: 6px auto;" class="pull-right">Fecha de emisión del PDF: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
+            <div>
+                <!--<img src="{{ logo }}" width="80">-->
+                <span class="pull-right">Fecha de emisión del PDF: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
-                <span class="pull-right" style="padding: 70px;">
+            <h3>Análisis del Caso</h3>
+            <br>
+            <p><b>ID:</b> {{ case.id }}</p>
+            <p><b>Nombre del analista:</b> {{ analyst_name }}</p>
+            <span class="pull-right" style="padding-right: 100px;">
                         {% if case.picture %}
                             <img src="{{ case_picture }}"
                                  class="img-circle img-responsive" width="100px" height="100px">
@@ -37,10 +49,7 @@
                             <img src="{{ default_avatar }}"
                                  class="img-circle img-responsive" width="100px" height="100px">
                         {% endif %}
-                </span>
-            <h2>Análisis del Caso</h2>
-            <p><b>ID:</b> {{ case.id }}</p>
-            <p><b>Nombre del analista:</b> {{ analyst_name }}</p>
+            </span>
             <p><b>Fecha:</b> {{ case.created_date }}</p>
             <p><b>Cantidad de ATMs afectados:</b> {{ case.atms.count }}</p>
             <p><b>Monto faltante estimado:</b> {{ case.missing_amount }}</p>
@@ -48,20 +57,22 @@
             <p><b>Localizaciones de los ATMs afectados:</b></p>
             <ul>
                 {% for loc in atm_locations %}
-                    <li>{{ loc }}</li>
+                <li>{{ loc }}</li>
                 {% endfor %}
             </ul>
             <br>
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h2 class="panel-title">Archivos logs</h2>
+                    <h3 class="panel-title">Archivos logs</h3>
                 </div>
                 <div class="panel-body">
-                    <table class="table table-hover" id="error-table">
+                    <table class="table table-hover" id="files-table">
                         <thead>
                         <tr>
                             <th>Nombre del archivo</th>
-                            <th>Fecha creación</th>
+                            <th>Fecha de creación</th>
+                            <th>SHA1</th>
+                            <th>MD5</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -69,6 +80,8 @@
                         <tr>
                             <td>{{ file.filename }}</td>
                             <td>{{ file.date }}</td>
+                            <td>{{ file.sha1 }}</td>
+                            <td>{{ file.md5 }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -76,7 +89,7 @@
                 </div>
             </div>
             <div class="row">
-                <h2>Reporte Ejecutivo</h2>
+                <h3>Reporte Ejecutivo</h3>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 10px;">Cantidad de transacciones</h5>
                     <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
@@ -102,10 +115,12 @@
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h5 style="font-size: 9px;">Monto transacciones con errores importantes</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}
+                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }}
+                        {{ currency }}
                     </div>
                 </div>
             </div>
+            <div id="page-break"></div>
             <div class="row">
                 <h3>Estimación de porcentaje de culpa</h3>
                 <div class="col-md-4 col-xs-4">
@@ -122,9 +137,11 @@
                 </div>
             </div>
             <br>
-            <h2>Reporte Técnico</h2>
+            <h3>Reporte Técnico</h3>
+            <br>
             <h4>Analista: {{ analyst_name }}</h4>
             {% if resolution %}
+            <br>
             <p><b>Resolución:</b></p>
             <div class="form-group">
                     <textarea class="form-control" readonly>
@@ -132,11 +149,46 @@
                     </textarea>
             </div>
             {% endif %}
+            <div class="row" style="padding-top: 70px;">
+                <div class="col-md-6 col-xs-6">
+                    <img src="{{ atm_index_chart }}"
+                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                    <img src="{{ total_operations_report_chart }}"
+                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-12 col-xs-12" style="padding-top: 50px; padding-bottom: 50px;">
+                    <img src="{{ errors_report_chart }}"
+                         style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+                <div id="page-break"></div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>Errores Criticos</h6>
+                    <img src="{{ critical_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>Errores Importantes</h6>
+                    <img src="{{ important_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>Transacciones sin problemas</h6>
+                    <img src="{{ no_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-12 col-xs-12">
+                    <h5>Reporte de Operaciones</h5>
+                    <img src="{{ operations_report_chart }}"
+                         style="width: 100%; height: 300px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+            </div>
             <br>
             {% if operations_table %}
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h2 class="panel-title">Operaciones</h2>
+                    <h3 class="panel-title">Operaciones</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table table-hover">
@@ -163,41 +215,7 @@
             </div>
             {% endif %}
             <br>
-            <h5>Gráficas:</h5>
-            <div class="row" style="padding-top: 35px; padding-bottom: 70px;">
-                <div class="col-md-6 col-xs-6">
-                    <img src="{{ atm_index_chart }}"
-                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
-                </div>
-                <div class="col-md-6 col-xs-6">
-                    <img src="{{ total_operations_report_chart }}"
-                         style="width: 100%; height: 140px; margin: 0px auto; max-height: 200px; position: relative;"/>
-                </div>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Errores Criticos</h6>
-                <img src="{{ critical_errors_chart }}"
-                     style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Errores Importantes</h6>
-                <img src="{{ important_errors_chart }}"
-                     style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
-            </div>
-            <div class="col-md-4 col-xs-4">
-                <h6>Transacciones sin problemas</h6>
-                <img src="{{ no_errors_chart }}"
-                     style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
-            </div>
-            <div class="col-md-12 col-xs-12">
-                <h5>Reporte de Operaciones</h5>
-                <img src="{{ operations_report_chart }}"
-                     style="width: 100%; height: 300px; margin: 0px auto; max-height: 280px; position: relative;"/>
-            </div>
-            <div class="col-md-12 col-xs-12" style="padding-top: 50px; padding-bottom: 50px;">
-                <img src="{{ errors_report_chart }}"
-                     style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
-            </div>
+
             <div class="col-md-12 col-xs-12" style="padding-top: 50px; padding-bottom: 80px;">
                 <h5>Timeline</h5>
                 <img src="{{ chart_events_timeline }}"
@@ -207,7 +225,7 @@
             <div class="col-md-12 col-xs-12" style="padding-top: 10px;">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h2 class="panel-title">Timeline</h2>
+                        <h3 class="panel-title">Timeline</h3>
                     </div>
                     <div class="panel-body">
                         <table class="table table-hover" style="font-size: 14px;">

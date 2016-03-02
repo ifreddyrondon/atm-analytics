@@ -2,7 +2,6 @@ import base64
 import itertools
 import json
 import os
-import time
 
 import pdfkit
 from django.conf import settings
@@ -286,7 +285,7 @@ def generate_pdf(request, case_id):
         for journal_file in atm.journals.all():
             tmp = {}
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
-            # tmp['date'] = journal_file.file.name.split(os.sep)[len(journal_file.file.name.split(os.sep)) - 2]
+
             files.append(utils.create_file_element(journal_file.file.name))
 
             # save only new errors names
@@ -351,11 +350,19 @@ def generate_pdf(request, case_id):
 
     style_list = [bootstrap, base]
 
-    try:
-        pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list)  # , options=options)
-    except Exception as e:
-        if "code 1" in e:
-            pass
+    options = {
+        'page-size': 'Letter',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'footer-center': '[page]',
+        'footer-font-size': '12'
+        # 'header-left': 'LOGO'
+    }
+
+    pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list, options=options)
 
     for image in images.values():
         os.remove(image)
