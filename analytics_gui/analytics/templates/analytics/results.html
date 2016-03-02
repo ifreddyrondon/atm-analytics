@@ -7,7 +7,12 @@
     {{ block.super }}
     <style>
         .percent-result {
-            font-size: 40px;
+            font-size: 35px;
+        }
+
+        .dynamic-analysis {
+            background-color: #00A9FF;
+            color: white;
         }
 
         .vis-item.green {
@@ -247,6 +252,7 @@
                     <hr>
                     <div class="row">
                         <h3>Análisis Automático</h3>
+                        <h4>Eventos del XFS</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones</h5>
                             <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
@@ -259,6 +265,8 @@
                             <h5>Cantidad de transacciones con errores críticos</h5>
                             <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-4 col-xs-12">
                             <h5>Porcentaje total de transacciones de errores críticos</h5>
                             <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }}%
@@ -272,6 +280,32 @@
                             <h5>Monto total de transacciones con errores importantes</h5>
                             <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }} {{ currency }}</div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Rango de tiempo del timeline</h5>
+                            <div id="timeline-dynamic-range-dates" class="well dynamic-analysis text-center"></div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Monto faltante analizado en el timeline</h5>
+                            <div id="timeline-dynamic-missing-amount" class="well text-center dynamic-analysis"
+                                 style="font-size: 28px;"></div>
+                        </div>
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Efectivo faltante estimado del caso</h5>
+                            <div class="well percent-result dynamic-analysis text-center"
+                                 style="font-size: 28px;">{{ case.missing_amount }} {{ currency }}</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-xs-12">
+                            <h5>Porcentaje de errores críticos identificados como faltante</h5>
+                            <div id="timeline-dynamic-critic-errors-vs-critic-errors"
+                                 class="well percent-result dynamic-analysis text-center"
+                                 style="font-size: 28px;"></div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <h4>Estimación de porcentaje de culpa</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Logs Journal
@@ -519,16 +553,27 @@
             window.windowsEventsData = [];
             var windows_events = {{ windows_events | jsonify }};
 
-            function fillTimelineTable(items) {
+            function fillTimelineTableAndDynamicFields(items) {
                 timelineTable.clear();
+                var missingAmount = 0;
+                var numberOfCriticErrors = 0;
                 _.each(items, function (item) {
                     timelineTable.row.add([
                         "<input type='checkbox'></td>",
                         moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
                         item.error ? item.error : item.content,
                         item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
+                    missingAmount += item.amount;
+                    if (item.color == "{{ COLOR_RED }}") {
+                        numberOfCriticErrors += 1;
+                    }
                 });
                 timelineTable.draw();
+                var start = moment(timeline.getWindow().start);
+                var end = moment(timeline.getWindow().end);
+                $("#timeline-dynamic-range-dates").html(start.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ") + "<br>" + end.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"));
+                $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ currency }}");
+                $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.errors.critics_number).toFixed(2) + "%");
             }
 
             var timelineContainer = document.getElementById('chart-events-timeline');
@@ -536,12 +581,15 @@
                 windows_events.min_date = moment(windows_events.min_date);
                 windows_events.max_date = moment(windows_events.max_date);
             }
+            var minDateMoment = moment(minDate);
+            var maxDateMoment = moment(maxDate);
             var options = {
-                min: windows_events.min_date && windows_events.min_date < minDate ? windows_events.min_date : minDate,
-                max: windows_events.max_date && windows_events.max_date > maxDate ? windows_events.max_date : maxDate,
+                min: windows_events.min_date && windows_events.min_date < minDateMoment ? windows_events.min_date : minDateMoment,
+                max: windows_events.max_date && windows_events.max_date > maxDateMoment ? windows_events.max_date : maxDateMoment,
             };
+
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
-            fillTimelineTable(window.timelineData);
+            fillTimelineTableAndDynamicFields(window.timelineData);
             timeline.fit();
             timeline.on("rangechanged", function (properties) {
                 var tableData = [];
@@ -552,7 +600,7 @@
                     });
                     tableData.push(itemID[0]);
                 });
-                fillTimelineTable(_.sortBy(tableData, 'date'));
+                fillTimelineTableAndDynamicFields(_.sortBy(tableData, 'date'));
             });
 
             function filterTimeline() {
@@ -612,7 +660,7 @@
                 var items = itemsJournal.concat(itemsWindows);
                 timeline.setItems(items);
                 timeline.fit();
-                fillTimelineTable(items);
+                fillTimelineTableAndDynamicFields(items);
             }
 
             // init timeline calendar
@@ -744,7 +792,7 @@
                 var items = window.timelineData.concat(window.windowsEventsData);
                 timeline.setItems(items);
                 timeline.fit();
-                fillTimelineTable(items);
+                fillTimelineTableAndDynamicFields(items);
                 filterTimeline();
             });
 
