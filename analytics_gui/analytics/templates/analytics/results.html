@@ -6,6 +6,11 @@
 {% block css %}
     {{ block.super }}
     <style>
+        #amount-report-chart .x.axis text {
+            text-anchor: end !important;
+            transform: rotate(-45deg);
+        }
+
         .percent-result {
             font-size: 27px;
             text-align: center;
@@ -129,6 +134,20 @@
                                 <span>
                                     <a class="reset"
                                        href="javascript:totalOperationsReportChart.filterAll();dc.redrawAll();dc.refocusAll();"
+                                       style="display: none;">
+                                        reset
+                                    </a>
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div id="amount-report-chart" style="width:100%; height: 300px; margin: 0 auto 20px">
+                            <h4>Montos
+                                <span>
+                                    <a class="reset"
+                                       href="javascript:amountReportChart.filterAll();dc.redrawAll();dc.refocusAll();"
                                        style="display: none;">
                                         reset
                                     </a>
@@ -443,6 +462,7 @@
             var noErrorsChart = dc.barChart("#no-errors-chart");
             operationsReportChart = dc.barChart("#operations-report-chart");
             totalOperationsReportChart = dc.pieChart("#total-operations-report-chart");
+            amountReportChart = dc.barChart("#amount-report-chart");
             var dataTable = dc.dataTable("#operations-table");
 
             var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
@@ -468,6 +488,9 @@
             });
             var errorsDim = ndx.dimension(function (d) {
                 return d.error;
+            });
+            var amountDim = ndx.dimension(function (d) {
+                return d.amount;
             });
             var dateDim = ndx.dimension(function (d) {
                 return d.date;
@@ -502,6 +525,10 @@
             });
 
             var errorsGroupCount = errorsDim.group().reduceCount(function (d) {
+                return d;
+            });
+
+            var amountGroupCount = amountDim.group().reduceCount(function (d) {
                 return d;
             });
 
@@ -912,6 +939,7 @@
                     .mouseZoomable(true)
                     .brushOn(false)
                     .elasticY(true)
+                    .centerBar(true)
                     .transitionDuration(100)
                     .x(d3.time.scale().domain([minDate, maxDate]))
                     .xAxis().tickFormat();
@@ -976,6 +1004,19 @@
                     .renderLabel(false)
                     .legend(dc.legend());
 
+            // PIE CHART AMOUNT ROW ---------------------- //
+            amountReportChart
+                    .dimension(amountDim)
+                    .group(amountGroupCount)
+                    .transitionDuration(100)
+                    .outerPadding(0)
+                    .gap(1)
+                    .elasticY(true)
+                    .x(d3.scale.ordinal())
+                    .xUnits(dc.units.ordinal)
+                    .renderHorizontalGridLines(true);
+
+            // TABLE ------------------------------------- //
             dataTable
                     .dimension(dateDim)
                     .group(function (d) {
