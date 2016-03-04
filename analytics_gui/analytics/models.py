@@ -121,15 +121,6 @@ def get_atm_microsoft_event_viewer_attachment_path(instance, filename):
     )
 
 
-def get_atm_cash_replacement_schedule_attachment_path(instance, filename):
-    return os.path.join(
-            'atm',
-            'cash_replacement_schedule',
-            str(timezone.now()),
-            filename
-    )
-
-
 def get_atm_other_log_attachment_path(instance, filename):
     return os.path.join(
             'atm',
@@ -203,11 +194,6 @@ class AtmCase(models.Model):
     microsoft_event_viewer = models.FileField(
             null=True, blank=True,
             upload_to=get_atm_microsoft_event_viewer_attachment_path
-    )
-
-    cash_replacement_schedule = models.FileField(
-            null=True, blank=True,
-            upload_to=get_atm_cash_replacement_schedule_attachment_path
     )
 
     person_name_journal_virtual = models.CharField(
