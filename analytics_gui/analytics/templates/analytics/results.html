@@ -161,6 +161,8 @@
                                 <th>Fecha</th>
                                 <th>Error</th>
                                 <th>Monto</th>
+                                <th>Numero de ATM</th>
+                                <th>Tipo</th>
                             </tr>
                             </thead>
                         </table>
@@ -245,6 +247,8 @@
                                 <th>Fecha</th>
                                 <th>Error</th>
                                 <th>Monto</th>
+                                <th>Numero de ATM</th>
+                                <th>Tipo</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -507,8 +511,9 @@
                     {"width": "20px"},
                     null,
                     null,
-                    null
-                ],
+                    {"width": "100px"},
+                    {"width": "20px"},
+                    null],
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
@@ -543,8 +548,9 @@
                     {"width": "20px"},
                     null,
                     null,
-                    null
-                ],
+                    {"width": "100px"},
+                    {"width": "20px"},
+                    null],
                 "language": {
                     "sProcessing": "Procesando...",
                     "sLengthMenu": "Mostrar _MENU_ registros",
@@ -591,7 +597,11 @@
                         "<input type='checkbox'></td>",
                         moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
                         item.error ? item.error : item.content,
-                        item.amount ? item.amount + " " + "{{ currency }}" : "Sin definir"]);
+                        item.amount ? item.amount + " " + "{{ currency }}" : "No aplica",
+                        item.atm_index + 1 ? item.atm_index + 1 : "No aplica",
+                        item.event_type ? item.event_type : "No aplica"
+                    ]);
+
                     missingAmount += item.amount ? item.amount : 0;
                     if (item.color == "{{ COLOR_RED }}") {
                         numberOfCriticErrors += 1;
@@ -984,6 +994,12 @@
                         },
                         function (d) {
                             return d.amount + " " + "{{ currency }}";
+                        },
+                        function (d) {
+                            return d.atm_index + 1;
+                        },
+                        function (d) {
+                            return d.event_type;
                         }
                     ])
                     .sortBy(function (d) {
