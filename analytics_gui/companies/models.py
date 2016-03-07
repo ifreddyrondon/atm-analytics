@@ -50,3 +50,9 @@ class CompanyAtmLocation(models.Model):
 
     def __unicode__(self):
         return self.address
+
+
+class AtmRepositionEvent(models.Model):
+    bank = models.ForeignKey(Bank)
+    location = models.ForeignKey(CompanyAtmLocation)
+    reposition_date = models.DateTimeField()

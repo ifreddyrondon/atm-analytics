@@ -1,12 +1,13 @@
 import csv
 
+import datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from analytics_gui.companies.forms import ConfigForm, BankFormSet, CompanyAtmLocationFormSet
-from analytics_gui.companies.models import Company, CompanyAtmLocation
+from analytics_gui.companies.models import Company, CompanyAtmLocation, Bank, AtmRepositionEvent
 
 
 @login_required(login_url='/login')
@@ -31,6 +32,18 @@ def config(request):
                 reader = csv.DictReader(request.FILES["address_csv"])
                 for row in reader:
                     CompanyAtmLocation.objects.create(address=row['direccion'], company=company)
+
+            if 'atms_reposition_events' in request.FILES:
+                reader = csv.reader(request.FILES["atms_reposition_events"])
+                for row in reader:
+                    try:
+                        bank = Bank.objects.get(company=company, name=row[0])
+                        atm_direction = CompanyAtmLocation.objects.get(company=company, address=row[1])
+                        reposition_event_data = datetime.datetime.strptime(row[2], "%d/%m/%Y %H:%M")
+                        AtmRepositionEvent.objects.get_or_create(bank=bank, location=atm_direction,
+                                                                 reposition_date=reposition_event_data)
+                    except (Bank.DoesNotExist, CompanyAtmLocation.DoesNotExist):
+                        continue
 
             return HttpResponseRedirect(reverse("companies:config"))
 
