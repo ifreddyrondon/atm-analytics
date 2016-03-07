@@ -108,7 +108,8 @@ def analyze_case(request, case_id):
         "are_there": False,
         "min_date": None,
         "max_date": None,
-        "keys": []
+        "keys": [],
+        "count": 0,
     }
     meta = {
         "transactions_number": 0,
@@ -143,6 +144,7 @@ def analyze_case(request, case_id):
             in_all_events_keys = set(windows_events["keys"])
             in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
             windows_events["keys"] = windows_events["keys"] + list(in_record_id_keys_but_not_in_all)
+            windows_events["count"] = atm.event_viewer_errors.count()
 
         # Journals Virtual
         for journal_file in atm.journals.all():
@@ -236,7 +238,7 @@ def generate_pdf(request, case_id):
     company_logo = None
     atm_locations = []
     options = {
-        'margin-bottom': '0.75in',
+        'margin-bottom': '0.8in',
         'footer-right': '[page]'
     }
 
@@ -247,7 +249,7 @@ def generate_pdf(request, case_id):
 
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
-    image_root = os.path.join(settings.BASE_DIR, 'media/')
+    media_root = os.path.join(settings.BASE_DIR, 'media/')
     logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
     default_avatar = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'default_avatar.png')
     html_template = 'analytics/pdf_template.html'
@@ -312,20 +314,24 @@ def generate_pdf(request, case_id):
                     filename = key + ".png"
                 else:
                     filename = key + ".svg"
-                with open(image_root + filename, 'w') as f:
+                with open(media_root + filename, 'w') as f:
                     f.write(image_data)
-                    images[key.replace('-', '_')] = image_root + filename
+                    images[key.replace('-', '_')] = media_root + filename
 
     time_line_table = utils.build_table(
         args['time_line[Fecha][]'],
         args['time_line[Error][]'],
-        args['time_line[Monto][]']
+        args['time_line[Monto][]'],
+        args['time_line[ATM][]'],
+        atms
     )
 
     operations_table = utils.build_table(
         args['operations[Fecha][]'],
         args['operations[Error][]'],
-        args['operations[Monto][]']
+        args['operations[Monto][]'],
+        args['operations[ATM][]'],
+        atms
     )
 
     args.update(images)
@@ -352,22 +358,23 @@ def generate_pdf(request, case_id):
 
     options = {
         'page-size': 'Letter',
-        'margin-top': '0.75in',
-        'margin-right': '0.75in',
-        'margin-bottom': '0.75in',
-        'margin-left': '0.75in',
+        'margin-top': '0.8in',
+        'margin-right': '0.8in',
+        'margin-bottom': '0.8in',
+        'margin-left': '0.8in',
         'encoding': "UTF-8",
         'footer-center': '[page]',
-        'footer-font-size': '12'
-        # 'header-left': 'LOGO'
+        'footer-font-size': '10'
     }
 
-    pdfkit.from_string(rendered_html, image_root + 'report.pdf', css=style_list, options=options)
+    pdfkit.from_string(rendered_html, media_root + 'tmp_report.pdf', css=style_list, options=options)
 
     for image in images.values():
         os.remove(image)
 
-    with open(image_root + 'report.pdf', 'rb') as pdf_file:
+    utils.add_report_header(media_root + 'tmp_report.pdf')
+
+    with open(media_root + 'report.pdf', 'rb') as pdf_file:
         return HttpResponse(
             json.dumps({'file': base64.b64encode(pdf_file.read())}),
             content_type="application/pdf")

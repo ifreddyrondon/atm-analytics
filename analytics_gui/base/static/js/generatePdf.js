@@ -3,8 +3,20 @@ $("#generate-pdf").click(function(event) {
     $("#wait").show();
     var svgList = document.getElementsByTagName("svg");
     var time_line = document.getElementById("chart-events-timeline");
+    var atm_index_chart = document.getElementById("atm-index-chart").children[1];
+    atm_index_chart.id = "atm-index-chart";
+    var total_op_report_chart = document.getElementById("total-operations-report-chart").children[1];
+    total_op_report_chart.id = "total-operations-report-chart";
+    var operations_report_chart = document.getElementById("operations-report-chart").children[1];
+    operations_report_chart.id = "operations-report-chart";
+    var errors_report_chart = document.getElementById("errors-report-chart").children[1];
+    errors_report_chart.id = "errors-report-chart";
     var array = Array.prototype.slice.call(svgList);
     array.push(time_line);
+    array.push(atm_index_chart);
+    array.push(total_op_report_chart);
+    array.push(operations_report_chart);
+    array.push(errors_report_chart);
     generatePdf(array);
 });
 
@@ -151,6 +163,7 @@ readTable = function(id) {
     var date = []
     var error = []
     var mount = []
+    var atm = []
     //gets rows of table
     var rowLength = table.rows.length;
 
@@ -175,6 +188,9 @@ readTable = function(id) {
                 case 3: // Mount
                     mount.push(cells.item(j).innerHTML);
                     break;
+                case 4:
+                    atm.push(cells.item(j).innerHTML);
+                    break;
             }
         }
     }
@@ -182,6 +198,7 @@ readTable = function(id) {
     data['Fecha'] = date;
     data['Error'] = error;
     data['Monto'] = mount;
+    data['ATM'] = atm;
 
     return data;
 }
