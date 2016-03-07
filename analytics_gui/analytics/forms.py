@@ -77,9 +77,8 @@ class CreateAtmForm(forms.ModelForm):
         model = AtmCase
         fields = (
             'hardware', 'software', 'operating_system', 'errors_manual',
-            'microsoft_event_viewer', 'cash_replacement_schedule',
-            'person_name_journal_virtual', 'other_log',
-            'atm_location',
+            'microsoft_event_viewer', 'person_name_journal_virtual',
+            'other_log', 'atm_location',
         )
 
     def __init__(self, *args, **kwargs):

@@ -322,30 +322,6 @@
                                                     </div>
 
                                                     <hr>
-                                                    <div class="form-group">
-                                                        <button class="btn btn-default" type="button"
-                                                                name="{{ atm_form.prefix }}-collapseCashReplacementSchedule"
-                                                                data-toggle="collapse"
-                                                                data-target="#{{ atm_form.prefix }}-collapseCashReplacementSchedule"
-                                                                aria-expanded="false"
-                                                                aria-controls="collapseExample">
-                                                            Usted cuenta con los horario programadas de la reposición
-                                                            del
-                                                            efectivo
-                                                        </button>
-                                                        <a href="javascript: void (0)" data-toggle="popover"
-                                                           class="pull-right" data-placement="left" data-html="true"
-                                                           data-trigger="focus" title="Horario programado de reposición"
-                                                           data-content="Aceptamos el archivo en formato Excel (XLS) o CVS el cual debe estar contener las siguientes columnas en este orden.<br><br><u>Banco, Calle ATM, Horario de reposición(M:H-DD:MM:YYYY), Empresa de reposición, Nombre del Operario1, Identificación1, Nombre del Operario2, Identificación2</u><br><br>Esto nos permitirá identificar posibles errores que estén ocurriendo después del proceso de reposición de efectivo.">
-                                                            <i class="fa fa-question-circle fa-2x"></i>
-                                                        </a>
-                                                        <div class="collapse"
-                                                             id="{{ atm_form.prefix }}-collapseCashReplacementSchedule">
-                                                            <br>
-                                                            {{ atm_form.cash_replacement_schedule }}
-                                                        </div>
-                                                    </div>
-                                                    <hr>
                                                     <div class="form-group {% if atm_form.person_name_journal_virtual.errors %}has-error{% endif %}">
                                                         {% if atm_form.person_name_journal_virtual.help_text %}
                                                             <span class="help-block">{{ atm_form.person_name_journal_virtual.help_text }}</span>

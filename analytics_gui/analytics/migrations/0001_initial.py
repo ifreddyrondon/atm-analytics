@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('operating_system', models.CharField(help_text=b'Sistema Operativo', max_length=1, choices=[(b'0', b'Windows XP'), (b'1', b'Windows 7'), (b'2', b'Windows 8')])),
                 ('errors_manual', models.FileField(null=True, upload_to=analytics_gui.analytics.models.get_atm_errors_manual_attachment_path, blank=True)),
                 ('microsoft_event_viewer', models.FileField(null=True, upload_to=analytics_gui.analytics.models.get_atm_microsoft_event_viewer_attachment_path, blank=True)),
-                ('cash_replacement_schedule', models.FileField(null=True, upload_to=analytics_gui.analytics.models.get_atm_cash_replacement_schedule_attachment_path, blank=True)),
+                ('cash_replacement_schedule', models.FileField(null=True, upload_to="media", blank=True)),
                 ('person_name_journal_virtual', models.CharField(help_text=b'Nombre de la persona que le facilito el Journal virtual', max_length=255)),
                 ('other_log', models.FileField(help_text=b'\xc2\xbfOtro tipo de log?', null=True, upload_to=analytics_gui.analytics.models.get_atm_other_log_attachment_path, blank=True)),
                 ('atm_location', models.ManyToManyField(help_text=b'Localizaci\xc3\xb3n del ATM', related_name='locations', to='companies.CompanyAtmLocation')),
