@@ -22,28 +22,28 @@
         }
 
         .vis-item.green {
-            background-color: {{ COLOR_GREEN }};
-            border-color: {{ COLOR_GREEN }};
+            background-color: {{ COLORS.GREEN }};
+            border-color: {{ COLORS.GREEN }};
         }
 
         .vis-item.orange {
-            background-color: {{ COLOR_ORANGE }};
-            border-color: {{ COLOR_ORANGE }};
+            background-color: {{ COLORS.ORANGE }};
+            border-color: {{ COLORS.ORANGE }};
         }
 
         .vis-item.red {
-            background-color: {{ COLOR_RED }};
-            border-color: {{ COLOR_RED }};
+            background-color: {{ COLORS.RED }};
+            border-color: {{ COLORS.RED }};
         }
 
         .vis-item.window-event {
-            background-color: {{ COLOR_BLUE }};
-            border-color: {{ COLOR_BLUE }};
+            background-color: {{ COLORS.BLUE }};
+            border-color: {{ COLORS.BLUE }};
             color: white;
         }
 
         .vis-item.reposition-event {
-            background-color: {{ COLOR_YELLOW }};
+            background-color: {{ COLORS.YELLOW }};
             border-color: #000000;
         }
     </style>
@@ -226,7 +226,7 @@
                                     <option value="all" selected>Todos</option>
                                 </select>
                             </div>
-                            {% if windows_events.are_there %}
+                            {% if meta.windows.are_there %}
                                 <h4>Filtros de eventos de windows</h4>
                                 <div class="form-group">
                                     <div class="input-group">
@@ -284,30 +284,30 @@
                         <h4>Eventos del XFS</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones</h5>
-                            <div class="well percent-result">{{ meta.transactions_number }}</div>
+                            <div class="well percent-result">{{ meta.journal.transactions_number }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones validas</h5>
-                            <div class="well percent-result">{{ meta.amount.valid_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.valid_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de transacciones con errores críticos</h5>
-                            <div class="well percent-result">{{ meta.errors.critics_number }}</div>
+                            <div class="well percent-result">{{ meta.journal.errors.critics_number }}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-xs-12">
                             <h5>Porcentaje total de transacciones de errores críticos</h5>
-                            <div class="well percent-result">{{ meta.errors.critics_number_percentage }}%
+                            <div class="well percent-result">{{ meta.journal.errors.critics_number_percentage }}%
                             </div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores criticos</h5>
-                            <div class="well percent-result">{{ meta.amount.critical_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.critical_errors_transactions }} {{ currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Monto total de transacciones con errores importantes</h5>
-                            <div class="well percent-result">{{ meta.amount.important_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.important_errors_transactions }} {{ currency }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -334,10 +334,10 @@
                     </div>
                     <div class="row">
                         <h4>Microsoft Event Viewer</h4>
-                        {% if windows_events.are_there %}
+                        {% if meta.windows.are_there %}
                             <div class="col-md-4 col-xs-12">
                                 <h5>Total de eventos</h5>
-                                <div class="well percent-result">{{ windows_events.count }}</div>
+                                <div class="well percent-result">{{ meta.windows.count }}</div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <h5>Total de eventos mostrados en el time line</h5>
@@ -360,7 +360,7 @@
                         <h4>Eventos de Reposición de efectivo</h4>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de eventos de reposición de efectivo totales</h5>
-                            <div class="well percent-result">Sin definir</div>
+                            <div class="well percent-result">{{ meta.reposition.count }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>Cantidad de eventos de efectivo que involucran la direcciones de los ATMs
@@ -451,11 +451,12 @@
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var journalData = {{ journal_traces | jsonify }};
+            var traces = {{ traces | jsonify }}
+            var journalData = traces.journal;
             var meta = {{ meta | jsonify }};
             var transformed = {};
 
-            meta.errors.names = _.map(meta.errors.names, function (item) {
+            meta.journal.errors.names = _.map(meta.journal.errors.names, function (item) {
                 return {id: item, text: item};
             });
 
@@ -511,17 +512,17 @@
                 return d;
             });
             var criticalErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_RED }}") {
+                if (d.color == "{{ COLORS.RED }}") {
                     return 1;
                 }
             });
             var importantErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_ORANGE }}") {
+                if (d.color == "{{ COLORS.ORANGE }}") {
                     return 1;
                 }
             });
             var noErrors = dateDim.group().reduceSum(function (d) {
-                if (d.color == "{{ COLOR_GREEN }}") {
+                if (d.color == "{{ COLORS.GREEN }}") {
                     return 1;
                 }
             });
@@ -616,9 +617,7 @@
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
             window.windowsEventsData = [];
-            window.repositionData = {{ reposition_traces | jsonify }};
-            var windows_events = {{ windows_events | jsonify }};
-            var reposition_events_meta = {{ reposition_events_meta | jsonify }};
+            window.repositionData = traces.reposition;
 
             _.map(window.repositionData, function (d) {
                 d.date = dtgFormat2.parse(d.date);
@@ -646,7 +645,7 @@
                     ]);
 
                     missingAmount += item.amount ? item.amount : 0;
-                    if (item.color == "{{ COLOR_RED }}") {
+                    if (item.color == "{{ COLORS.RED }}") {
                         numberOfCriticErrors += 1;
                     }
                     if (item.event_type == "WindowsEventViewer") {
@@ -658,7 +657,7 @@
                 var end = moment(timeline.getWindow().end);
                 $("#timeline-dynamic-range-dates").html(start.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ") + "<br>" + end.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"));
                 $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ currency }}");
-                $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.errors.critics_number).toFixed(2) + "%");
+                $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.journal.errors.critics_number).toFixed(2) + "%");
 
                 $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
             }
@@ -668,18 +667,18 @@
             var minDateMoment = moment(minDate);
             var maxDateMoment = moment(maxDate);
             // bounds dates for reposition events
-            if (reposition_events_meta.min_date && reposition_events_meta.max_date){
-                reposition_events_meta.min_date = moment(reposition_events_meta.min_date);
-                reposition_events_meta.max_date = moment(reposition_events_meta.max_date);
-                minDateMoment = reposition_events_meta.min_date < minDateMoment ? reposition_events_meta.min_date : minDateMoment;
-                maxDateMoment = reposition_events_meta.max_date > maxDateMoment ? reposition_events_meta.max_date : maxDateMoment;
+            if (meta.reposition.min_date && meta.reposition.max_date){
+                meta.reposition.min_date = moment(meta.reposition.min_date);
+                meta.reposition.max_date = moment(meta.reposition.max_date);
+                minDateMoment = meta.reposition.min_date < minDateMoment ? meta.reposition.min_date : minDateMoment;
+                maxDateMoment = meta.reposition.max_date > maxDateMoment ? meta.reposition.max_date : maxDateMoment;
             }
             // bounds dates for windows events
-            if (windows_events.are_there && windows_events.min_date && windows_events.max_date) {
-                windows_events.min_date = moment(windows_events.min_date);
-                windows_events.max_date = moment(windows_events.max_date);
-                minDateMoment = windows_events.min_date < minDateMoment ? windows_events.min_date : minDateMoment;
-                maxDateMoment = windows_events.max_date > maxDateMoment ? windows_events.max_date : maxDateMoment;
+            if (meta.windows.are_there && meta.windows.min_date && meta.windows.max_date) {
+                meta.windows.min_date = moment(meta.windows.min_date);
+                meta.windows.max_date = moment(meta.windows.max_date);
+                minDateMoment = meta.windows.min_date < minDateMoment ? meta.windows.min_date : minDateMoment;
+                maxDateMoment = meta.windows.max_date > maxDateMoment ? meta.windows.max_date : maxDateMoment;
             }
             var options = {
                 min: minDateMoment,
@@ -725,21 +724,21 @@
                 // filter critical errors
                 if (!$("#timeline-filter-critical-erros").is(":checked")) {
                     itemsJournal = _.filter(itemsJournal, function (item) {
-                        return item.color != "{{ COLOR_RED }}";
+                        return item.color != "{{ COLORS.RED }}";
                     });
                 }
 
                 // filter important errors
                 if (!$("#timeline-filter-important-erros").is(":checked")) {
                     itemsJournal = _.filter(itemsJournal, function (item) {
-                        return item.color != "{{ COLOR_ORANGE }}";
+                        return item.color != "{{ COLORS.ORANGE }}";
                     });
                 }
 
                 // filter no errors
                 if (!$("#timeline-filter-no-erros").is(":checked")) {
                     itemsJournal = _.filter(itemsJournal, function (item) {
-                        return item.color != "{{ COLOR_GREEN }}";
+                        return item.color != "{{ COLORS.GREEN }}";
                     });
                 }
 
@@ -783,7 +782,7 @@
                 filterTimeline()
             });
 
-            if (windows_events.are_there) {
+            if (meta.windows.are_there) {
                 $("#timeline-windows-event-calendar-picker").daterangepicker({
                     "timePicker": true,
                     "timePicker24Hour": true,
@@ -793,10 +792,10 @@
                         "separator": " / "
                     },
                     "alwaysShowCalendars": true,
-                    "minDate": windows_events.min_date,
-                    "maxDate": windows_events.max_date,
-                    "startDate": windows_events.min_date,
-                    "endDate": windows_events.max_date
+                    "minDate": meta.windows.min_date,
+                    "maxDate": meta.windows.max_date,
+                    "startDate": meta.windows.min_date,
+                    "endDate": meta.windows.max_date
                 }, function (start, end, label) {
                     $.ajax({
                                 method: "POST",
@@ -821,7 +820,7 @@
 
             // init errors filter
             $("#timeline-filter-errors").select2({
-                data: meta.errors.names,
+                data: meta.journal.errors.names,
                 width: 'element'
             });
             $("#timeline-filter-errors").change(function (evt) {
@@ -851,7 +850,7 @@
             });
 
             $("#timeline-filter-windows-errors").select2({
-                data: windows_events.keys,
+                data: meta.windows.keys,
                 width: '100%'
             });
             $("#timeline-filter-windows-errors").change(function (evt) {
@@ -908,7 +907,7 @@
                     .label(function (d) {
                         return (d.value / ndx.groupAll().reduceCount().value() * 100).toFixed(2) + "%";
                     });
-            totalOperationsReportChart.ordinalColors(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]);
+            totalOperationsReportChart.ordinalColors(["{{ COLORS.RED }}", "{{ COLORS.ORANGE }}", "{{ COLORS.GREEN }}"]);
 
             // BAR CHART FILTER BY TYPE ROW ---------------------- //
             criticalErrorsChart
@@ -924,7 +923,7 @@
                     .xAxis().tickFormat();
             criticalErrorsChart.on("renderlet", function (chart) {
                 chart.selectAll('rect.bar').each(function (d) {
-                    d3.select(this).attr("style", "fill: {{ COLOR_RED }}");
+                    d3.select(this).attr("style", "fill: {{ COLORS.RED }}");
                 });
             });
 
@@ -941,7 +940,7 @@
                     .xAxis().tickFormat();
             importantErrorsChart.on("renderlet", function (chart) {
                 chart.selectAll('rect.bar').each(function (d) {
-                    d3.select(this).attr("style", "fill: {{ COLOR_ORANGE }}");
+                    d3.select(this).attr("style", "fill: {{ COLORS.ORANGE }}");
                 });
             });
 
@@ -958,7 +957,7 @@
                     .xAxis().tickFormat();
             noErrorsChart.on("renderlet", function (chart) {
                 chart.selectAll('rect.bar').each(function (d) {
-                    d3.select(this).attr("style", "fill: {{ COLOR_GREEN }}");
+                    d3.select(this).attr("style", "fill: {{ COLORS.GREEN }}");
                 });
             });
 
@@ -976,13 +975,13 @@
                     .xAxis().tickFormat();
 
             operationsReportChart
-                    .colors(d3.scale.ordinal().domain(["red", "orange", "green"]).range(["{{ COLOR_RED }}", "{{ COLOR_ORANGE }}", "{{ COLOR_GREEN }}"]))
+                    .colors(d3.scale.ordinal().domain(["red", "orange", "green"]).range(["{{ COLORS.RED }}", "{{ COLORS.ORANGE }}", "{{ COLORS.GREEN }}"]))
                     .colorAccessor(function (d) {
-                        if (transformed[d.key].color == "{{ COLOR_RED }}") {
+                        if (transformed[d.key].color == "{{ COLORS.RED }}") {
                             return "red"
-                        } else if (transformed[d.key].color == "{{ COLOR_ORANGE }}") {
+                        } else if (transformed[d.key].color == "{{ COLORS.ORANGE }}") {
                             return "orange"
-                        } else if (transformed[d.key].color == "{{ COLOR_GREEN }}") {
+                        } else if (transformed[d.key].color == "{{ COLORS.GREEN }}") {
                             return "green"
                         }
                     });

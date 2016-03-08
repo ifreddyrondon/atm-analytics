@@ -94,85 +94,94 @@ def analyze_case(request, case_id):
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
 
-    journal_traces = []
-    event_viewer_traces = []
-    reposition_traces = []
-    windows_events = {
-        "are_there": False,
-        "min_date": None,
-        "max_date": None,
-        "keys": [],
-        "count": 0,
+    traces = {
+        "journal": [],
+        "reposition": [],
     }
+
     meta = {
-        "transactions_number": 0,
-        "dates": {
-            "min": None,
-            "max": None,
+        "journal": {
+            "transactions_number": 0,
+            "dates": {
+                "min": None,
+                "max": None,
+            },
+            "amount": {
+                "valid_transactions": 0,
+                "critical_errors_transactions": 0,
+                "important_errors_transactions": 0,
+            },
+            "errors": {
+                "critics_number": 0,
+                "names": []
+            }
         },
-        "amount": {
-            "valid_transactions": 0,
-            "critical_errors_transactions": 0,
-            "important_errors_transactions": 0,
+        "windows": {
+            "are_there": False,
+            "min_date": None,
+            "max_date": None,
+            "keys": [],
+            "count": 0,
         },
-        "errors": {
-            "critics_number": 0,
-            "names": []
+        "reposition": {
+            "min_date": None,
+            "max_date": None,
+            "count": 0,
         }
-    }
-    reposition_events_meta = {
-        "min_date": None,
-        "max_date": None,
     }
 
     for index, atm in enumerate(atms):
         # windows events
         if atm.microsoft_event_viewer:
-            windows_events["are_there"] = True
+            meta["windows"]["are_there"] = True
             # get the min and max dates for filter
-            if not windows_events["min_date"] \
-                    or windows_events["min_date"] > atm.event_viewer_errors.first().event_date:
-                windows_events["min_date"] = atm.event_viewer_errors.first().event_date
-            if not windows_events["max_date"] \
-                    or windows_events["max_date"] < atm.event_viewer_errors.last().event_date:
-                windows_events["max_date"] = atm.event_viewer_errors.last().event_date
+            if not meta["windows"]["min_date"] \
+                    or meta["windows"]["min_date"] > atm.event_viewer_errors.first().event_date:
+                meta["windows"]["min_date"] = atm.event_viewer_errors.first().event_date
+            if not meta["windows"]["max_date"] \
+                    or meta["windows"]["max_date"] < atm.event_viewer_errors.last().event_date:
+                meta["windows"]["max_date"] = atm.event_viewer_errors.last().event_date
             # get the keys of records id
             event_id_keys = set(atm.event_viewer_errors.values_list('event_id', flat=True).distinct())
-            in_all_events_keys = set(windows_events["keys"])
+            in_all_events_keys = set(meta["windows"]["keys"])
             in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
-            windows_events["keys"] = windows_events["keys"] + list(in_record_id_keys_but_not_in_all)
-            windows_events["count"] = atm.event_viewer_errors.count()
+            meta["windows"]["keys"] = meta["windows"]["keys"] + list(in_record_id_keys_but_not_in_all)
+            meta["windows"]["count"] += atm.event_viewer_errors.count()
 
         # Journals Virtual
         for journal_file in atm.journals.all():
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
-            journal_traces.append(trace)
+            traces["journal"].append(trace)
             # save only new errors names
-            in_all_errors_names = set(meta["errors"]["names"])
+            in_all_errors_names = set(meta["journal"]["errors"]["names"])
             in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
-            meta["errors"]["names"] = meta["errors"]["names"] + list(in_errors_names_but_not_in_all)
+            meta["journal"]["errors"]["names"] = meta["journal"]["errors"]["names"] + list(
+                in_errors_names_but_not_in_all)
             # save meta
-            meta["transactions_number"] += meta_journal["transactions_number"]
-            meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
-            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
-            meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
-            if not meta["dates"]["min"] or meta["dates"]["min"] > meta_journal["dates"]["min"]:
-                meta["dates"]["min"] = meta_journal["dates"]["min"]
-            if not meta["dates"]["max"] or meta["dates"]["max"] < meta_journal["dates"]["max"]:
-                meta["dates"]["max"] = meta_journal["dates"]["max"]
+            meta["journal"]["transactions_number"] += meta_journal["transactions_number"]
+            meta["journal"]["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
+            meta["journal"]["amount"]["critical_errors_transactions"] += meta_journal["amount"][
+                "critical_errors_transactions"]
+            meta["journal"]["amount"]["important_errors_transactions"] += meta_journal["amount"][
+                "important_errors_transactions"]
+            meta["journal"]["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+            if not meta["journal"]["dates"]["min"] or meta["journal"]["dates"]["min"] > meta_journal["dates"]["min"]:
+                meta["journal"]["dates"]["min"] = meta_journal["dates"]["min"]
+            if not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]:
+                meta["journal"]["dates"]["max"] = meta_journal["dates"]["max"]
 
         # reposition events
         atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())
+        meta["reposition"]["count"] += len(atm_reposition_events)
         for event in atm_reposition_events:
             # get the min and max dates for filter
-            if not reposition_events_meta["min_date"] \
-                    or reposition_events_meta["min_date"] > event.reposition_date:
-                reposition_events_meta["min_date"] = event.reposition_date
-            if not reposition_events_meta["max_date"] \
-                    or reposition_events_meta["max_date"] < event.reposition_date:
-                reposition_events_meta["max_date"] = event.reposition_date
-            reposition_traces.append({
+            if not meta["reposition"]["min_date"] \
+                    or meta["reposition"]["min_date"] > event.reposition_date:
+                meta["reposition"]["min_date"] = event.reposition_date
+            if not meta["reposition"]["max_date"] \
+                    or meta["reposition"]["max_date"] < event.reposition_date:
+                meta["reposition"]["max_date"] = event.reposition_date
+            traces["reposition"].append({
                 "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
                 "address": event.location.address,
             })
@@ -204,39 +213,38 @@ def analyze_case(request, case_id):
                 })
             return JsonResponse(events_response, safe=False, status=200)
 
-    journal_traces = list(itertools.chain(*journal_traces))
+    traces["journal"] = list(itertools.chain(*traces["journal"]))
 
-    meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
+    meta["journal"]["errors"]["critics_number_percentage"] = meta["journal"]["errors"]["critics_number"] * 100 / \
+                                                             meta["journal"]["transactions_number"]
     # get the currency
     currency = case.get_missing_amount_currency_display()
     currency = currency[currency.index("-") + 1:currency.index("|")].strip()
 
     # serialize the min and max dates
-    if windows_events["min_date"] is not None and windows_events["max_date"] is not None:
-        windows_events["min_date"] = windows_events["min_date"].strftime("%Y-%m-%d %H:%M:%S")
-        windows_events["max_date"] = windows_events["max_date"].strftime("%Y-%m-%d %H:%M:%S")
-    if meta["dates"]["min"] is not None and meta["dates"]["max"] is not None:
-        meta["dates"]["min"] = meta["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
-        meta["dates"]["max"] = meta["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
-    if reposition_events_meta["min_date"] is not None and reposition_events_meta["max_date"] is not None:
-        reposition_events_meta["min_date"] = reposition_events_meta["min_date"].strftime("%Y-%m-%d %H:%M:%S")
-        reposition_events_meta["max_date"] = reposition_events_meta["max_date"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["windows"]["min_date"] is not None and meta["windows"]["max_date"] is not None:
+        meta["windows"]["min_date"] = meta["windows"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["windows"]["max_date"] = meta["windows"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["journal"]["dates"]["min"] is not None and meta["journal"]["dates"]["max"] is not None:
+        meta["journal"]["dates"]["min"] = meta["journal"]["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["journal"]["dates"]["max"] = meta["journal"]["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["reposition"]["min_date"] is not None and meta["reposition"]["max_date"] is not None:
+        meta["reposition"]["min_date"] = meta["reposition"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["reposition"]["max_date"] = meta["reposition"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
 
     return render(request, 'analytics/results.html', {
         'case': case,
         'form': form,
-        'journal_traces': journal_traces,
-        'event_viewer_traces': event_viewer_traces,
-        'reposition_traces': reposition_traces,
+        'traces': traces,
         'meta': meta,
-        'windows_events': windows_events,
-        'reposition_events_meta': reposition_events_meta,
         'currency': currency,
-        'COLOR_GREEN': settings.COLOR_GREEN,
-        'COLOR_RED': settings.COLOR_RED,
-        'COLOR_ORANGE': settings.COLOR_ORANGE,
-        'COLOR_BLUE': settings.COLOR_BLUE,
-        'COLOR_YELLOW': settings.COLOR_YELLOW,
+        'COLORS': {
+            'GREEN': settings.COLOR_GREEN,
+            'RED': settings.COLOR_RED,
+            'ORANGE': settings.COLOR_ORANGE,
+            'BLUE': settings.COLOR_BLUE,
+            'YELLOW': settings.COLOR_YELLOW,
+        }
     })
 
 
