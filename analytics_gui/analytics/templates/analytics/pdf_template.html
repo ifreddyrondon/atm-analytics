@@ -18,20 +18,19 @@
         }
 
         #files-table > *{
-            font-size: 9px;
+        font-size: 9px;
         }
 
         #files-table {
-            width: 100%;
+        width: 100%;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="row">
+    <div class="row" style="padding-top: 30;">
         <div class="col-md-12">
             <div>
-                <!--<img src="{{ logo }}" width="80">-->
                 <span class="pull-right">Fecha de emisión del PDF: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
             </div>
             <h3>Análisis del Caso</h3>
@@ -61,7 +60,7 @@
                 {% endfor %}
             </ul>
             <br>
-            <div class="panel panel-primary">
+            <div class="panel panel-primary" style="padding-top: 30;">
                 <div class="panel-heading">
                     <h3 class="panel-title">Archivos logs</h3>
                 </div>
@@ -121,7 +120,7 @@
                 </div>
             </div>
             <div id="page-break"></div>
-            <div class="row">
+            <div class="row" style="padding-top: 15;">
                 <h3>Estimación de porcentaje de culpa</h3>
                 <div class="col-md-4 col-xs-4">
                     <h5>Logs Journal</h5>
@@ -138,7 +137,6 @@
             </div>
             <br>
             <h3>Reporte Técnico</h3>
-            <br>
             <h4>Analista: {{ analyst_name }}</h4>
             {% if resolution %}
             <br>
@@ -166,6 +164,12 @@
                          style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
                 </div>
                 <div id="page-break"></div>
+                <div class="col-md-12 col-xs-12" style="padding-bottom: 50px;">
+                    <h6>Montos</h6>
+                    <img src="{{ amount_report_chart }}"
+                         style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+                <div id="page-break"></div>
                 <div class="col-md-4 col-xs-4">
                     <h6>Errores Criticos</h6>
                     <img src="{{ critical_errors_chart }}"
@@ -187,9 +191,9 @@
                          style="width: 100%; height: 300px; margin: 0px auto; max-height: 280px; position: relative;"/>
                 </div>
             </div>
-            <br>
             {% if operations_table %}
-            <div class="panel panel-primary">
+            <div id="page-break"></div>
+            <div class="panel panel-primary" style="padding-top: 30;">
                 <div class="panel-heading">
                     <h3 class="panel-title">Operaciones</h3>
                 </div>
@@ -219,43 +223,47 @@
                 </div>
             </div>
             {% endif %}
-            <br>
 
-            <div class="col-md-12 col-xs-12" style="padding-top: 50px; padding-bottom: 80px;">
-                <h5>Timeline</h5>
-                <img src="{{ chart_events_timeline }}"
-                     style="width: 100%; margin: 0px auto; max-height: 20000px; position: relative;"/>
-            </div>
-            {% if time_line_table %}
-            <div class="col-md-12 col-xs-12" style="padding-top: 10px;">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Timeline</h3>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-hover" style="font-size: 14px;">
-                            <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Error</th>
-                                <th>Monto</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for row in time_line_table %}
-                            <tr>
-                                {% for col in row %}
-                                <td>
-                                    {{ col }}
-                                </td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+            <div id="page-break"></div>
+            <div class="row" style="padding-top: 30;">
+                <div class="col-md-12 col-xs-12">
+                    <h5>Timeline</h5>
+                    <img src="{{ chart_events_timeline }}"
+                         style="width: 100%; margin: 0px auto; max-height: 20000px; position: relative;"/>
                 </div>
             </div>
+            <div id="page-break"></div>
+
+            {% if time_line_table %}
+
+            <div class="panel panel-primary" style="padding-top: 30;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Timeline</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover" style="font-size: 14px;">
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Error</th>
+                            <th>Monto</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in time_line_table %}
+                        <tr>
+                            {% for col in row %}
+                            <td>
+                                {{ col }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             {% endif %}
         </div>
     </div>

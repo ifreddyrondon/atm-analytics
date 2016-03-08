@@ -3,20 +3,23 @@ $("#generate-pdf").click(function(event) {
     $("#wait").show();
     var svgList = document.getElementsByTagName("svg");
     var time_line = document.getElementById("chart-events-timeline");
-    var atm_index_chart = document.getElementById("atm-index-chart").children[1];
-    atm_index_chart.id = "atm-index-chart";
-    var total_op_report_chart = document.getElementById("total-operations-report-chart").children[1];
-    total_op_report_chart.id = "total-operations-report-chart";
-    var operations_report_chart = document.getElementById("operations-report-chart").children[1];
-    operations_report_chart.id = "operations-report-chart";
-    var errors_report_chart = document.getElementById("errors-report-chart").children[1];
-    errors_report_chart.id = "errors-report-chart";
+    var atm_index_chart = document.getElementById("atm-index-chart");//.children[1];
+    // atm_index_chart.id = "atm-index-chart";
+    var total_op_report_chart = document.getElementById("total-operations-report-chart");//.children[1];
+    // total_op_report_chart.id = "total-operations-report-chart";
+    var operations_report_chart = document.getElementById("operations-report-chart");//.children[1];
+    // operations_report_chart.id = "operations-report-chart";
+    var errors_report_chart = document.getElementById("errors-report-chart"); //.children[1];
+    // errors_report_chart.id = "errors-report-chart";
+    var amount_report_chart = document.getElementById("amount-report-chart");//.children[1];
+    // amount_report_chart.id = "amount-report-chart";
     var array = Array.prototype.slice.call(svgList);
     array.push(time_line);
     array.push(atm_index_chart);
     array.push(total_op_report_chart);
     array.push(operations_report_chart);
     array.push(errors_report_chart);
+    array.push(amount_report_chart);
     generatePdf(array);
 });
 
@@ -150,11 +153,32 @@ convertBase64ToPDF = function (name, base64) {
 }
 
 getImageData = function(element) {
-    var html2obj = html2canvas(element);
-    var queue = html2obj.parse();
-    var canvas = html2obj.render(queue);
-    var data = canvas.toDataURL('image/png');
-    return data.split(",")[1];
+    element = svgToCanvas(element);
+    if (element.tagName.toLowerCase() == "div") {
+        var html2obj = html2canvas(element);
+        var queue = html2obj.parse();
+        var canvas = html2obj.render(queue);
+        var data = canvas.toDataURL('image/png');
+    } else if (element.tagName.toLowerCase() == "canvas") {
+        var data = element.toDataURL('image/png');
+    }
+
+    return data;
+    // return data.split(",")[1];
+}
+
+svgToCanvas = function(targetElem) {
+    var svgElems = targetElem.getElementsByTagName("svg");
+
+    if (svgElems.length == 1) {
+        var svg = svgElems[0].outerHTML;
+        var canvas = document.createElement('canvas');
+        canvg(canvas, svg);
+        return canvas;
+    } else {
+        console.log("Svg into element not found");
+        return targetElem;
+    }
 }
 
 readTable = function(id) {

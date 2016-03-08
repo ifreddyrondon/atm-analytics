@@ -237,10 +237,6 @@ def generate_pdf(request, case_id):
     case_picture = None
     company_logo = None
     atm_locations = []
-    options = {
-        'margin-bottom': '0.8in',
-        'footer-right': '[page]'
-    }
 
     if case.picture:
         case_picture = settings.BASE_DIR + case.picture.url
@@ -279,10 +275,6 @@ def generate_pdf(request, case_id):
         if atm.other_log:
             files.append(utils.create_file_element(atm.other_log.name))
 
-        # Cash replacement schedule
-        if atm.cash_replacement_schedule:
-            files.append(utils.create_file_element(atm.cash_replacement_schedule.name))
-
         # Journals Virtual
         for journal_file in atm.journals.all():
             tmp = {}
@@ -309,10 +301,11 @@ def generate_pdf(request, case_id):
         args = dict(request.POST.iterlists())
         for key in args.keys():
             if 'chart' in key:
-                image_data = base64.b64decode(args[key][0])
-                if 'timeline' in key:
+                if 'image/png' in args[key][0]:
+                    image_data = base64.b64decode(args[key][0].split(",")[1])
                     filename = key + ".png"
                 else:
+                    image_data = base64.b64decode(args[key][0])
                     filename = key + ".svg"
                 with open(media_root + filename, 'w') as f:
                     f.write(image_data)
@@ -358,10 +351,10 @@ def generate_pdf(request, case_id):
 
     options = {
         'page-size': 'Letter',
-        'margin-top': '0.8in',
-        'margin-right': '0.8in',
-        'margin-bottom': '0.8in',
-        'margin-left': '0.8in',
+        'margin-top': '0.75in',
+        'margin-right': '0.6in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.6in',
         'encoding': "UTF-8",
         'footer-center': '[page]',
         'footer-font-size': '10'
@@ -370,7 +363,8 @@ def generate_pdf(request, case_id):
     pdfkit.from_string(rendered_html, media_root + 'tmp_report.pdf', css=style_list, options=options)
 
     for image in images.values():
-        os.remove(image)
+        # os.remove(image)
+        pass
 
     utils.add_report_header(media_root + 'tmp_report.pdf')
 
