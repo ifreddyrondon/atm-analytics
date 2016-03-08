@@ -1,3 +1,4 @@
+import datetime
 import itertools
 
 from django.conf import settings
@@ -90,6 +91,8 @@ def view_case(request, case_id):
 
 @login_required(login_url='/login')
 def analyze_case(request, case_id):
+    # threshold to find close events, 5 min
+    threshold_time = 300
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
@@ -127,6 +130,7 @@ def analyze_case(request, case_id):
             "min_date": None,
             "max_date": None,
             "count": 0,
+            "close_events_count": 0,
         }
     }
 
@@ -181,6 +185,14 @@ def analyze_case(request, case_id):
             if not meta["reposition"]["max_date"] \
                     or meta["reposition"]["max_date"] < event.reposition_date:
                 meta["reposition"]["max_date"] = event.reposition_date
+
+            # find close events to this reposition event
+            start_date = event.reposition_date - datetime.timedelta(seconds=threshold_time)
+            end_date = event.reposition_date + datetime.timedelta(seconds=threshold_time)
+            meta["reposition"]["close_events_count"] += AtmEventViewerEvent.objects.filter(
+                atm__in=atms,
+                event_date__range=(start_date, end_date)).count()
+
             traces["reposition"].append({
                 "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
                 "address": event.location.address,
