@@ -41,6 +41,11 @@
             border-color: {{ COLOR_BLUE }};
             color: white;
         }
+
+        .vis-item.reposition-event {
+            background-color: {{ COLOR_YELLOW }};
+            border-color: #000000;
+        }
     </style>
 {% endblock %}
 
@@ -610,9 +615,20 @@
 
             // CHARTS ***********************************************************
             // TIMELINE *********************************************************
-            window.timelineData = journalData;
             window.windowsEventsData = [];
+            window.repositionData = {{ reposition_traces | jsonify }};
             var windows_events = {{ windows_events | jsonify }};
+            var reposition_events_meta = {{ reposition_events_meta | jsonify }};
+
+            _.map(window.repositionData, function (d) {
+                d.date = dtgFormat2.parse(d.date);
+                d.start = d.date;
+                d.content = d.address;
+                d.event_type = "RepositionEvent";
+                d.className = "reposition-event";
+            });
+
+            window.timelineData = journalData.concat(window.repositionData);
 
             function fillTimelineTableAndDynamicFields(items) {
                 timelineTable.clear();
@@ -648,15 +664,26 @@
             }
 
             var timelineContainer = document.getElementById('chart-events-timeline');
-            if (windows_events.are_there) {
-                windows_events.min_date = moment(windows_events.min_date);
-                windows_events.max_date = moment(windows_events.max_date);
-            }
+            // bounds dates for xfs data
             var minDateMoment = moment(minDate);
             var maxDateMoment = moment(maxDate);
+            // bounds dates for reposition events
+            if (reposition_events_meta.min_date && reposition_events_meta.max_date){
+                reposition_events_meta.min_date = moment(reposition_events_meta.min_date);
+                reposition_events_meta.max_date = moment(reposition_events_meta.max_date);
+                minDateMoment = reposition_events_meta.min_date < minDateMoment ? reposition_events_meta.min_date : minDateMoment;
+                maxDateMoment = reposition_events_meta.max_date > maxDateMoment ? reposition_events_meta.max_date : maxDateMoment;
+            }
+            // bounds dates for windows events
+            if (windows_events.are_there && windows_events.min_date && windows_events.max_date) {
+                windows_events.min_date = moment(windows_events.min_date);
+                windows_events.max_date = moment(windows_events.max_date);
+                minDateMoment = windows_events.min_date < minDateMoment ? windows_events.min_date : minDateMoment;
+                maxDateMoment = windows_events.max_date > maxDateMoment ? windows_events.max_date : maxDateMoment;
+            }
             var options = {
-                min: windows_events.min_date && windows_events.min_date < minDateMoment ? windows_events.min_date : minDateMoment,
-                max: windows_events.max_date && windows_events.max_date > maxDateMoment ? windows_events.max_date : maxDateMoment,
+                min: minDateMoment,
+                max: maxDateMoment
             };
 
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
@@ -728,7 +755,11 @@
                     });
                 }
 
+                var itemsReposition = window.repositionData;
+
                 var items = itemsJournal.concat(itemsWindows);
+                items = items.concat(itemsReposition);
+
                 timeline.setItems(items);
                 timeline.fit();
                 fillTimelineTableAndDynamicFields(items);

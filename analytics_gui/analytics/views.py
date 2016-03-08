@@ -11,7 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
 from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
-from analytics_gui.companies.models import Company
+from analytics_gui.companies.models import Company, AtmRepositionEvent
 
 
 @login_required(login_url='/login')
@@ -96,6 +96,7 @@ def analyze_case(request, case_id):
 
     journal_traces = []
     event_viewer_traces = []
+    reposition_traces = []
     windows_events = {
         "are_there": False,
         "min_date": None,
@@ -118,6 +119,10 @@ def analyze_case(request, case_id):
             "critics_number": 0,
             "names": []
         }
+    }
+    reposition_events_meta = {
+        "min_date": None,
+        "max_date": None,
     }
 
     for index, atm in enumerate(atms):
@@ -156,6 +161,21 @@ def analyze_case(request, case_id):
                 meta["dates"]["min"] = meta_journal["dates"]["min"]
             if not meta["dates"]["max"] or meta["dates"]["max"] < meta_journal["dates"]["max"]:
                 meta["dates"]["max"] = meta_journal["dates"]["max"]
+
+        # reposition events
+        atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())
+        for event in atm_reposition_events:
+            # get the min and max dates for filter
+            if not reposition_events_meta["min_date"] \
+                    or reposition_events_meta["min_date"] > event.reposition_date:
+                reposition_events_meta["min_date"] = event.reposition_date
+            if not reposition_events_meta["max_date"] \
+                    or reposition_events_meta["max_date"] < event.reposition_date:
+                reposition_events_meta["max_date"] = event.reposition_date
+            reposition_traces.append({
+                "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "address": event.location.address,
+            })
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -198,19 +218,25 @@ def analyze_case(request, case_id):
     if meta["dates"]["min"] is not None and meta["dates"]["max"] is not None:
         meta["dates"]["min"] = meta["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
         meta["dates"]["max"] = meta["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
+    if reposition_events_meta["min_date"] is not None and reposition_events_meta["max_date"] is not None:
+        reposition_events_meta["min_date"] = reposition_events_meta["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        reposition_events_meta["max_date"] = reposition_events_meta["max_date"].strftime("%Y-%m-%d %H:%M:%S")
 
     return render(request, 'analytics/results.html', {
         'case': case,
         'form': form,
         'journal_traces': journal_traces,
         'event_viewer_traces': event_viewer_traces,
+        'reposition_traces': reposition_traces,
         'meta': meta,
         'windows_events': windows_events,
+        'reposition_events_meta': reposition_events_meta,
         'currency': currency,
         'COLOR_GREEN': settings.COLOR_GREEN,
         'COLOR_RED': settings.COLOR_RED,
         'COLOR_ORANGE': settings.COLOR_ORANGE,
         'COLOR_BLUE': settings.COLOR_BLUE,
+        'COLOR_YELLOW': settings.COLOR_YELLOW,
     })
 
 
