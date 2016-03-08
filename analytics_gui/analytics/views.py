@@ -200,17 +200,18 @@ def analyze_case(request, case_id):
         if 'event_start_date_timeline' in request.POST and 'event_end_date_timeline' in request.POST:
             start_date = request.POST['event_start_date_timeline']
             end_date = request.POST['event_end_date_timeline']
-            events = AtmEventViewerEvent.objects.filter(event_date__range=(start_date, end_date))
             events_response = []
-            for event in events:
-                events_response.append({
-                    "date": event.event_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    "eventId": event.event_id,
-                    "eventRecordId": event.event_record_id,
-                    "context": event.context,
-                    "className": "window-event",
-                    "color": settings.COLOR_BLUE
-                })
+            for atm in atms:
+                events = AtmEventViewerEvent.objects.filter(atm=atm, event_date__range=(start_date, end_date))
+                for event in events:
+                    events_response.append({
+                        "date": event.event_date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "eventId": event.event_id,
+                        "eventRecordId": event.event_record_id,
+                        "context": event.context,
+                        "className": "window-event",
+                        "color": settings.COLOR_BLUE
+                    })
             return JsonResponse(events_response, safe=False, status=200)
 
     traces["journal"] = list(itertools.chain(*traces["journal"]))
