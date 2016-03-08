@@ -64,6 +64,7 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         "dates": {
             "min": None,
             "max": None,
+            "all": [],
         },
         "amount": {
             "valid_transactions": 0,
@@ -91,6 +92,10 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
             meta["dates"]["min"] = meta_date
         if not meta["dates"]["max"] or meta["dates"]["max"] < meta_date:
             meta["dates"]["max"] = meta_date
+        # save all dates
+        if meta_date not in meta["dates"]["all"]:
+            meta["dates"]["all"].append(meta_date)
+
         # GET AMOUNT
         match = re.search(r'RETIRO:.*', item)
         trace["amount"] = match.group().split(":")[1].strip() if match else ""

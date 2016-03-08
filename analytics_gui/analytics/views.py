@@ -186,17 +186,24 @@ def analyze_case(request, case_id):
                     or meta["reposition"]["max_date"] < event.reposition_date:
                 meta["reposition"]["max_date"] = event.reposition_date
 
-            # find close events to this reposition event
+            traces["reposition"].append({
+                "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "address": event.location.address,
+            })
+
+            # find close windows events to this reposition event
             start_date = event.reposition_date - datetime.timedelta(seconds=threshold_time)
             end_date = event.reposition_date + datetime.timedelta(seconds=threshold_time)
             meta["reposition"]["close_events_count"] += AtmEventViewerEvent.objects.filter(
                 atm__in=atms,
                 event_date__range=(start_date, end_date)).count()
 
-            traces["reposition"].append({
-                "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
-                "address": event.location.address,
-            })
+            # find close xfs events to this reposition event
+            start_date = start_date.replace(tzinfo=None)
+            end_date = end_date.replace(tzinfo=None)
+            for xfs_date in meta_journal["dates"]["all"]:
+                if start_date <= xfs_date <= end_date:
+                    meta["reposition"]["close_events_count"] += 1
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
