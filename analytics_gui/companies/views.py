@@ -29,9 +29,9 @@ def config(request):
             atm_location_form_set.save()
 
             if 'address_csv' in request.FILES:
-                reader = csv.DictReader(request.FILES["address_csv"])
+                reader = csv.reader(request.FILES["address_csv"])
                 for row in reader:
-                    CompanyAtmLocation.objects.create(address=row['direccion'], company=company)
+                    CompanyAtmLocation.objects.get_or_create(address=row[0], company=company)
 
             if 'atms_reposition_events' in request.FILES:
                 reader = csv.reader(request.FILES["atms_reposition_events"])
