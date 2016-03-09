@@ -1,25 +1,14 @@
 # coding=utf-8
 from django import forms
-
-default_errors = {
-    u'required': u"Este campo es requerido",
-    u'invalid': u"Coloca un valor válido",
-    u'inactive': u"Esta cuenta esta inactiva",
-    u'invalid_login': u"Por favor coloca el usuario y clave correcta",
-    u'email_not_exists': u"No existe usuario con este correo electrónico",
-    u'password_incorrect': u"La contraseña introducida es incorrecta. Intenta nuevamente",
-    u'password_mismatch': u"Las contraseñas no coinciden",
-    u'unknown': u"Ese usuario no tiene una cuenta asociada.",
-}
+from django.utils.translation import ugettext as _
 
 
 class CustomAuthenticationForm(forms.Form):
-
     username = forms.CharField(
         max_length=254,
         widget=forms.TextInput(
             attrs={
-                'placeholder': 'Nombre de usuario',
+                'placeholder': _('User name'),
                 'class': 'form-control'
             }
         )
@@ -28,25 +17,18 @@ class CustomAuthenticationForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'placeholder': 'Contraseña',
+                'placeholder': _('Password'),
                 'class': 'form-control'
             }
         )
     )
 
-    def __init__(self, *args, **kwargs):
-        super(CustomAuthenticationForm, self).__init__(*args, **kwargs)
-
-        for key in self.fields:
-            self.fields[key].error_messages = default_errors
-
 
 class CreateAnalystForm(forms.Form):
-
     first_name = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'placeholder': 'Nombre',
+                'placeholder': _('First name'),
                 'class': 'form-control'
             }
         )
@@ -55,7 +37,7 @@ class CreateAnalystForm(forms.Form):
     last_name = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'placeholder': 'Apellido',
+                'placeholder': _('Last name'),
                 'class': 'form-control'
             }
         )
@@ -64,7 +46,7 @@ class CreateAnalystForm(forms.Form):
     email = forms.EmailField(
         widget=forms.TextInput(
             attrs={
-                'placeholder': 'Email',
+                'placeholder': _('Email'),
                 'class': 'form-control'
             }
         )
@@ -73,7 +55,7 @@ class CreateAnalystForm(forms.Form):
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'placeholder': 'Username',
+                'placeholder': _('Username'),
                 'class': 'form-control'
             }
         )
@@ -82,14 +64,8 @@ class CreateAnalystForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'placeholder': 'Contraseña',
+                'placeholder': _('Password'),
                 'class': 'form-control'
             }
         )
     )
-
-    def __init__(self, *args, **kwargs):
-        super(CreateAnalystForm, self).__init__(*args, **kwargs)
-
-        for key in self.fields:
-            self.fields[key].error_messages = default_errors
