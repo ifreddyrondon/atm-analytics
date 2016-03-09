@@ -27,6 +27,7 @@ class Company(models.Model):
 
     class Meta:
         verbose_name = _("Company")
+        verbose_name_plural = _("Companies")
 
 
 class Bank(models.Model):
