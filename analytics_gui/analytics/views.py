@@ -237,9 +237,6 @@ def analyze_case(request, case_id):
 
     meta["journal"]["errors"]["critics_number_percentage"] = meta["journal"]["errors"]["critics_number"] * 100 / \
                                                              meta["journal"]["transactions_number"]
-    # get the currency
-    currency = case.get_missing_amount_currency_display()
-    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
 
     # serialize the min and max dates
     if meta["windows"]["min_date"] is not None and meta["windows"]["max_date"] is not None:
@@ -257,7 +254,6 @@ def analyze_case(request, case_id):
         'form': form,
         'traces': traces,
         'meta': meta,
-        'currency': currency,
         'COLORS': {
             'GREEN': settings.COLOR_GREEN,
             'RED': settings.COLOR_RED,

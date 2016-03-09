@@ -288,7 +288,7 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Total amount of valid transactions" %}</h5>
-                            <div class="well percent-result">{{ meta.journal.amount.valid_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.valid_transactions }} {{ case.pretty_currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Transactions with critical errors" %}</h5>
@@ -303,11 +303,11 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Total amount of transactions with critical errors" %}</h5>
-                            <div class="well percent-result">{{ meta.journal.amount.critical_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.critical_errors_transactions }} {{ case.pretty_currency }}</div>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Total amount of transactions with important errors" %}</h5>
-                            <div class="well percent-result">{{ meta.journal.amount.important_errors_transactions }} {{ currency }}</div>
+                            <div class="well percent-result">{{ meta.journal.amount.important_errors_transactions }} {{ case.pretty_currency }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -322,7 +322,7 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Estimated cash missing in case" %}</h5>
-                            <div class="well percent-result dynamic-analysis">{{ case.missing_amount }} {{ currency }}</div>
+                            <div class="well percent-result dynamic-analysis">{{ case.missing_amount }} {{ case.pretty_currency }}</div>
                         </div>
                     </div>
                     <div class="row">
@@ -592,7 +592,7 @@
                         "<input type='checkbox'></td>",
                         moment(item.date).format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"),
                         item.error ? item.error : item.content,
-                        item.amount ? item.amount + " " + "{{ currency }}" : "Does not apply",
+                        item.amount ? item.amount + " " + "{{ case.pretty_currency }}" : "Does not apply",
                         item.atm_index + 1 ? item.atm_index + 1 : "Does not apply",
                         item.event_type ? item.event_type : "Does not apply"
                     ]);
@@ -609,7 +609,7 @@
                 var start = moment(timeline.getWindow().start);
                 var end = moment(timeline.getWindow().end);
                 $("#timeline-dynamic-range-dates").html(start.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ") + "<br>" + end.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"));
-                $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ currency }}");
+                $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ case.pretty_currency }}");
                 $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.journal.errors.critics_number).toFixed(2) + "%");
 
                 $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
@@ -1017,7 +1017,7 @@
                             return d.content;
                         },
                         function (d) {
-                            return d.amount + " " + "{{ currency }}";
+                            return d.amount + " " + "{{ case.pretty_currency }}";
                         },
                         function (d) {
                             return d.atm_index + 1;

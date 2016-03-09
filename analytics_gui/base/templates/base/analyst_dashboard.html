@@ -41,7 +41,7 @@
                             <tr>
                                 <td><a href="{% url "analytics:view_case" case.id %}">{{ case.number }}</a></td>
                                 <td>{{ case.name }}</td>
-                                <td>${{ case.missing_amount }}</td>
+                                <td>{{ case.missing_amount }} {{ case.pretty_currency }}</td>
                                 <td>{{ case.atms.count }}</td>
                                 <td>{{ case.get_status_display }}</td>
                                 <td><a href="{% url "analytics:analyze" case.id %}" class="btn btn-default btn-xs">{% trans "results" %}</a></td>

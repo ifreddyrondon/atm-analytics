@@ -92,6 +92,11 @@ class Case(models.Model):
         top = Case.objects.order_by('-number')
         return top[0].number + 1 if len(top) > 0 else 0
 
+    @property
+    def pretty_currency(self):
+        currency = self.get_missing_amount_currency_display()
+        return currency[currency.index("-") + 1:currency.index("|")].strip()
+
     def save(self, **kwargs):
         """Get last value of Number from database, and increment before save
         :param **kwargs:
