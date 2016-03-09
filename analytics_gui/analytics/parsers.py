@@ -1,11 +1,12 @@
-
 import random
 import re
+from datetime import datetime
 from decimal import Decimal
 
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
-from datetime import datetime
+
+from django.utils.translation import ugettext as _
 
 from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
 
@@ -133,14 +134,14 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         color = AtmErrorXFS.ERROR_COLOR_GREEN if not error else random.choice(
             [AtmErrorXFS.ERROR_COLOR_ORANGE, AtmErrorXFS.ERROR_COLOR_RED])
 
-        event_type = "Sin error"
+        event_type = _("No error")
         class_name = "green"
         if color == AtmErrorXFS.ERROR_COLOR_ORANGE:
-            event_type = "Error importante"
+            event_type = _("Important error")
             class_name = "orange"
             meta["amount"]["important_errors_transactions"] += trace["amount"]
         elif color == AtmErrorXFS.ERROR_COLOR_RED:
-            event_type = "Error critico"
+            event_type = _("Critical error")
             class_name = "red"
             meta["errors"]["critics_number"] += 1
             meta["amount"]["critical_errors_transactions"] += trace["amount"]

@@ -1,47 +1,36 @@
-# coding=utf-8
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
+from django.utils.translation import ugettext as _
 
 from analytics_gui.analytics.models import Case, AtmCase
 from analytics_gui.companies.models import Bank, CompanyAtmLocation
 
-default_errors = {
-    u'required': u"Este campo es requerido",
-    u'invalid': u"Coloca un valor válido",
-    u'inactive': u"Esta cuenta esta inactiva",
-    u'invalid_login': u"Por favor coloca el usuario y clave correcta",
-    u'email_not_exists': u"No existe usuario con este correo electrónico",
-    u'password_incorrect': u"La contraseña introducida es incorrecta. Intenta nuevamente",
-    u'password_mismatch': u"Las contraseñas no coinciden",
-    u'unknown': u"Ese usuario no tiene una cuenta asociada.",
-}
-
 
 class CreateCaseForm(forms.ModelForm):
     number = forms.IntegerField(
-            help_text='Número de caso',
-            min_value=0,
-            required=False,
-            widget=forms.TextInput(attrs={'placeholder': str(Case.get_case_number())})
+        help_text=_('Case number'),
+        min_value=0,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': str(Case.get_case_number())})
     )
 
     priority = forms.ChoiceField(
-            widget=forms.RadioSelect,
-            choices=Case.PRIORITY_CHOICES,
-            help_text='Importancia del caso'
+        widget=forms.RadioSelect,
+        choices=Case.PRIORITY_CHOICES,
+        help_text=_('Importance of the case')
     )
 
     status = forms.ChoiceField(
-            widget=forms.RadioSelect,
-            choices=Case.STATUS_CHOICES,
-            initial=Case.STATUS_OPEN,
-            help_text='Estado del caso'
+        widget=forms.RadioSelect,
+        choices=Case.STATUS_CHOICES,
+        initial=Case.STATUS_OPEN,
+        help_text=_('Case status')
     )
 
     created_date = forms.DateField(
-            input_formats=['%d-%m-%Y', ],
-            widget=forms.DateInput(format='%d-%m-%Y'),
-            help_text='Fecha de creación del caso',
+        input_formats=['%d-%m-%Y', ],
+        widget=forms.DateInput(format='%d-%m-%Y'),
+        help_text=_('Creation date of the case'),
     )
 
     class Meta:
@@ -54,9 +43,6 @@ class CreateCaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')
         super(CreateCaseForm, self).__init__(*args, **kwargs)
-
-        for key in self.fields:
-            self.fields[key].error_messages = default_errors
 
         self.fields['bank'].queryset = Bank.objects.filter(company=company)
 
@@ -84,34 +70,28 @@ class CreateAtmForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CreateAtmForm, self).__init__(*args, **kwargs)
 
-        for key in self.fields:
-            self.fields[key].error_messages = default_errors
-
         if kwargs.get('initial'):
             self.fields['atm_location'].queryset = CompanyAtmLocation.objects.filter(
                 company=kwargs.get('initial').get('company'))
 
 
 CreateAtmFormSet = inlineformset_factory(
-        Case,
-        AtmCase,
-        formset=BaseAtmFormSet,
-        form=CreateAtmForm,
-        extra=0,
-        min_num=0,
-        max_num=1,
+    Case,
+    AtmCase,
+    formset=BaseAtmFormSet,
+    form=CreateAtmForm,
+    extra=0,
+    min_num=0,
+    max_num=1,
 )
 
 
 class AnalyticForm(forms.ModelForm):
     class Meta:
         model = Case
-        fields = ('resolution', )
+        fields = ('resolution',)
 
     def __init__(self, *args, **kwargs):
         super(AnalyticForm, self).__init__(*args, **kwargs)
-
-        for key in self.fields:
-            self.fields[key].error_messages = default_errors
 
         self.fields['resolution'].required = True
