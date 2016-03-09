@@ -24,6 +24,10 @@
         #files-table {
         width: 100%;
         }
+
+        #filters_timeline > * {
+        display: inline ! important;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +123,9 @@
                     </div>
                 </div>
             </div>
+
             <div id="page-break"></div>
+
             <div class="row" style="padding-top: 15;">
                 <h3>Estimación de porcentaje de culpa</h3>
                 <div class="col-md-4 col-xs-4">
@@ -191,8 +197,10 @@
                          style="width: 100%; height: 300px; margin: 0px auto; max-height: 280px; position: relative;"/>
                 </div>
             </div>
-            {% if operations_table %}
+
             <div id="page-break"></div>
+
+            {% if operations_table %}
             <div class="panel panel-primary" style="padding-top: 30;">
                 <div class="panel-heading">
                     <h3 class="panel-title">Operaciones</h3>
@@ -225,7 +233,39 @@
             {% endif %}
 
             <div id="page-break"></div>
+
             <div class="row" style="padding-top: 30;">
+                {% if critical_filter or important_filter or no_error_filter %}
+                <h4>Filtros de Journal eventos</h4>
+                <div class="col-md-4 col-xs-4">
+                    <h5>Filtro por errores:<br>
+                        <small>
+                            {% if critical_filter %}
+                            Error critico
+                            {% endif %}
+                            {% if important_filter %}
+                            Error importante
+                            {% endif %}
+                            {% if no_error_filter %}
+                            Sin errores
+                            {% endif %}
+                        </small>
+                    </h5>
+                </div>
+                {% endif%}
+                <div class="col-md-4 col-xs-4">
+                    <h5>Filtro por fecha:<br>
+                        <small>{{ date_filter|first }}</small>
+                    </h5>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5>Otros filtros:<br>
+                        <small>{{ filters|first }}</small>
+                    </h5>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
                 <div class="col-md-12 col-xs-12">
                     <h5>Timeline</h5>
                     <img src="{{ chart_events_timeline }}"

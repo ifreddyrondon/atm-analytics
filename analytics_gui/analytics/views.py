@@ -363,10 +363,9 @@ def generate_pdf(request, case_id):
     pdfkit.from_string(rendered_html, media_root + 'tmp_report.pdf', css=style_list, options=options)
 
     for image in images.values():
-        # os.remove(image)
-        pass
+        os.remove(image)
 
-    utils.add_report_header(media_root + 'tmp_report.pdf')
+    utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf')
 
     with open(media_root + 'report.pdf', 'rb') as pdf_file:
         return HttpResponse(

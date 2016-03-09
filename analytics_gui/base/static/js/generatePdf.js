@@ -26,6 +26,8 @@ $("#generate-pdf").click(function(event) {
 generatePdf = function(array) {
     data = {}
 
+    getDataFilters(data);
+
     operations_table = readTable('operations-table');
     time_line_table = readTable('timeline-table');
     resolution = d3.select("#id_resolution")[0][0].value;
@@ -176,7 +178,6 @@ svgToCanvas = function(targetElem) {
         canvg(canvas, svg);
         return canvas;
     } else {
-        console.log("Svg into element not found");
         return targetElem;
     }
 }
@@ -225,4 +226,26 @@ readTable = function(id) {
     data['ATM'] = atm;
 
     return data;
+}
+
+getDataFilters = function(data) {
+    data['critical_filter'] = document.getElementById("timeline-filter-critical-erros").checked;
+    data['important_filter'] = document.getElementById("timeline-filter-important-erros").checked;
+    data['no_error_filter'] = no_error = document.getElementById("timeline-filter-no-erros").checked;
+
+    data['date_filter'] = document.getElementById("timeline-calendar-picker").value;
+
+    filters = []
+
+    $(".select2-selection__rendered > *").each(function(index) {
+        if($(this).attr("title") != undefined) {
+            filters.push($(this).attr("title"));
+        }
+    });
+
+    if (filters.length == 0) {
+        data['filters'] = "Todos";
+    } else {
+        data['filters'] = filters.join(", ")
+    }
 }

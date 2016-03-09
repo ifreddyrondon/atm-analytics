@@ -65,7 +65,7 @@ def hash_file_to_sha1(file_path):
     return method.hexdigest()
 
 
-def add_report_header(target):
+def add_header_and_rotate_timeline(target):
     header_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'doc', 'header.pdf')
     result_root = os.path.join(settings.BASE_DIR, 'media', 'report.pdf')
     pdf_target = PyPDF2.PdfFileReader(open(target, 'rb'))
@@ -77,6 +77,8 @@ def add_report_header(target):
 
     for page_num in range(pdf_target.getNumPages()):
         page = pdf_target.getPage(page_num)
+        if (page_num >= 5) and (page_num <= pdf_target.getNumPages() - 2):
+            page.rotateClockwise(-90)
         pdf_writer.addPage(page)
 
     result = open(result_root, 'wb')
