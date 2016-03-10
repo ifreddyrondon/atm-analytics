@@ -1,12 +1,31 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.utils import translation
+from django.utils.translation import check_for_language
 
 from analytics_gui.analytics.models import Case
 from analytics_gui.authentication.forms import CreateAnalystForm
 from analytics_gui.authentication.models import UserDashboard
 from analytics_gui.companies.models import Company
+
+
+def set_language(request):
+    next_page = request.GET.get('next', None)
+    if not next_page:
+        next_page = request.META.get('HTTP_REFERER', None)
+    if not next_page:
+        next_page = '/'
+    response = HttpResponseRedirect(next_page)
+    if request.method == 'GET':
+        lang_code = request.GET.get('lang', None)
+        if lang_code and check_for_language(lang_code):
+            translation.activate(lang_code)
+            if hasattr(request, 'session'):
+                request.session[translation.LANGUAGE_SESSION_KEY] = lang_code
+
+    return response
 
 
 @login_required(login_url='/login')
@@ -25,16 +44,16 @@ def dashboard(request):
                 create_analyst_form = CreateAnalystForm(request.POST)
                 if create_analyst_form.is_valid():
                     user = User.objects.create_user(
-                            username=create_analyst_form.cleaned_data.get('username'),
-                            password=create_analyst_form.cleaned_data.get('password'),
-                            email=create_analyst_form.cleaned_data.get('email'),
-                            first_name=create_analyst_form.cleaned_data.get('first_name'),
-                            last_name=create_analyst_form.cleaned_data.get('last_name'),
+                        username=create_analyst_form.cleaned_data.get('username'),
+                        password=create_analyst_form.cleaned_data.get('password'),
+                        email=create_analyst_form.cleaned_data.get('email'),
+                        first_name=create_analyst_form.cleaned_data.get('first_name'),
+                        last_name=create_analyst_form.cleaned_data.get('last_name'),
                     )
                     UserDashboard.objects.create(
-                            user=user,
-                            charge=UserDashboard.POSITION_ANALYST,
-                            company=company,
+                        user=user,
+                        charge=UserDashboard.POSITION_ANALYST,
+                        company=company,
                     )
 
                     return JsonResponse({}, status=200)

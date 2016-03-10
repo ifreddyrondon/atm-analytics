@@ -151,3 +151,11 @@ h1 {
 .panel-heading div span {
     margin-left: 5px;
 }
+
+.flag-img {
+    max-height: 20px;
+}
+
+.dropdown-menu-lang {
+    min-width: 50px;
+}

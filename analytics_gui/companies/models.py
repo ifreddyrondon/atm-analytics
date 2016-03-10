@@ -2,7 +2,7 @@
 import os
 
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 
 def get_company_logo_attachment_path(instance, filename):

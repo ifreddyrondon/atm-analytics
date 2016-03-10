@@ -3,7 +3,7 @@ import os
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from analytics_gui.analytics.choices import CURRENCY_CHOICES
 from analytics_gui.authentication.models import UserDashboard
