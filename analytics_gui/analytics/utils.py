@@ -1,11 +1,14 @@
 # coding=utf-8
 import datetime
 import hashlib
+import math
 import os
 import time
 
 import PyPDF2
 from django.conf import settings
+
+PIXELS_X_PAGE = 1657.9
 
 
 def build_table(date, error, mount, atm, atms):
@@ -65,19 +68,21 @@ def hash_file_to_sha1(file_path):
     return method.hexdigest()
 
 
-def add_header_and_rotate_timeline(target):
+def add_header_and_rotate_timeline(target, height):
     header_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'doc', 'header.pdf')
     result_root = os.path.join(settings.BASE_DIR, 'media', 'report.pdf')
     pdf_target = PyPDF2.PdfFileReader(open(target, 'rb'))
     pdf_header = PyPDF2.PdfFileReader(open(header_root, 'rb'))
     pdf_writer = PyPDF2.PdfFileWriter()
 
+    total_pages = int(math.ceil(height / PIXELS_X_PAGE))
+
     for page_num in range(pdf_target.getNumPages()):
         pdf_target.getPage(page_num).mergePage(pdf_header.getPage(0))
 
     for page_num in range(pdf_target.getNumPages()):
         page = pdf_target.getPage(page_num)
-        if (page_num >= 5) and (page_num <= pdf_target.getNumPages() - 2):
+        if (page_num >= 6) and (page_num <= (6 + total_pages - 1)):
             page.rotateClockwise(-90)
         pdf_writer.addPage(page)
 

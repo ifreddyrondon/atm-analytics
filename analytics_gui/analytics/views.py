@@ -503,7 +503,8 @@ def generate_pdf(request, case_id):
     for image in images.values():
         os.remove(image)
 
-    utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf')
+    timeline_height = int(args['timeline_height'][0])
+    utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf', timeline_height)
 
     with open(media_root + 'report.pdf', 'rb') as pdf_file:
         return HttpResponse(
