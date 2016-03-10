@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import ugettext as _
 from grappelli.forms import GrappelliSortableHiddenMixin
 
 from analytics_gui.authentication.models import UserDashboard
@@ -38,7 +39,7 @@ class CompanyAdmin(admin.ModelAdmin):
         return li
 
     banks_list.allow_tags = True
-    banks_list.short_description = 'Bancos'
+    banks_list.short_description = _('Banks')
 
     def atm_number_4_bank(self, obj):
         li = '<ul>'
@@ -48,7 +49,7 @@ class CompanyAdmin(admin.ModelAdmin):
         return li
 
     atm_number_4_bank.allow_tags = True
-    atm_number_4_bank.short_description = 'Cantidad de ATMs'
+    atm_number_4_bank.short_description = _("Number of ATMs")
 
 
 admin.site.register(Company, CompanyAdmin)

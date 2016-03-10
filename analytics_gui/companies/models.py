@@ -2,6 +2,7 @@
 import os
 
 from django.db import models
+from django.utils.translation import ugettext as _
 
 
 def get_company_logo_attachment_path(instance, filename):
@@ -14,39 +15,45 @@ def get_company_logo_attachment_path(instance, filename):
 
 class Company(models.Model):
     logo = models.ImageField(upload_to=get_company_logo_attachment_path, null=True, blank=True)
-    name = models.CharField('Nombre', max_length=255, help_text='Nombre de la Empresa')
-    email = models.EmailField('Email', max_length=255, help_text='Email')
-    phone = models.CharField('Teléfono', max_length=255, help_text='Teléfono')
+    name = models.CharField(
+        _('Name'), max_length=255, help_text=_('Company name'))
+    email = models.EmailField(
+        _('Email'), max_length=255, help_text=_('Email'))
+    phone = models.CharField(
+        _('Phone'), max_length=255, help_text=_('Phone number'))
 
     def __unicode__(self):
         return self.name
 
     class Meta:
-        verbose_name = "Compañia"
+        verbose_name = _("Company")
+        verbose_name_plural = _("Companies")
 
 
 class Bank(models.Model):
-    name = models.CharField('Nombre', max_length=255, help_text='Nombre del Banco')
-    atms_number = models.IntegerField('ATMs', help_text='Cantidad ATMs')
+    name = models.CharField(
+        _('Name'), max_length=255, help_text=_('Bank name'))
+    atms_number = models.IntegerField(
+        'ATMs', help_text=_('Number of ATMs'))
     company = models.ForeignKey(Company, related_name="banks")
-    position = models.PositiveSmallIntegerField("Posición", null=True)
+    position = models.PositiveSmallIntegerField(_("Position"), null=True)
 
     class Meta:
         ordering = ['position']
-        verbose_name = "Banco"
+        verbose_name = _("Bank")
 
     def __unicode__(self):
         return self.name
 
 
 class CompanyAtmLocation(models.Model):
-    address = models.CharField('Direción', max_length=255)
+    address = models.CharField(_("Address"), max_length=255)
     company = models.ForeignKey(Company)
-    position = models.PositiveSmallIntegerField("Posición", null=True)
+    position = models.PositiveSmallIntegerField(_("Position"), null=True)
 
     class Meta:
         ordering = ['position']
-        verbose_name = "Direción de ATM"
+        verbose_name = _("ATM address")
 
     def __unicode__(self):
         return self.address

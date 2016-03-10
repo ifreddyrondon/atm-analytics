@@ -248,4 +248,14 @@ getDataFilters = function(data) {
     } else {
         data['filters'] = filters.join(", ")
     }
+
+    var dates_text = $("#timeline-dynamic-range-dates").text()
+    var length = dates_text.length
+
+    data['timeline_dynamic_range_dates_1'] = dates_text.slice(0, length/2);
+    data['timeline_dynamic_range_dates_2'] = dates_text.slice(length/2, length);
+    data['timeline_dynamic_missing_amount'] = $("#timeline-dynamic-missing-amount").text();
+    // TODO: Falta por añadir
+    // console.log($(".well .percent-result .dynamic-analysis").text());
+    data['timeline_dynamic_critic_errors_vs_critic_errors'] = $("#timeline-dynamic-critic-errors-vs-critic-errors").text();
 }

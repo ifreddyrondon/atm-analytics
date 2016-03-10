@@ -1,4 +1,6 @@
 {% load staticfiles %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -54,7 +56,7 @@
                            aria-expanded="false"><i class="fa fa-user"></i> {{ user.email }} <span
                                 class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="{% url 'logout' %}?next=/"><i class="fa fa-sign-out"></i> Log out</a></li>
+                            <li><a href="{% url 'logout' %}?next=/"><i class="fa fa-sign-out"></i> {% trans "Log out" %}</a></li>
                         </ul>
                     </li>
                 </ul>

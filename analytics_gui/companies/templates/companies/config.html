@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load bootstrap %}
 {% load widget_tweaks %}
 {% load staticfiles %}
@@ -43,11 +44,11 @@
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <ol class="breadcrumb">
-                    <li><a href="{% url "base:dashboard" %}">home</a></li>
-                    <li class="active">configuración</li>
+                    <li><a href="{% url "base:dashboard" %}">{% trans "home" %}</a></li>
+                    <li class="active">{% trans "settings" %}</li>
                 </ol>
                 <div class="wall inner-wall">
-                    <h1>Configuración</h1>
+                    <h2>{% trans "Settings" %}</h2>
                     <form method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% if form.non_field_errors %}
@@ -106,22 +107,22 @@
                                 {% endif %}
                                 <br>
                                 <span class="btn btn-default btn-xs btn-file">
-                                    Cambiar logo <input id="id_logo" name="logo" type="file">
+                                    {% trans "Change picture" %} <input id="id_logo" name="logo" type="file">
                                 </span>
                             </div>
                             <div class="col-md-12">
                                 <hr>
                                 <div id="form_bank_set_container"
                                      class="form-group well {% if bank_form_set.non_form_errors %}has-error{% endif %}">
-                                    <h5>Bancos</h5>
+                                    <h5>{% trans "Banks" %}</h5>
                                     <span class="help-block">{{ bank_form_set.non_form_errors|join:"<br \>" }}</span>
 
                                     <table id="form_bank_set_table" class="table table-condensed">
                                         <thead>
                                         <tr>
-                                            <th scope="col">Nombre del banco</th>
-                                            <th scope="col">Cantidad de ATMs</th>
-                                            <th scope="col">Eliminar</th>
+                                            <th scope="col">{% trans "Bank name" %}</th>
+                                            <th scope="col">{% trans "Number of ATMs" %}</th>
+                                            <th scope="col">{% trans "Delete" %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -145,19 +146,19 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="javascript:void(0)" class="add-bank-row btn btn-default">Añadir</a>
+                                    <a href="javascript:void(0)" class="add-bank-row btn btn-default">{% trans "Add" %}</a>
                                     {{ bank_form_set.management_form }}
                                 </div>
                                 <div id="form_address_set_container"
                                      class="form-group well {% if atm_location_form_set.non_form_errors %}has-error{% endif %}">
-                                    <h5>Dirección de ATMs</h5>
+                                    <h5>{% trans "ATMs address" %}</h5>
                                     <span class="help-block">{{ atm_location_form_set.non_form_errors|join:"<br \>" }}</span>
 
                                     <table id="form_address_set_table" class="table table-condensed">
                                         <thead>
                                         <tr>
-                                            <th scope="col">Dirección</th>
-                                            <th scope="col">Eliminar</th>
+                                            <th scope="col">{% trans "address" %}</th>
+                                            <th scope="col">{% trans "Delete" %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -178,16 +179,10 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="javascript:void(0)" class="add-address-row btn btn-default">Añadir</a>
+                                    <a href="javascript:void(0)" class="add-address-row btn btn-default">{% trans "Add" %}</a>
                                     <hr>
                                     <div class="form-group">
-                                        <h5>O Subir direcciones en CSV <a href="javascript: void (0)"
-                                                                          data-toggle="popover"
-                                                                          class="pull-right" data-placement="left"
-                                                                          data-trigger="hover" title="Texto de Ayuda"
-                                                                          data-content='El formato del archivo debe ser CSV y la cabecera debe ser <direccion>.'>
-                                            <i class="fa fa-question-circle fa-2x"></i>
-                                        </a></h5>
+                                        <h5>{% trans "Or upload addresses in CSV format" %}</h5>
                                         <input id="id_address_csv" name="address_csv" type="file">
                                     </div>
 
@@ -195,14 +190,14 @@
                                 </div>
                                 <div class="form-group well">
                                     <div class="form-group">
-                                        <h5>Eventos de reposición de ATMs</h5>
+                                        <h5>{% trans "ATMs replenishment events in CSV format" %}</h5>
                                         <input id="atms_reposition_events" name="atms_reposition_events" type="file">
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="form-group">
                                     <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
-                                           value="Guardar"/>
+                                           value="{% trans "Save" %}"/>
                                 </div>
                             </div>
                         </div>

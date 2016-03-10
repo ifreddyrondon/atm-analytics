@@ -2,6 +2,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 
 from analytics_gui.authentication.forms import CustomAuthenticationForm
@@ -24,12 +25,12 @@ class Login(View):
             user = authenticate(username=username, password=password)
 
             if user is None:
-                messages.error(request, "Usuario o Contraseña incorrecto")
+                messages.error(request, _("User or incorrect password"))
                 return render(request, 'authentication/login.html', {
                     'form': form
                 })
             if not user.is_active:
-                messages.info(request, "Usuario inactivo")
+                messages.info(request, _("Inactive user"))
                 return render(request, 'authentication/login.html', {
                     'form': form
                 })

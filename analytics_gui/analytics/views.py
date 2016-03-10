@@ -1,4 +1,5 @@
 import base64
+import datetime
 import itertools
 import json
 import os
@@ -19,7 +20,7 @@ from analytics_gui.analytics import utils
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
 from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
-from analytics_gui.companies.models import Company
+from analytics_gui.companies.models import Company, AtmRepositionEvent
 
 
 @login_required(login_url='/login')
@@ -98,72 +99,119 @@ def view_case(request, case_id):
 
 @login_required(login_url='/login')
 def analyze_case(request, case_id):
+    # threshold to find close events, 5 min
+    threshold_time = 300
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
 
-    journal_traces = []
-    event_viewer_traces = []
-    windows_events = {
-        "are_there": False,
-        "min_date": None,
-        "max_date": None,
-        "keys": [],
-        "count": 0,
+    traces = {
+        "journal": [],
+        "reposition": [],
     }
+
     meta = {
-        "transactions_number": 0,
-        "dates": {
-            "min": None,
-            "max": None,
+        "journal": {
+            "transactions_number": 0,
+            "dates": {
+                "min": None,
+                "max": None,
+            },
+            "amount": {
+                "valid_transactions": 0,
+                "critical_errors_transactions": 0,
+                "important_errors_transactions": 0,
+            },
+            "errors": {
+                "critics_number": 0,
+                "names": []
+            }
         },
-        "amount": {
-            "valid_transactions": 0,
-            "critical_errors_transactions": 0,
-            "important_errors_transactions": 0,
+        "windows": {
+            "are_there": False,
+            "min_date": None,
+            "max_date": None,
+            "keys": [],
+            "count": 0,
         },
-        "errors": {
-            "critics_number": 0,
-            "names": []
+        "reposition": {
+            "min_date": None,
+            "max_date": None,
+            "count": 0,
+            "close_events_count": 0,
         }
     }
 
     for index, atm in enumerate(atms):
         # windows events
         if atm.microsoft_event_viewer:
-            windows_events["are_there"] = True
+            meta["windows"]["are_there"] = True
             # get the min and max dates for filter
-            if not windows_events["min_date"] \
-                    or windows_events["min_date"] > atm.event_viewer_errors.first().event_date:
-                windows_events["min_date"] = atm.event_viewer_errors.first().event_date
-            if not windows_events["max_date"] \
-                    or windows_events["max_date"] < atm.event_viewer_errors.last().event_date:
-                windows_events["max_date"] = atm.event_viewer_errors.last().event_date
+            if not meta["windows"]["min_date"] \
+                    or meta["windows"]["min_date"] > atm.event_viewer_errors.first().event_date:
+                meta["windows"]["min_date"] = atm.event_viewer_errors.first().event_date
+            if not meta["windows"]["max_date"] \
+                    or meta["windows"]["max_date"] < atm.event_viewer_errors.last().event_date:
+                meta["windows"]["max_date"] = atm.event_viewer_errors.last().event_date
             # get the keys of records id
             event_id_keys = set(atm.event_viewer_errors.values_list('event_id', flat=True).distinct())
-            in_all_events_keys = set(windows_events["keys"])
+            in_all_events_keys = set(meta["windows"]["keys"])
             in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
-            windows_events["keys"] = windows_events["keys"] + list(in_record_id_keys_but_not_in_all)
-            windows_events["count"] = atm.event_viewer_errors.count()
+            meta["windows"]["keys"] = meta["windows"]["keys"] + list(in_record_id_keys_but_not_in_all)
+            meta["windows"]["count"] += atm.event_viewer_errors.count()
 
         # Journals Virtual
         for journal_file in atm.journals.all():
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
-            journal_traces.append(trace)
+            traces["journal"].append(trace)
             # save only new errors names
-            in_all_errors_names = set(meta["errors"]["names"])
+            in_all_errors_names = set(meta["journal"]["errors"]["names"])
             in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
-            meta["errors"]["names"] = meta["errors"]["names"] + list(in_errors_names_but_not_in_all)
+            meta["journal"]["errors"]["names"] = meta["journal"]["errors"]["names"] + list(
+                in_errors_names_but_not_in_all)
             # save meta
-            meta["transactions_number"] += meta_journal["transactions_number"]
-            meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
-            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
-            meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
-            if not meta["dates"]["min"] or meta["dates"]["min"] > meta_journal["dates"]["min"]:
-                meta["dates"]["min"] = meta_journal["dates"]["min"]
-            if not meta["dates"]["max"] or meta["dates"]["max"] < meta_journal["dates"]["max"]:
-                meta["dates"]["max"] = meta_journal["dates"]["max"]
+            meta["journal"]["transactions_number"] += meta_journal["transactions_number"]
+            meta["journal"]["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
+            meta["journal"]["amount"]["critical_errors_transactions"] += meta_journal["amount"][
+                "critical_errors_transactions"]
+            meta["journal"]["amount"]["important_errors_transactions"] += meta_journal["amount"][
+                "important_errors_transactions"]
+            meta["journal"]["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+            if not meta["journal"]["dates"]["min"] or meta["journal"]["dates"]["min"] > meta_journal["dates"]["min"]:
+                meta["journal"]["dates"]["min"] = meta_journal["dates"]["min"]
+            if not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]:
+                meta["journal"]["dates"]["max"] = meta_journal["dates"]["max"]
+
+        # reposition events
+        atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())
+        meta["reposition"]["count"] += len(atm_reposition_events)
+        for event in atm_reposition_events:
+            # get the min and max dates for filter
+            if not meta["reposition"]["min_date"] \
+                    or meta["reposition"]["min_date"] > event.reposition_date:
+                meta["reposition"]["min_date"] = event.reposition_date
+            if not meta["reposition"]["max_date"] \
+                    or meta["reposition"]["max_date"] < event.reposition_date:
+                meta["reposition"]["max_date"] = event.reposition_date
+
+            traces["reposition"].append({
+                "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "address": event.location.address,
+            })
+
+            # find close windows events to this reposition event
+            start_date = event.reposition_date - datetime.timedelta(seconds=threshold_time)
+            end_date = event.reposition_date + datetime.timedelta(seconds=threshold_time)
+            meta["reposition"]["close_events_count"] += AtmEventViewerEvent.objects.filter(
+                atm__in=atms,
+                event_date__range=(start_date, end_date)).count()
+
+            # find close xfs events to this reposition event
+            start_date = start_date.replace(tzinfo=None)
+            end_date = end_date.replace(tzinfo=None)
+            for xfs_date in meta_journal["dates"]["all"]:
+                if start_date <= xfs_date <= end_date:
+                    meta["reposition"]["close_events_count"] += 1
 
     if request.method == 'POST':
         form = AnalyticForm(request.POST, instance=case)
@@ -179,46 +227,48 @@ def analyze_case(request, case_id):
         if 'event_start_date_timeline' in request.POST and 'event_end_date_timeline' in request.POST:
             start_date = request.POST['event_start_date_timeline']
             end_date = request.POST['event_end_date_timeline']
-            events = AtmEventViewerEvent.objects.filter(event_date__range=(start_date, end_date))
             events_response = []
-            for event in events:
-                events_response.append({
-                    "date": event.event_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    "eventId": event.event_id,
-                    "eventRecordId": event.event_record_id,
-                    "context": event.context,
-                    "className": "window-event",
-                    "color": settings.COLOR_BLUE
-                })
+            for atm in atms:
+                events = AtmEventViewerEvent.objects.filter(atm=atm, event_date__range=(start_date, end_date))
+                for event in events:
+                    events_response.append({
+                        "date": event.event_date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "eventId": event.event_id,
+                        "eventRecordId": event.event_record_id,
+                        "context": event.context,
+                        "className": "window-event",
+                        "color": settings.COLOR_BLUE
+                    })
             return JsonResponse(events_response, safe=False, status=200)
 
-    journal_traces = list(itertools.chain(*journal_traces))
+    traces["journal"] = list(itertools.chain(*traces["journal"]))
 
-    meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
-    # get the currency
-    currency = case.get_missing_amount_currency_display()
-    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
+    meta["journal"]["errors"]["critics_number_percentage"] = meta["journal"]["errors"]["critics_number"] * 100 / \
+                                                             meta["journal"]["transactions_number"]
 
     # serialize the min and max dates
-    if windows_events["min_date"] is not None and windows_events["max_date"] is not None:
-        windows_events["min_date"] = windows_events["min_date"].strftime("%Y-%m-%d %H:%M:%S")
-        windows_events["max_date"] = windows_events["max_date"].strftime("%Y-%m-%d %H:%M:%S")
-    if meta["dates"]["min"] is not None and meta["dates"]["max"] is not None:
-        meta["dates"]["min"] = meta["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
-        meta["dates"]["max"] = meta["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["windows"]["min_date"] is not None and meta["windows"]["max_date"] is not None:
+        meta["windows"]["min_date"] = meta["windows"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["windows"]["max_date"] = meta["windows"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["journal"]["dates"]["min"] is not None and meta["journal"]["dates"]["max"] is not None:
+        meta["journal"]["dates"]["min"] = meta["journal"]["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["journal"]["dates"]["max"] = meta["journal"]["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["reposition"]["min_date"] is not None and meta["reposition"]["max_date"] is not None:
+        meta["reposition"]["min_date"] = meta["reposition"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["reposition"]["max_date"] = meta["reposition"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
 
     return render(request, 'analytics/results.html', {
         'case': case,
         'form': form,
-        'journal_traces': journal_traces,
-        'event_viewer_traces': event_viewer_traces,
+        'traces': traces,
         'meta': meta,
-        'windows_events': windows_events,
-        'currency': currency,
-        'COLOR_GREEN': settings.COLOR_GREEN,
-        'COLOR_RED': settings.COLOR_RED,
-        'COLOR_ORANGE': settings.COLOR_ORANGE,
-        'COLOR_BLUE': settings.COLOR_BLUE,
+        'COLORS': {
+            'GREEN': settings.COLOR_GREEN,
+            'RED': settings.COLOR_RED,
+            'ORANGE': settings.COLOR_ORANGE,
+            'BLUE': settings.COLOR_BLUE,
+            'YELLOW': settings.COLOR_YELLOW,
+        }
     })
 
 
@@ -229,6 +279,7 @@ def delete_case(request, case_id):
 
 
 def generate_pdf(request, case_id):
+    threshold_time = 300
     args = None
     case = get_object_or_404(Case, id=case_id)
     atms = case.atms.all()
@@ -237,6 +288,11 @@ def generate_pdf(request, case_id):
     case_picture = None
     company_logo = None
     atm_locations = []
+
+    traces = {
+        "journal": [],
+        "reposition": [],
+    }
 
     if case.picture:
         case_picture = settings.BASE_DIR + case.picture.url
@@ -251,51 +307,134 @@ def generate_pdf(request, case_id):
     html_template = 'analytics/pdf_template.html'
 
     meta = {
-        "transactions_number": 0,
-        "amount": {
-            "valid_transactions": 0,
-            "critical_errors_transactions": 0,
-            "important_errors_transactions": 0,
+        "journal": {
+            "transactions_number": 0,
+            "dates": {
+                "min": None,
+                "max": None,
+            },
+            "amount": {
+                "valid_transactions": 0,
+                "critical_errors_transactions": 0,
+                "important_errors_transactions": 0,
+            },
+            "errors": {
+                "critics_number": 0,
+                "names": []
+            }
         },
-        "errors": {
-            "critics_number": 0,
-            "names": []
+        "windows": {
+            "are_there": False,
+            "min_date": None,
+            "max_date": None,
+            "keys": [],
+            "count": 0,
+        },
+        "reposition": {
+            "min_date": None,
+            "max_date": None,
+            "count": 0,
+            "close_events_count": 0,
         }
     }
 
     for index, atm in enumerate(atms):
         tmp = {}
+
         for loc in atm.atm_location.all():
             atm_locations.append(loc.address)
-        # Microsoft Event Viewer
-        if atm.microsoft_event_viewer:
-            files.append(utils.create_file_element(atm.microsoft_event_viewer.name))
 
         # Other log
         if atm.other_log:
             files.append(utils.create_file_element(atm.other_log.name))
 
+        # windows events
+        if atm.microsoft_event_viewer:
+            files.append(utils.create_file_element(atm.microsoft_event_viewer.name))
+            meta["windows"]["are_there"] = True
+            # get the min and max dates for filter
+            if not meta["windows"]["min_date"] \
+                    or meta["windows"]["min_date"] > atm.event_viewer_errors.first().event_date:
+                meta["windows"]["min_date"] = atm.event_viewer_errors.first().event_date
+            if not meta["windows"]["max_date"] \
+                    or meta["windows"]["max_date"] < atm.event_viewer_errors.last().event_date:
+                meta["windows"]["max_date"] = atm.event_viewer_errors.last().event_date
+            # get the keys of records id
+            event_id_keys = set(atm.event_viewer_errors.values_list('event_id', flat=True).distinct())
+            in_all_events_keys = set(meta["windows"]["keys"])
+            in_record_id_keys_but_not_in_all = event_id_keys - in_all_events_keys
+            meta["windows"]["keys"] = meta["windows"]["keys"] + list(in_record_id_keys_but_not_in_all)
+            meta["windows"]["count"] += atm.event_viewer_errors.count()
+
         # Journals Virtual
         for journal_file in atm.journals.all():
-            tmp = {}
             trace, meta_journal = parse_log_file(journal_file.file.file, index)
-
             files.append(utils.create_file_element(journal_file.file.name))
-
+            traces["journal"].append(trace)
             # save only new errors names
-            in_all_errors_names = set(meta["errors"]["names"])
+            in_all_errors_names = set(meta["journal"]["errors"]["names"])
             in_errors_names_but_not_in_all = meta_journal["errors"]["names"] - in_all_errors_names
-            meta["errors"]["names"] = meta["errors"]["names"] + list(in_errors_names_but_not_in_all)
+            meta["journal"]["errors"]["names"] = meta["journal"]["errors"]["names"] + list(
+                in_errors_names_but_not_in_all)
             # save meta
-            meta["transactions_number"] += meta_journal["transactions_number"]
-            meta["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
-            meta["amount"]["critical_errors_transactions"] += meta_journal["amount"]["critical_errors_transactions"]
-            meta["amount"]["important_errors_transactions"] += meta_journal["amount"]["important_errors_transactions"]
-            meta["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+            meta["journal"]["transactions_number"] += meta_journal["transactions_number"]
+            meta["journal"]["amount"]["valid_transactions"] += meta_journal["amount"]["valid_transactions"]
+            meta["journal"]["amount"]["critical_errors_transactions"] += meta_journal["amount"][
+                "critical_errors_transactions"]
+            meta["journal"]["amount"]["important_errors_transactions"] += meta_journal["amount"][
+                "important_errors_transactions"]
+            meta["journal"]["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
+            if not meta["journal"]["dates"]["min"] or meta["journal"]["dates"]["min"] > meta_journal["dates"]["min"]:
+                meta["journal"]["dates"]["min"] = meta_journal["dates"]["min"]
+            if not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]:
+                meta["journal"]["dates"]["max"] = meta_journal["dates"]["max"]
 
-    meta["errors"]["critics_number_percentage"] = meta["errors"]["critics_number"] * 100 / meta["transactions_number"]
-    currency = case.get_missing_amount_currency_display()
-    currency = currency[currency.index("-") + 1:currency.index("|")].strip()
+        # reposition events
+        atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())
+        meta["reposition"]["count"] += len(atm_reposition_events)
+        for event in atm_reposition_events:
+            # get the min and max dates for filter
+            if not meta["reposition"]["min_date"] \
+                    or meta["reposition"]["min_date"] > event.reposition_date:
+                meta["reposition"]["min_date"] = event.reposition_date
+            if not meta["reposition"]["max_date"] \
+                    or meta["reposition"]["max_date"] < event.reposition_date:
+                meta["reposition"]["max_date"] = event.reposition_date
+
+            traces["reposition"].append({
+                "date": event.reposition_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "address": event.location.address,
+            })
+
+            # find close windows events to this reposition event
+            start_date = event.reposition_date - datetime.timedelta(seconds=threshold_time)
+            end_date = event.reposition_date + datetime.timedelta(seconds=threshold_time)
+            meta["reposition"]["close_events_count"] += AtmEventViewerEvent.objects.filter(
+                atm__in=atms,
+                event_date__range=(start_date, end_date)).count()
+
+            # find close xfs events to this reposition event
+            start_date = start_date.replace(tzinfo=None)
+            end_date = end_date.replace(tzinfo=None)
+            for xfs_date in meta_journal["dates"]["all"]:
+                if start_date <= xfs_date <= end_date:
+                    meta["reposition"]["close_events_count"] += 1
+
+    traces["journal"] = list(itertools.chain(*traces["journal"]))
+
+    meta["journal"]["errors"]["critics_number_percentage"] = meta["journal"]["errors"]["critics_number"] * 100 / \
+                                                             meta["journal"]["transactions_number"]
+
+    # serialize the min and max dates
+    if meta["windows"]["min_date"] is not None and meta["windows"]["max_date"] is not None:
+        meta["windows"]["min_date"] = meta["windows"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["windows"]["max_date"] = meta["windows"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["journal"]["dates"]["min"] is not None and meta["journal"]["dates"]["max"] is not None:
+        meta["journal"]["dates"]["min"] = meta["journal"]["dates"]["min"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["journal"]["dates"]["max"] = meta["journal"]["dates"]["max"].strftime("%Y-%m-%d %H:%M:%S")
+    if meta["reposition"]["min_date"] is not None and meta["reposition"]["max_date"] is not None:
+        meta["reposition"]["min_date"] = meta["reposition"]["min_date"].strftime("%Y-%m-%d %H:%M:%S")
+        meta["reposition"]["max_date"] = meta["reposition"]["max_date"].strftime("%Y-%m-%d %H:%M:%S")
 
     if request.is_ajax():
         args = dict(request.POST.iterlists())
@@ -333,7 +472,6 @@ def generate_pdf(request, case_id):
     args['logo'] = logo
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
-    args['currency'] = currency
     args['meta'] = meta
     args['atm_locations'] = atm_locations
     args['case_picture'] = case_picture

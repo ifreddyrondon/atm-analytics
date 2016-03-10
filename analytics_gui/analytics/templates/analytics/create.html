@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load bootstrap %}
 {% load widget_tweaks %}
 {% load staticfiles %}
@@ -42,21 +43,20 @@
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <ol class="breadcrumb">
-                    <li><a href="{% url "base:dashboard" %}">home</a></li>
+                    <li><a href="{% url "base:dashboard" %}">{% trans "home" %}</a></li>
                     {% if create %}
-                        <li class="active">crear caso</li>
+                        <li class="active">{% trans "create case" %}</li>
                     {% else %}
-                        <li class="active">vista de caso</li>
+                        <li class="active">{% trans "case" %}</li>
                     {% endif %}
                 </ol>
                 <div class="wall inner-wall">
                     {% if create %}
-                        <h1>NUEVO CASO</h1>
+                        <h1>{% trans "New case" %}</h1>
                     {% else %}
                         <h1>
-                            Vista de caso
                             <a class="btn btn-danger pull-right"
-                               href="{% url "analytics:delete_case" form.instance.id %}">Borrar</a>
+                               href="{% url "analytics:delete_case" form.instance.id %}">{% trans "Delete" %}</a>
                         </h1>
                     {% endif %}
                     <form method="post" action="" enctype="multipart/form-data">
@@ -189,7 +189,7 @@
                                 {% endif %}
                                 <br>
                                 <span class="btn btn-default btn-xs btn-file">
-                                    Cambiar imagen <input id="id_picture" name="picture" type="file">
+                                    {% trans "Change picture" %} <input id="id_picture" name="picture" type="file">
                                 </span>
                             </div>
                             <div class="col-md-12">
@@ -206,14 +206,14 @@
                                 <hr>
 
                                 <div id="add-atms-container" class="form-inline {% if not create %}hidden{% endif %}">
-                                    <span class="help-block">Cuantos ATMs quieres agregar</span>
+                                    <span class="help-block">{% trans "How many ATMs do you like to add?" %}</span>
                                     <div id="atms-to-append-container" class="form-group">
-                                        <label class="sr-only" for="atms-to-append">ATMs</label>
+                                        <label class="sr-only" for="atms-to-append">{% trans "ATMs" %}</label>
                                         <input type="number" min="1" class="form-control" id="atms-to-append"
-                                               placeholder="ATMs">
+                                               placeholder="{% trans "ATMs" %}">
                                     </div>
                                     <div class="form-group">
-                                        <button id="add-atms" class="btn btn-default">Agregar</button>
+                                        <button id="add-atms" class="btn btn-default">{% trans "Add" %}</button>
                                     </div>
                                     <br>
                                     <div class="form-group has-error">
@@ -231,7 +231,7 @@
                                                     <a role="button" data-toggle="collapse"
                                                        data-parent="#atms-accordion"
                                                        href="#{{ atm_form.prefix }}" aria-expanded="true">
-                                                        ATM {{ forloop.counter }}
+                                                        {% trans "ATM" %} {{ forloop.counter }}
                                                     </a>
                                                     <a href="javascript:void (0)" class="pull-right delete-atm">
                                                         <span class="glyphicon glyphicon-trash"></span>
@@ -284,12 +284,12 @@
                                                                 data-target="#{{ atm_form.prefix }}-collapseErrorsManual"
                                                                 aria-expanded="false"
                                                                 aria-controls="collapseExample">
-                                                            Usted cuenta con los manuales de errores
+                                                            {% trans "Do you have error manuals?" %}
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
                                                            class="pull-right" data-placement="left" data-html="true"
-                                                           data-trigger="focus" title="Manual de errores"
-                                                           data-content="El manual de errores, es el documento proporcionado por el fabricante el cual identifica el error que se crea en el Journal (log de operaciones XFS)  del que proviene de las operaciones del hardware del ATM, recomendamos  que si tienen alguna nueva versión de hardware o software para los ATMS en producción introducir el Journal en Formato PDF o alguna configuración especifica que este plasmada en formato PDF para cualquiera de las marcas de ATMs como NCR, Wincor Nixdorf , Diebold, Triton , Nautilus   puede adjuntarla al caso.">
+                                                           data-trigger="focus" title="{% trans "Manual of errors" %}"
+                                                           data-content="{% trans "The manual errors, is the document provided by the manufacturer which identifies the error that is created in the Journal (log of operations XFS) which comes from hardware operations of the ATM, we recommend that if you have any new version of hardware or ATMS software for production introduce the Journal in PDF format or configuration specifies that this embodied in PDF format for any of the brands of ATMs and NCR, Wincor Nixdorf, Diebold, Triton, Nautilus can attach to the case." %}">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         <div class="collapse"
@@ -306,12 +306,13 @@
                                                                 data-target="#{{ atm_form.prefix }}-collapseMicrosoftEventViewer"
                                                                 aria-expanded="false"
                                                                 aria-controls="collapseExample">
-                                                            Usted cuenta con los logs de Microsoft EventViewer
+                                                            {% trans "Do you have the Microsoft EventViewer log?" %}
                                                         </button>
                                                         <a href="javascript: void (0)" data-toggle="popover"
                                                            class="pull-right" data-placement="left" data-html="true"
-                                                           data-trigger="focus" title="Microsoft Event viewer"
-                                                           data-content="Para los ATMs que estén en XP, Windows 7 y Windows 8, Microsoft cuenta con un sistema de logs interno que nos permitirá identificar si el error o faltante proviene de una mala operación del fabricante o de un operario de soporte.<br><br>Si usted no está directamente involucrado con las operaciones del ATM recomendamos leer el siguiente manual para poder extraer los logs del Microsoft sobre el rango de fechas que se detectó el faltante.<br><br>Como extraer logs Event Viewer Microsoft (<a target='blank' href='https://kb.acronis.com/content/8859'>https://kb.acronis.com/content/8859</a>)">
+                                                           data-trigger="focus"
+                                                           title="{% trans "Microsoft EventViewer" %}"
+                                                           data-content="{% trans "For ATMs that are in XP, Windows 7 and Windows 8, Microsoft has a system of internal logs that allow us to identify missing or if the error comes from a bad operation of the manufacturer or operator support..<br><br>If you are not directly involved with the operations of ATM recommend that you read the following manual to remove the logs from Microsoft on the date range that the missing was detected.<br><br>How to export and view event logs in Windows (<a target='blank' href='https://kb.acronis.com/content/8859'>https://kb.acronis.com/content/8859</a>)" %}">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         <div class="collapse"
@@ -332,7 +333,7 @@
                                                         {{ atm_form.person_name_journal_virtual|add_class:"form-control" }}
                                                     </div>
                                                     <div class="form-group journal_virtual">
-                                                        <span class="help-block">Seleccionar Journal Virtual</span>
+                                                        <span class="help-block">{% trans "Select Virtual Journal" %}</span>
                                                         <span class="help-block errors"></span>
                                                         {% if not create %}
                                                             {% for file in atm_form.instance.journals.all %}
@@ -346,8 +347,9 @@
                                                         <div class="journal-file-container">
                                                             <span class="btn btn-default btn-xs btn-file"
                                                                   style="margin-bottom: 2px">
-                                                            Añadir archivo<input type="file" class="add-journal"
-                                                                                 name="atms-{{ forloop.counter0 }}-journal_virtual[]">
+                                                            {% trans "Add file" %}<input type="file"
+                                                                                         class="add-journal"
+                                                                                         name="atms-{{ forloop.counter0 }}-journal_virtual[]">
                                                             </span>
                                                             <span class="selectedFiles"></span>
                                                         </div>
@@ -359,8 +361,9 @@
                                                         {% endif %}
                                                         <a href="javascript: void (0)" data-toggle="popover"
                                                            class="pull-right" data-placement="left" data-html="true"
-                                                           data-trigger="focus" title="Otro Tipo de logs"
-                                                           data-content="Si usted o su red cuenta con el Software de seguridad como Cyttek SDAX para la protección de los cajeros automáticos puede suministrar el log del agente para poder identificar problemas que el cajero pueda tener en mayor profundidad y delimitar así el problema de faltante mas especifico.">
+                                                           data-trigger="focus"
+                                                           title="{% trans "Another type of log" %}"
+                                                           data-content="{% trans "If you or your network has the security software as Cyttek SDAX for the protection of ATMs can supply the agent log to identify problems that ATM may have greater depth and thus define the problem more specific missing." %}">
                                                             <i class="fa fa-question-circle fa-2x"></i>
                                                         </a>
                                                         {% if atm_form.other_log.errors %}
@@ -389,8 +392,8 @@
                                 </div>
 
                                 <div id="add-atm-container" class="form-group {% if create %}hidden{% endif %}">
-                                    <a id="add-atm" href="javascript:void(0)" class="btn btn-default btn-lg">Agregar
-                                        ATM</a>
+                                    <a id="add-atm" href="javascript:void(0)" class="btn btn-default btn-lg">
+                                        {% trans "Add ATM" %}</a>
                                 </div>
 
                                 <hr>
@@ -406,9 +409,9 @@
 
                                 <div class="form-group">
                                     <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
-                                           value="Guardar"/>
+                                           value="{% trans "Save" %}"/>
                                     <input class="btn btn-primary btn-lg pull-left" name="analyze" type="submit"
-                                           value="Analizar"/>
+                                           value="{% trans "Analyze" %}"/>
                                 </div>
 
                             </div>
@@ -431,7 +434,7 @@
                     var atms2append = $("#atms-to-append").val();
                     if (atms2append < 1 || "") {
                         $("#atms-to-append-container").addClass("has-error");
-                        $("#atms-to-append-container").parent().find(".errors").html("Debe introducir el número de ATMs")
+                        $("#atms-to-append-container").parent().find(".errors").html("You must enter the number of ATMs")
                     } else {
                         $("#atms-to-append-container").removeClass("has-error");
                         $("#atms-to-append-container").parent().find(".errors").html("");
@@ -453,10 +456,10 @@
             $(".created_date").datepicker({format: 'dd-mm-yyyy'});
 
             // init select2
-            $("#id_missing_amount_currency").select2({placeholder: "Seleccione la divisa"});
-            $(".select2-bank").select2({placeholder: "Seleccione un banco"});
+            $("#id_missing_amount_currency").select2({placeholder: "Select the currency"});
+            $(".select2-bank").select2({placeholder: "Select a bank"});
             $(".select2-location").select2({
-                placeholder: "Seleccione una localización, puede comenzar escribiendo para filtrar",
+                placeholder: "Select a location, you can begin typing to filter"
             });
             // FIX: hide the atms container after init select2
             if (create) {
@@ -578,7 +581,7 @@
                 $journal_virtual.find(".journal-file-container").remove();
                 $journal_virtual.append('<div class="journal-file-container">' +
                         '<span class="btn btn-default btn-xs btn-file" style="margin-bottom: 2px">' +
-                        'Añadir archivo <input type="file" class="add-journal" name="atms-' + (total - 1) + '-journal_virtual[]">' +
+                        'Add file <input type="file" class="add-journal" name="atms-' + (total - 1) + '-journal_virtual[]">' +
                         '</span>' +
                         '<span class="selectedFiles"></span>' +
                         '</div>');
@@ -596,8 +599,8 @@
                 $(selector).after(newElement);
                 // init select2
                 $(selector).find(".select2-location").select2({
-                    placeholder: "Seleccione una localización, puede comenzar escribiendo para filtrar",
-                    width: '100%',
+                    placeholder: "Select a location, you can begin typing to filter",
+                    width: '100%'
                 });
             }
 

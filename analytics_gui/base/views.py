@@ -41,7 +41,7 @@ def dashboard(request):
                 else:
                     return JsonResponse(create_analyst_form.errors, status=400)
 
-        return render(request, 'base/admin_dashboard.html', {
+        return render(request, 'base/manager_dashboard.html', {
             "company": company,
             "users": company.users.filter(charge=UserDashboard.POSITION_ANALYST),
             "create_analyst_form": create_analyst_form,

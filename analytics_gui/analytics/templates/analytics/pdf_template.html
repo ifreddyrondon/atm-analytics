@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +28,15 @@
 
         #filters_timeline > * {
         display: inline ! important;
+        }
+
+        .dynamic-analysis {
+        background-color: #00A9FF ! important;
+        color: white;
+        }
+
+        #timeline-dynamic-range-dates span {
+        font-size: 8px;
         }
     </style>
 </head>
@@ -91,57 +101,136 @@
                     </table>
                 </div>
             </div>
+
             <div class="row">
-                <h3>Reporte Ejecutivo</h3>
+                <h3>{% trans "Automatic analysis" %}</h3>
+                <h4>{% trans "XFS events" %}</h4>
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Cantidad de transacciones</h5>
-                    <div class="well percent-result text-center">{{ meta.transactions_number }}</div>
+                    <h6>{% trans "Number of transactions" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.transactions_number }}</div>
                 </div>
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Monto total de transacciones validas</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.valid_transactions }} {{ currency }}
+                    <h6>{% trans "Total amount of valid transactions" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.valid_transactions }} {{ case.pretty_currency }}
                     </div>
                 </div>
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Transacciones con errores críticos</h5>
-                    <div class="well percent-result text-center">{{ meta.errors.critics_number }}</div>
+                    <h6>{% trans "Transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.errors.critics_number }}</div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Porcentaje transacciones de errores críticos</h5>
-                    <div class="well percent-result text-center">{{ meta.errors.critics_number_percentage }} %</div>
-                </div>
-                <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 10px;">Monto transacciones con errores criticos</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.critical_errors_transactions }}
-                        {{ currency }}
+                    <h6>{% trans "Total percentage of transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.errors.critics_number_percentage }}%
                     </div>
                 </div>
                 <div class="col-md-4 col-xs-4">
-                    <h5 style="font-size: 9px;">Monto transacciones con errores importantes</h5>
-                    <div class="well percent-result text-center">{{ meta.amount.important_errors_transactions }}
-                        {{ currency }}
+                    <h6>{% trans "Total amount of transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.critical_errors_transactions }} {{ case.pretty_currency }}
                     </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total amount of transactions with important errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.important_errors_transactions }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+            </div>
+            <div id="page-break"></div>
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Timeline range" %}</h6>
+                    <div id="timeline-dynamic-range-dates" class="well dynamic-analysis text-center">
+                        <span>{{ timeline_dynamic_range_dates_1 | first }}
+                            <br>
+                            {{ timeline_dynamic_range_dates_2 | first }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Missing amount in the timeline" %}</h6>
+                    <div id="timeline-dynamic-missing-amount"
+                         class="well percent-result dynamic-analysis">
+                        {{ timeline_dynamic_missing_amount | first}}
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Estimated cash missing in case" %}</h6>
+                    <div class="well percent-result dynamic-analysis">{{ case.missing_amount }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Percentage of critical errors identified as missing" %}</h6>
+                    <div id="timeline-dynamic-critic-errors-vs-critic-errors"
+                         class="well percent-result dynamic-analysis">
+                        {{ timeline_dynamic_critic_errors_vs_critic_errors | first}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>{% trans "Microsoft EventViewer" %}</h4>
+                {% if meta.windows.are_there %}
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events" %}</h6>
+                    <div class="well percent-result">{{ meta.windows.count }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events shown in the timeline" %}</h6>
+                    <div id="timeline-dynamic-number-windows-events"
+                         class="well percent-result">
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events that can induce errors XFS" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Percentage of total errors that induce errors XFS" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                {% else %}
+                <div class="well text-center">{% trans "Not provided logs for analysis" %}</div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <h4>{% trans "Cash replenishment events" %}</h4>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Amount of total cash replenishment events" %}</h6>
+                    <div class="well percent-result">{{ meta.reposition.count }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Amount of cash events involving the analyzed ATM addresses" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Number of events in timeline which can induce malfunction" %}</h6>
+                    <div class="well percent-result">{{ meta.reposition.close_events_count }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>{% trans "Estimating percentage of fault" %}</h4>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "User" %}</h6>
+                    <div class="well percent-result text-center">33%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "Bank" %}</h6>
+                    <div class="well percent-result text-center">30%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "Maintenance or replacement company" %}</h6>
+                    <div class="well percent-result text-center">27%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "External" %}</h6>
+                    <div class="well percent-result text-center">10%</div>
                 </div>
             </div>
 
             <div id="page-break"></div>
 
-            <div class="row" style="padding-top: 15;">
-                <h3>Estimación de porcentaje de culpa</h3>
-                <div class="col-md-4 col-xs-4">
-                    <h5>Logs Journal</h5>
-                    <div class="well percent-result text-center">33%</div>
-                </div>
-                <div class="col-md-4 col-xs-4">
-                    <h5>Logs Windows</h5>
-                    <div class="well percent-result text-center">100%</div>
-                </div>
-                <div class="col-md-4 col-xs-4">
-                    <h5>Estimación del caso</h5>
-                    <div class="well percent-result text-center">98%</div>
-                </div>
-            </div>
-            <br>
             <h3>Reporte Técnico</h3>
             <h4>Analista: {{ analyst_name }}</h4>
             {% if resolution %}

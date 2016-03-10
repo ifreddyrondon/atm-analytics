@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 
 {% block content %}
     <div class="container">
@@ -6,15 +7,15 @@
             <div class="col-md-10 col-md-offset-1">
                 <div class="row">
                     <a href="{% url 'analytics:create' %}" class="btn btn-lg btn-primary pull-right">
-                        Crear caso
+                        {% trans "Create case" %}
                     </a>
                 </div>
                 <br>
                 <div class="panel panel-primary row">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Casos</h3>
+                        <h3 class="panel-title">{% trans "Cases" %}</h3>
                         <div class="pull-right">
-                            <span class="clickable filter" data-toggle="tooltip" title="Filtro de tabla"
+                            <span class="clickable filter" data-toggle="tooltip" title="{% trans "Table filter" %}"
                                   data-container="body">
                                 <i class="glyphicon glyphicon-filter"></i>
                             </span>
@@ -22,17 +23,17 @@
                     </div>
                     <div class="panel-body">
                         <input type="text" class="form-control" id="cases-table-filter" data-action="filter"
-                               data-filters="#cases-table" placeholder="Filtar casos"/>
+                               data-filters="#cases-table" placeholder="{% trans "Filter cases" %}"/>
                     </div>
                     <table class="table table-hover" id="cases-table">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre del caso</th>
-                            <th>Monto faltante</th>
-                            <th>Cantidad de ATMs</th>
-                            <th>Estado</th>
-                            <th>Resultados</th>
+                            <th>{% trans "ID" %}</th>
+                            <th>{% trans "Case name" %}</th>
+                            <th>{% trans "Missing amount" %}</th>
+                            <th>{% trans "Number of ATMs" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Results" %}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -40,10 +41,10 @@
                             <tr>
                                 <td><a href="{% url "analytics:view_case" case.id %}">{{ case.number }}</a></td>
                                 <td>{{ case.name }}</td>
-                                <td>${{ case.missing_amount }}</td>
+                                <td>{{ case.missing_amount }} {{ case.pretty_currency }}</td>
                                 <td>{{ case.atms.count }}</td>
                                 <td>{{ case.get_status_display }}</td>
-                                <td><a href="{% url "analytics:analyze" case.id %}" class="btn btn-default btn-xs">resultados</a></td>
+                                <td><a href="{% url "analytics:analyze" case.id %}" class="btn btn-default btn-xs">{% trans "results" %}</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -58,32 +59,7 @@
     {{ block.super }}
     <script>
         $(function () {
-            var oTable = $("#cases-table").DataTable({
-                "language": {
-                    "sProcessing": "Procesando...",
-                    "sLengthMenu": "Mostrar _MENU_ registros",
-                    "sZeroRecords": "No se encontraron resultados",
-                    "sEmptyTable": "Ningún dato disponible en esta tabla",
-                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix": "",
-                    "sSearch": "Buscar:",
-                    "sUrl": "",
-                    "sInfoThousands": ",",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst": "Primero",
-                        "sLast": "Último",
-                        "sNext": "Siguiente",
-                        "sPrevious": "Anterior"
-                    },
-                    "oAria": {
-                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                    }
-                }
-            });
+            var oTable = $("#cases-table").DataTable();
             $('#cases-table-filter').keyup(function () {
                 oTable.search($(this).val()).draw();
             });
