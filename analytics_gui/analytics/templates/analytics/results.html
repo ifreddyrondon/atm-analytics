@@ -243,6 +243,24 @@
                                         <option value="all" selected>{% trans "All" %}</option>
                                     </select>
                                 </div>
+                                <div class="btn-group text-center" data-toggle="buttons">
+                                    <label class="btn btn-primary disabled">
+                                        <input id="timeline-filter-windows-events" type="checkbox"
+                                               autocomplete="off">{% trans "Windows events" %}
+                                    </label>
+                                </div>
+                            {% endif %}
+                            {% if meta.reposition.count > 0 %}
+                                <h4>{% trans "Cash replenishment events filters" %}</h4>
+                                <div class="form-group">
+                                    <div class="btn-group text-center" data-toggle="buttons">
+                                        <label class="btn btn-primary active">
+                                            <input id="timeline-filter-replenishment-events" type="checkbox"
+                                                   autocomplete="off"
+                                                   checked>{% trans "Cash replenishment events" %}
+                                        </label>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                         <br>
@@ -616,6 +634,11 @@
                 $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
             }
 
+            if (meta.windows.are_there && meta.windows.min_date && meta.windows.max_date) {
+                meta.windows.min_date = moment(meta.windows.min_date);
+                meta.windows.max_date = moment(meta.windows.max_date);
+            }
+
             var timelineContainer = document.getElementById('chart-events-timeline');
             var options = {};
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
@@ -687,7 +710,21 @@
                     });
                 }
 
+                // filter all windows errors
+                if (!$("#timeline-filter-windows-events").is(":checked")) {
+                    itemsWindows = _.filter(itemsWindows, function (item) {
+                        return item.event_type != "WindowsEventViewer";
+                    });
+                }
+
                 var itemsReposition = window.repositionData;
+
+                // filter replenishment events
+                if (!$("#timeline-filter-replenishment-events").is(":checked")) {
+                    itemsReposition = _.filter(itemsReposition, function (item) {
+                        return item.event_type != "RepositionEvent";
+                    });
+                }
 
                 var items = itemsJournal.concat(itemsWindows);
                 items = items.concat(itemsReposition);
@@ -746,12 +783,15 @@
                                     d.event_type = "WindowsEventViewer";
                                 });
                                 window.windowsEventsData = windowsEventsData;
+                                $("#timeline-filter-windows-events").parent().removeClass("disabled").addClass("active");
+                                $("#timeline-filter-windows-events").prop('checked', true);
                                 filterTimeline();
                             });
                 });
             }
 
             // init errors filter
+            // xfs events
             $("#timeline-filter-errors").select2({
                 data: meta.journal.errors.names,
                 width: 'element'
@@ -771,7 +811,6 @@
                     }
                 }
             });
-
             $("#timeline-filter-critical-erros").change(function (evt) {
                 filterTimeline();
             });
@@ -781,7 +820,7 @@
             $("#timeline-filter-no-erros").change(function (evt) {
                 filterTimeline();
             });
-
+            // windows events
             $("#timeline-filter-windows-errors").select2({
                 data: meta.windows.keys,
                 width: '100%'
@@ -801,6 +840,16 @@
                     }
                 }
             });
+            $("#timeline-filter-windows-events").change(function (evt) {
+                filterTimeline();
+            });
+            // cash replaiments events
+            if (meta.reposition.count > 0) {
+                $("#timeline-filter-replenishment-events").change(function (evt) {
+                    filterTimeline();
+                });
+            }
+
             // CROSSFILTER ******************************************************
             // DATA COUNT
             dataCount
