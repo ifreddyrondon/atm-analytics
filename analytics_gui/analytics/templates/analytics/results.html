@@ -242,6 +242,12 @@
                                         <option value="all" selected>{% trans "All" %}</option>
                                     </select>
                                 </div>
+                                <div class="btn-group text-center" data-toggle="buttons">
+                                    <label class="btn btn-primary disabled">
+                                        <input id="timeline-filter-windows-events" type="checkbox"
+                                               autocomplete="off">{% trans "Windows events" %}
+                                    </label>
+                                </div>
                             {% endif %}
                         </div>
                         <br>
@@ -615,6 +621,11 @@
                 $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
             }
 
+            if (meta.windows.are_there && meta.windows.min_date && meta.windows.max_date) {
+                meta.windows.min_date = moment(meta.windows.min_date);
+                meta.windows.max_date = moment(meta.windows.max_date);
+            }
+
             var timelineContainer = document.getElementById('chart-events-timeline');
             var options = {};
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
@@ -686,6 +697,13 @@
                     });
                 }
 
+                // filter all windows errors
+                if (!$("#timeline-filter-windows-events").is(":checked")) {
+                    itemsWindows = _.filter(itemsWindows, function (item) {
+                        return item.event_type != "WindowsEventViewer";
+                    });
+                }
+
                 var itemsReposition = window.repositionData;
 
                 var items = itemsJournal.concat(itemsWindows);
@@ -745,6 +763,8 @@
                                     d.event_type = "WindowsEventViewer";
                                 });
                                 window.windowsEventsData = windowsEventsData;
+                                $("#timeline-filter-windows-events").parent().removeClass("disabled").addClass("active");
+                                $("#timeline-filter-windows-events").prop('checked', true);
                                 filterTimeline();
                             });
                 });
@@ -800,6 +820,10 @@
                     }
                 }
             });
+            $("#timeline-filter-windows-events").change(function (evt) {
+                filterTimeline();
+            });
+
             // CROSSFILTER ******************************************************
             // DATA COUNT
             dataCount
