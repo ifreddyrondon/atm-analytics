@@ -249,6 +249,18 @@
                                     </label>
                                 </div>
                             {% endif %}
+                            {% if meta.reposition.count > 0 %}
+                                <h4>{% trans "Cash replenishment events filters" %}</h4>
+                                <div class="form-group">
+                                    <div class="btn-group text-center" data-toggle="buttons">
+                                        <label class="btn btn-primary active">
+                                            <input id="timeline-filter-replenishment-events" type="checkbox"
+                                                   autocomplete="off"
+                                                   checked>{% trans "Cash replenishment events" %}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                         <br>
                         <div id="chart-events-timeline" style="width: 100%; margin: 0 auto"></div>
@@ -706,6 +718,13 @@
 
                 var itemsReposition = window.repositionData;
 
+                // filter replenishment events
+                if (!$("#timeline-filter-replenishment-events").is(":checked")) {
+                    itemsReposition = _.filter(itemsReposition, function (item) {
+                        return item.event_type != "RepositionEvent";
+                    });
+                }
+
                 var items = itemsJournal.concat(itemsWindows);
                 items = items.concat(itemsReposition);
 
@@ -771,6 +790,7 @@
             }
 
             // init errors filter
+            // xfs events
             $("#timeline-filter-errors").select2({
                 data: meta.journal.errors.names,
                 width: 'element'
@@ -790,7 +810,6 @@
                     }
                 }
             });
-
             $("#timeline-filter-critical-erros").change(function (evt) {
                 filterTimeline();
             });
@@ -800,7 +819,7 @@
             $("#timeline-filter-no-erros").change(function (evt) {
                 filterTimeline();
             });
-
+            // windows events
             $("#timeline-filter-windows-errors").select2({
                 data: meta.windows.keys,
                 width: '100%'
@@ -823,6 +842,12 @@
             $("#timeline-filter-windows-events").change(function (evt) {
                 filterTimeline();
             });
+            // cash replaiments events
+            if (meta.reposition.count > 0) {
+                $("#timeline-filter-replenishment-events").change(function (evt) {
+                    filterTimeline();
+                });
+            }
 
             // CROSSFILTER ******************************************************
             // DATA COUNT
