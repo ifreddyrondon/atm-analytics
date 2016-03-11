@@ -2,7 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from analytics_gui.companies.models import Company
 
@@ -21,7 +21,7 @@ class UserDashboard(models.Model):
         Company, related_name='users', verbose_name=_("Company"))
     charge = models.CharField("Cargo", max_length=1, choices=POSITIONS_CHOICES)
     position = models.PositiveSmallIntegerField(
-        _("position"), null=True)
+        _("Position"), null=True)
 
     def __unicode__(self):
         return self.user.username

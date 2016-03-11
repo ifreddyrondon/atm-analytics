@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from analytics_gui.analytics.models import Case, AtmCase
 from analytics_gui.companies.models import Bank, CompanyAtmLocation

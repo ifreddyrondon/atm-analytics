@@ -1,0 +1,856 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-03-10 20:40+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: analytics_gui/analytics/forms.py:11 analytics_gui/analytics/models.py:40
+msgid "Case number"
+msgstr "Número de caso"
+
+#: analytics_gui/analytics/forms.py:20 analytics_gui/analytics/models.py:49
+msgid "Importance of the case"
+msgstr "Importancia del caso"
+
+#: analytics_gui/analytics/forms.py:27 analytics_gui/analytics/models.py:55
+msgid "Case status"
+msgstr "Estado del caso"
+
+#: analytics_gui/analytics/forms.py:33 analytics_gui/analytics/models.py:59
+msgid "Creation date of the case"
+msgstr "Fecha de creación del caso"
+
+#: analytics_gui/analytics/models.py:26
+msgid "low"
+msgstr "bajo"
+
+#: analytics_gui/analytics/models.py:27
+msgid "medium"
+msgstr "medio"
+
+#: analytics_gui/analytics/models.py:28
+msgid "high"
+msgstr "alto"
+
+#: analytics_gui/analytics/models.py:34
+msgid "open"
+msgstr "abierto"
+
+#: analytics_gui/analytics/models.py:35
+msgid "close"
+msgstr "cerrado"
+
+#: analytics_gui/analytics/models.py:45
+#: analytics_gui/base/templates/base/analyst_dashboard.html:32
+msgid "Case name"
+msgstr "Nombre del caso"
+
+#: analytics_gui/analytics/models.py:65
+msgid "Estimated amount missing"
+msgstr "Monto faltante estimado"
+
+#: analytics_gui/analytics/models.py:71
+msgid "Currency"
+msgstr "Divisa"
+
+#: analytics_gui/analytics/models.py:76
+msgid "Extra brief description of the case"
+msgstr "Breve descripción extra del caso"
+
+#: analytics_gui/analytics/models.py:84
+#: analytics_gui/analytics/templates/analytics/results.html:388
+#: analytics_gui/companies/models.py:43
+msgid "Bank"
+msgstr "Banco"
+
+#: analytics_gui/analytics/models.py:113
+msgid "Case"
+msgstr "Caso"
+
+#: analytics_gui/analytics/models.py:167 analytics_gui/analytics/models.py:305
+msgid "Other XFS"
+msgstr "Otro XFS"
+
+#: analytics_gui/analytics/models.py:184 analytics_gui/analytics/models.py:332
+msgid "Hardware"
+msgstr "Hardware"
+
+#: analytics_gui/analytics/models.py:190 analytics_gui/analytics/models.py:339
+msgid "Software"
+msgstr "Software"
+
+#: analytics_gui/analytics/models.py:196
+msgid "Operating system"
+msgstr "Sistema Operativo"
+
+#: analytics_gui/analytics/models.py:211
+msgid "Name of the person who facilitates the virtual Journal"
+msgstr "Nombre de la persona que le facilito el Journal virtual"
+
+#: analytics_gui/analytics/models.py:216
+msgid "Another type of log?"
+msgstr "¿Otro tipo de log?"
+
+#: analytics_gui/analytics/models.py:222
+msgid "ATM location"
+msgstr "Localización del ATM"
+
+#: analytics_gui/analytics/models.py:226
+msgid "%(hardware), %(software) and %(OS)"
+msgstr "%(hardware), %(software) y %(OS)"
+
+#: analytics_gui/analytics/models.py:230
+#: analytics_gui/analytics/templates/analytics/create.html:234
+msgid "ATM"
+msgstr "ATM"
+
+#: analytics_gui/analytics/models.py:231
+#: analytics_gui/analytics/templates/analytics/create.html:211
+#: analytics_gui/analytics/templates/analytics/create.html:213
+#: analytics_gui/analytics/templates/analytics/results.html:82
+msgid "ATMs"
+msgstr "ATMs"
+
+#: analytics_gui/analytics/models.py:259
+msgid "XFS Error"
+msgstr "Error XFS"
+
+#: analytics_gui/analytics/models.py:260
+msgid "XFS Errors"
+msgstr "Errores XFS"
+
+#: analytics_gui/analytics/models.py:266 analytics_gui/analytics/models.py:376
+msgid "green"
+msgstr "verde"
+
+#: analytics_gui/analytics/models.py:267 analytics_gui/analytics/models.py:377
+msgid "red"
+msgstr "rojo"
+
+#: analytics_gui/analytics/models.py:268 analytics_gui/analytics/models.py:378
+msgid "orange"
+msgstr "naranja"
+
+#: analytics_gui/analytics/models.py:276
+msgid "user"
+msgstr "usuario"
+
+#: analytics_gui/analytics/models.py:277
+msgid "bank"
+msgstr "banco"
+
+#: analytics_gui/analytics/models.py:278
+msgid "transporting company"
+msgstr "transvalores"
+
+#: analytics_gui/analytics/models.py:279
+msgid "anonymous"
+msgstr "anonimo"
+
+#: analytics_gui/analytics/models.py:318 analytics_gui/analytics/models.py:391
+msgid "Identifier"
+msgstr "Identificador"
+
+#: analytics_gui/analytics/models.py:322 analytics_gui/analytics/models.py:395
+msgid "Unique identifier of the error"
+msgstr "Identificador único del error"
+
+#: analytics_gui/analytics/models.py:326 analytics_gui/analytics/models.py:399
+msgid "Description"
+msgstr "Descripción"
+
+#: analytics_gui/analytics/models.py:328 analytics_gui/analytics/models.py:401
+msgid "Description of error"
+msgstr "Descripción del error"
+
+#: analytics_gui/analytics/models.py:335
+msgid "ATM hardware"
+msgstr "Hardware del ATM"
+
+#: analytics_gui/analytics/models.py:342
+msgid "ATM software"
+msgstr "Software del ATM"
+
+#: analytics_gui/analytics/models.py:346 analytics_gui/analytics/models.py:405
+msgid "Operating System"
+msgstr "Sistema Operativo"
+
+#: analytics_gui/analytics/models.py:349 analytics_gui/analytics/models.py:408
+msgid "ATM Operating System"
+msgstr "Sistema Operativo del ATM"
+
+#: analytics_gui/analytics/models.py:353
+msgid "Guilt"
+msgstr "Culpa"
+
+#: analytics_gui/analytics/models.py:356
+msgid "Who is guilty?"
+msgstr "¿Quién tiene la culpa?"
+
+#: analytics_gui/analytics/models.py:360 analytics_gui/analytics/models.py:412
+msgid "Color"
+msgstr "Color"
+
+#: analytics_gui/analytics/models.py:363 analytics_gui/analytics/models.py:415
+msgid "Error color"
+msgstr "Color del error"
+
+#: analytics_gui/analytics/models.py:369
+msgid "EventViewer Error"
+msgstr "Error de EventViewer"
+
+#: analytics_gui/analytics/models.py:370
+msgid "EventViewer Errors"
+msgstr "Errores de EventViewer"
+
+#: analytics_gui/analytics/models.py:429
+msgid "Date of the event"
+msgstr "Fecha del evento"
+
+#: analytics_gui/analytics/parsers.py:137
+msgid "No error"
+msgstr "Sin error"
+
+#: analytics_gui/analytics/parsers.py:140
+msgid "Important error"
+msgstr "Error importante"
+
+#: analytics_gui/analytics/parsers.py:144
+#: analytics_gui/analytics/templates/analytics/results.html:204
+msgid "Critical error"
+msgstr "Error critico"
+
+#: analytics_gui/analytics/templates/analytics/create.html:46
+#: analytics_gui/analytics/templates/analytics/results.html:59
+#: analytics_gui/companies/templates/companies/config.html:47
+msgid "home"
+msgstr "home"
+
+#: analytics_gui/analytics/templates/analytics/create.html:48
+msgid "create case"
+msgstr "crear caso"
+
+#: analytics_gui/analytics/templates/analytics/create.html:50
+#: analytics_gui/analytics/templates/analytics/results.html:60
+msgid "case"
+msgstr "caso"
+
+#: analytics_gui/analytics/templates/analytics/create.html:55
+msgid "New case"
+msgstr "Nuevo caso"
+
+#: analytics_gui/analytics/templates/analytics/create.html:59
+#: analytics_gui/companies/templates/companies/config.html:125
+#: analytics_gui/companies/templates/companies/config.html:161
+msgid "Delete"
+msgstr "Borrar"
+
+#: analytics_gui/analytics/templates/analytics/create.html:192
+#: analytics_gui/companies/templates/companies/config.html:110
+msgid "Change picture"
+msgstr "Cambiar imagen"
+
+#: analytics_gui/analytics/templates/analytics/create.html:209
+msgid "How many ATMs do you like to add?"
+msgstr "Cuantos ATMs quieres agregar"
+
+#: analytics_gui/analytics/templates/analytics/create.html:216
+#: analytics_gui/companies/templates/companies/config.html:149
+#: analytics_gui/companies/templates/companies/config.html:182
+msgid "Add"
+msgstr "Agregar"
+
+#: analytics_gui/analytics/templates/analytics/create.html:287
+msgid "Do you have error manuals?"
+msgstr "¿Usted cuenta con los manuales de errores?"
+
+#: analytics_gui/analytics/templates/analytics/create.html:291
+msgid "Manual of errors"
+msgstr "Manual de errores"
+
+#: analytics_gui/analytics/templates/analytics/create.html:292
+msgid ""
+"The manual errors, is the document provided by the manufacturer which "
+"identifies the error that is created in the Journal (log of operations XFS) "
+"which comes from hardware operations of the ATM, we recommend that if you "
+"have any new version of hardware or ATMS software for production introduce "
+"the Journal in PDF format or configuration specifies that this embodied in "
+"PDF format for any of the brands of ATMs and NCR, Wincor Nixdorf, Diebold, "
+"Triton, Nautilus can attach to the case."
+msgstr ""
+"El manual de errores, es el documento proporcionado por el fabricante el "
+"cual identifica el error que se crea en el Journal (log de operaciones XFS) "
+"del que proviene de las operaciones del hardware del ATM, recomendamos que "
+"si tienen alguna nueva versión de hardware o software para los ATMS en "
+"producción introducir el Journal en Formato PDF o alguna configuración "
+"especifica que este plasmada en formato PDF para cualquiera de las marcas de "
+"ATMs como NCR, Wincor Nixdorf , Diebold, Triton , Nautilus   puede "
+"adjuntarla al caso."
+
+#: analytics_gui/analytics/templates/analytics/create.html:309
+msgid "Do you have the Microsoft EventViewer log?"
+msgstr "¿Usted cuenta con los logs de Microsoft EventViewer?"
+
+#: analytics_gui/analytics/templates/analytics/create.html:314
+#: analytics_gui/analytics/templates/analytics/results.html:336
+msgid "Microsoft EventViewer"
+msgstr "Microsoft EventViewer"
+
+#: analytics_gui/analytics/templates/analytics/create.html:315
+msgid ""
+"For ATMs that are in XP, Windows 7 and Windows 8, Microsoft has a system of "
+"internal logs that allow us to identify missing or if the error comes from a "
+"bad operation of the manufacturer or operator support..<br><br>If you are "
+"not directly involved with the operations of ATM recommend that you read the "
+"following manual to remove the logs from Microsoft on the date range that "
+"the missing was detected.<br><br>How to export and view event logs in "
+"Windows (<a target='blank' href='https://kb.acronis.com/"
+"content/8859'>https://kb.acronis.com/content/8859</a>)"
+msgstr ""
+"Para los ATMs que estén en XP, Windows 7 y Windows 8, Microsoft cuenta con "
+"un sistema de logs interno que nos permitirá identificar si el error o "
+"faltante proviene de una mala operación del fabricante o de un operario de "
+"soporte.<br><br>Si usted no está directamente involucrado con las "
+"operaciones del ATM recomendamos leer el siguiente manual para poder extraer "
+"los logs del Microsoft sobre el rango de fechas que se detectó el faltante."
+"<br><br>Como extraer logs Event Viewer Microsoft (<a target='blank' "
+"href='https://kb.acronis.com/content/8859'>https://kb.acronis.com/"
+"content/8859</a>)"
+
+#: analytics_gui/analytics/templates/analytics/create.html:336
+msgid "Select Virtual Journal"
+msgstr "Seleccionar Journal Virtual"
+
+#: analytics_gui/analytics/templates/analytics/create.html:350
+msgid "Add file"
+msgstr "Añadir archivo"
+
+#: analytics_gui/analytics/templates/analytics/create.html:365
+msgid "Another type of log"
+msgstr "Otro Tipo de logs"
+
+#: analytics_gui/analytics/templates/analytics/create.html:366
+msgid ""
+"If you or your network has the security software as Cyttek SDAX for the "
+"protection of ATMs can supply the agent log to identify problems that ATM "
+"may have greater depth and thus define the problem more specific missing."
+msgstr ""
+"Si usted o su red cuenta con el Software de seguridad como Cyttek SDAX para "
+"la protección de los cajeros automáticos puede suministrar el log del agente "
+"para poder identificar problemas que el cajero pueda tener en mayor "
+"profundidad y delimitar así el problema de faltante mas especifico."
+
+#: analytics_gui/analytics/templates/analytics/create.html:396
+msgid "Add ATM"
+msgstr "Agregar ATM"
+
+#: analytics_gui/analytics/templates/analytics/create.html:412
+#: analytics_gui/analytics/templates/analytics/results.html:433
+#: analytics_gui/companies/templates/companies/config.html:200
+msgid "Save"
+msgstr "Guardar"
+
+#: analytics_gui/analytics/templates/analytics/create.html:414
+msgid "Analyze"
+msgstr "Analizar"
+
+#: analytics_gui/analytics/templates/analytics/results.html:61
+#: analytics_gui/base/templates/base/analyst_dashboard.html:47
+msgid "results"
+msgstr "resultados"
+
+#: analytics_gui/analytics/templates/analytics/results.html:65
+msgid "Report"
+msgstr "Reporte"
+
+#: analytics_gui/analytics/templates/analytics/results.html:67
+msgid "case status"
+msgstr "estado del caso"
+
+#: analytics_gui/analytics/templates/analytics/results.html:78
+msgid "selected out of"
+msgstr "seleccionados de"
+
+#: analytics_gui/analytics/templates/analytics/results.html:78
+msgid "records"
+msgstr "registros"
+
+#: analytics_gui/analytics/templates/analytics/results.html:87
+#: analytics_gui/analytics/templates/analytics/results.html:99
+#: analytics_gui/analytics/templates/analytics/results.html:130
+#: analytics_gui/analytics/templates/analytics/results.html:144
+#: analytics_gui/analytics/templates/analytics/results.html:158
+msgid "reset"
+msgstr "reset"
+
+#: analytics_gui/analytics/templates/analytics/results.html:94
+msgid "Type of errors"
+msgstr "Tipos de errores"
+
+#: analytics_gui/analytics/templates/analytics/results.html:108
+msgid "Critical errors"
+msgstr "Errores Criticos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:113
+msgid "Important errors"
+msgstr "Errores Importantes"
+
+#: analytics_gui/analytics/templates/analytics/results.html:118
+msgid "Transactions without problems"
+msgstr "Transacciones sin problemas"
+
+#: analytics_gui/analytics/templates/analytics/results.html:125
+msgid "Operations report"
+msgstr "Reporte de Operaciones"
+
+#: analytics_gui/analytics/templates/analytics/results.html:139
+msgid "Errors"
+msgstr "Errores"
+
+#: analytics_gui/analytics/templates/analytics/results.html:153
+msgid "Amounts"
+msgstr "Montos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:167
+msgid "Operations"
+msgstr "Operaciones"
+
+#: analytics_gui/analytics/templates/analytics/results.html:171
+#: analytics_gui/analytics/templates/analytics/results.html:256
+msgid "Filter"
+msgstr "Filtro de tabla"
+
+#: analytics_gui/analytics/templates/analytics/results.html:180
+msgid "Filter operations"
+msgstr "Filtrar operaciones"
+
+#: analytics_gui/analytics/templates/analytics/results.html:185
+#: analytics_gui/analytics/templates/analytics/results.html:270
+msgid "Selector"
+msgstr "Selector"
+
+#: analytics_gui/analytics/templates/analytics/results.html:186
+#: analytics_gui/analytics/templates/analytics/results.html:271
+#: analytics_gui/analytics/templates/analytics/results.html:407
+msgid "Date"
+msgstr "Fecha"
+
+#: analytics_gui/analytics/templates/analytics/results.html:187
+#: analytics_gui/analytics/templates/analytics/results.html:272
+msgid "Error"
+msgstr "Error"
+
+#: analytics_gui/analytics/templates/analytics/results.html:188
+#: analytics_gui/analytics/templates/analytics/results.html:273
+msgid "Amount"
+msgstr "Monto"
+
+#: analytics_gui/analytics/templates/analytics/results.html:189
+#: analytics_gui/analytics/templates/analytics/results.html:274
+msgid "ATMs number"
+msgstr "Numero de ATM"
+
+#: analytics_gui/analytics/templates/analytics/results.html:190
+#: analytics_gui/analytics/templates/analytics/results.html:275
+msgid "Type"
+msgstr "Tipo"
+
+#: analytics_gui/analytics/templates/analytics/results.html:197
+#: analytics_gui/analytics/templates/analytics/results.html:253
+msgid "Timeline"
+msgstr "Timeline"
+
+#: analytics_gui/analytics/templates/analytics/results.html:199
+msgid "Journal events filters"
+msgstr "Filtros de Journal eventos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:208
+msgid "Important Error"
+msgstr "Error importante"
+
+#: analytics_gui/analytics/templates/analytics/results.html:212
+msgid "No errors"
+msgstr "Sin errores"
+
+#: analytics_gui/analytics/templates/analytics/results.html:226
+#: analytics_gui/analytics/templates/analytics/results.html:242
+msgid "All"
+msgstr "Todos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:230
+msgid "Windows event filters"
+msgstr "Filtros de eventos de windows"
+
+#: analytics_gui/analytics/templates/analytics/results.html:265
+msgid "timeline filter"
+msgstr "Filtrar timeline"
+
+#: analytics_gui/analytics/templates/analytics/results.html:283
+msgid "Automatic analysis"
+msgstr "Análisis Automático"
+
+#: analytics_gui/analytics/templates/analytics/results.html:284
+msgid "XFS events"
+msgstr "Eventos del XFS"
+
+#: analytics_gui/analytics/templates/analytics/results.html:286
+msgid "Number of transactions"
+msgstr "Cantidad de transacciones"
+
+#: analytics_gui/analytics/templates/analytics/results.html:290
+msgid "Total amount of valid transactions"
+msgstr "Monto total de transacciones validas"
+
+#: analytics_gui/analytics/templates/analytics/results.html:294
+msgid "Transactions with critical errors"
+msgstr "Cantidad de transacciones con errores críticos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:300
+msgid "Total percentage of transactions with critical errors"
+msgstr "Porcentaje total de transacciones de errores críticos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:305
+msgid "Total amount of transactions with critical errors"
+msgstr "Monto total de transacciones con errores criticos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:309
+msgid "Total amount of transactions with important errors"
+msgstr "Monto total de transacciones con errores importantes"
+
+#: analytics_gui/analytics/templates/analytics/results.html:315
+msgid "Timeline range"
+msgstr "Rango de tiempo del timeline"
+
+#: analytics_gui/analytics/templates/analytics/results.html:319
+msgid "Missing amount analyzed in the timeline"
+msgstr "Monto faltante analizado en el timeline"
+
+#: analytics_gui/analytics/templates/analytics/results.html:324
+msgid "Estimated cash missing in case"
+msgstr "Efectivo faltante estimado del caso"
+
+#: analytics_gui/analytics/templates/analytics/results.html:330
+msgid "Percentage of critical errors identified as missing"
+msgstr "Porcentaje de errores críticos identificados como faltante"
+
+#: analytics_gui/analytics/templates/analytics/results.html:339
+msgid "Total events"
+msgstr "Total de eventos"
+
+#: analytics_gui/analytics/templates/analytics/results.html:343
+msgid "Total events shown in the timeline"
+msgstr "Total de eventos mostrados en el timeline"
+
+#: analytics_gui/analytics/templates/analytics/results.html:348
+msgid "Total events that can induce errors XFS"
+msgstr "Total de eventos que pueden inducir errores XFS"
+
+#: analytics_gui/analytics/templates/analytics/results.html:349
+#: analytics_gui/analytics/templates/analytics/results.html:353
+#: analytics_gui/analytics/templates/analytics/results.html:367
+msgid "Undefined"
+msgstr "Sin definir"
+
+#: analytics_gui/analytics/templates/analytics/results.html:352
+msgid "Percentage of total errors that induce errors XFS"
+msgstr "Porcentaje de el total de errores que inducen errores XFS"
+
+#: analytics_gui/analytics/templates/analytics/results.html:356
+msgid "Not provided logs for analysis"
+msgstr "No se proporcionaron logs para su análisis"
+
+#: analytics_gui/analytics/templates/analytics/results.html:360
+msgid "Cash replenishment events"
+msgstr "Eventos de Reposición de efectivo"
+
+#: analytics_gui/analytics/templates/analytics/results.html:362
+msgid "Amount of total cash replenishment events"
+msgstr "Cantidad de eventos de reposición de efectivo totales"
+
+#: analytics_gui/analytics/templates/analytics/results.html:366
+msgid "Amount of cash events involving the analyzed ATM addresses"
+msgstr ""
+"Cantidad de eventos de efectivo que involucran la direcciones de los ATMs "
+"analizados"
+
+#: analytics_gui/analytics/templates/analytics/results.html:370
+msgid "Number of events in timeline which can induce malfunction"
+msgstr ""
+"Cantidad de eventos de Timeline que pueden inducir errores de funcionamiento"
+
+#: analytics_gui/analytics/templates/analytics/results.html:375
+msgid "Estimating percentage of fault"
+msgstr "Estimación de porcentaje de culpa"
+
+#: analytics_gui/analytics/templates/analytics/results.html:379
+msgid "Estimate based on events XFS"
+msgstr "Estimación basada en los eventos del XFS"
+
+#: analytics_gui/analytics/templates/analytics/results.html:384
+#: analytics_gui/authentication/models.py:30
+#: analytics_gui/authentication/templates/authentication/login.html:55
+msgid "User"
+msgstr "Usuario"
+
+#: analytics_gui/analytics/templates/analytics/results.html:392
+msgid "Maintenance or replacement company"
+msgstr "Empresa de mantenimiento o reposición"
+
+#: analytics_gui/analytics/templates/analytics/results.html:396
+msgid "External"
+msgstr "Externo"
+
+#: analytics_gui/analytics/templates/analytics/results.html:402
+msgid "Case Analysis"
+msgstr "Análisis del Caso"
+
+#: analytics_gui/analytics/templates/analytics/results.html:403
+#: analytics_gui/companies/models.py:19 analytics_gui/companies/models.py:35
+msgid "Name"
+msgstr "Nombre"
+
+#: analytics_gui/analytics/templates/analytics/results.html:404
+#: analytics_gui/base/templates/base/analyst_dashboard.html:31
+msgid "ID"
+msgstr "ID"
+
+#: analytics_gui/analytics/templates/analytics/results.html:405
+#: analytics_gui/base/templates/base/analyst_dashboard.html:33
+msgid "Missing amount"
+msgstr "Monto Faltante"
+
+#: analytics_gui/analytics/templates/analytics/results.html:406
+msgid "Number of affected ATMs"
+msgstr "Cantidad de ATMs afectados"
+
+#: analytics_gui/analytics/templates/analytics/results.html:408
+msgid "Client"
+msgstr "Cliente"
+
+#: analytics_gui/analytics/templates/analytics/results.html:409
+msgid "Resolution"
+msgstr "Resolución"
+
+#: analytics_gui/analytics/templates/analytics/results.html:426
+#: analytics_gui/base/templates/base/manager_dashboard.html:56
+msgid "Close"
+msgstr "Cerrar"
+
+#: analytics_gui/analytics/templates/analytics/results.html:429
+msgid "Open"
+msgstr "Abrir"
+
+#: analytics_gui/analytics/templates/analytics/results.html:435
+msgid "PDF"
+msgstr "PDF"
+
+#: analytics_gui/authentication/forms.py:11
+msgid "User name"
+msgstr "Nombre de usuario"
+
+#: analytics_gui/authentication/forms.py:20
+#: analytics_gui/authentication/forms.py:69
+#: analytics_gui/authentication/forms.py:72
+#: analytics_gui/authentication/templates/authentication/login.html:63
+msgid "Password"
+msgstr "Contraseña"
+
+#: analytics_gui/authentication/forms.py:29
+#: analytics_gui/authentication/forms.py:32
+msgid "First name"
+msgstr "Nombre"
+
+#: analytics_gui/authentication/forms.py:39
+#: analytics_gui/authentication/forms.py:42
+msgid "Last name"
+msgstr "Apellido"
+
+#: analytics_gui/authentication/forms.py:49
+#: analytics_gui/authentication/forms.py:52
+#: analytics_gui/companies/models.py:21
+msgid "Email"
+msgstr "Email"
+
+#: analytics_gui/authentication/forms.py:59
+#: analytics_gui/authentication/forms.py:62
+#: analytics_gui/base/templates/base/manager_dashboard.html:81
+msgid "Username"
+msgstr "Username"
+
+#: analytics_gui/authentication/models.py:14
+msgid "analyst"
+msgstr "analista"
+
+#: analytics_gui/authentication/models.py:15
+msgid "manager"
+msgstr "manager"
+
+#: analytics_gui/authentication/models.py:21
+#: analytics_gui/companies/models.py:29
+msgid "Company"
+msgstr "Compañia"
+
+#: analytics_gui/authentication/models.py:24
+#: analytics_gui/companies/models.py:39 analytics_gui/companies/models.py:52
+msgid "Position"
+msgstr "Posición"
+
+#: analytics_gui/authentication/templates/authentication/login.html:9
+msgid "Sign In"
+msgstr "Iniciar Sesión"
+
+#: analytics_gui/authentication/templates/authentication/login.html:36
+msgid "Please correct the error below"
+msgstr "Por favor corrija los errores a continuación"
+
+#: analytics_gui/authentication/templates/authentication/login.html:71
+msgid "Log in"
+msgstr "Log in"
+
+#: analytics_gui/authentication/templates/authentication/login.html:74
+msgid "Remember Me"
+msgstr "Recordar Usuario"
+
+#: analytics_gui/authentication/views.py:28
+msgid "User or incorrect password"
+msgstr "Usuario o contraseña incorrecto"
+
+#: analytics_gui/authentication/views.py:33
+msgid "Inactive user"
+msgstr "Usuario inactivo"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:10
+msgid "Create case"
+msgstr "Crear caso"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:16
+msgid "Cases"
+msgstr "Casos"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:18
+msgid "Table filter"
+msgstr "Filtro de tabla"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:26
+msgid "Filter cases"
+msgstr "Filtar casos"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:34
+#: analytics_gui/companies/admin.py:52 analytics_gui/companies/models.py:37
+#: analytics_gui/companies/templates/companies/config.html:124
+msgid "Number of ATMs"
+msgstr "Cantidad de ATMs"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:35
+msgid "Status"
+msgstr "Estado"
+
+#: analytics_gui/base/templates/base/analyst_dashboard.html:36
+msgid "Results"
+msgstr "Resultados"
+
+#: analytics_gui/base/templates/base/base.html:62
+msgid "Log out"
+msgstr "Log out"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:11
+#: analytics_gui/companies/templates/companies/config.html:51
+msgid "Settings"
+msgstr "Configuración"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:23
+msgid "New user"
+msgstr "Nuevo Usuario"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:58
+msgid "Create"
+msgstr "Crear"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:69
+msgid "Users"
+msgstr "Usuarios"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:71
+msgid "Add user"
+msgstr "Agregar Usuario"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:76
+msgid "Filter users"
+msgstr "Filtar usuarios"
+
+#: analytics_gui/base/templates/base/manager_dashboard.html:82
+msgid "Number of cases"
+msgstr "Numero de casos"
+
+#: analytics_gui/companies/admin.py:42
+#: analytics_gui/companies/templates/companies/config.html:117
+msgid "Banks"
+msgstr "Bancos"
+
+#: analytics_gui/companies/models.py:19
+msgid "Company name"
+msgstr "Nombre de la Empresa"
+
+#: analytics_gui/companies/models.py:23
+msgid "Phone"
+msgstr "Teléfono"
+
+#: analytics_gui/companies/models.py:23
+msgid "Phone number"
+msgstr "Teléfono"
+
+#: analytics_gui/companies/models.py:30
+msgid "Companies"
+msgstr "Compañia"
+
+#: analytics_gui/companies/models.py:35
+#: analytics_gui/companies/templates/companies/config.html:123
+msgid "Bank name"
+msgstr "Nombre del Banco"
+
+#: analytics_gui/companies/models.py:50
+#: analytics_gui/companies/templates/companies/config.html:160
+msgid "Address"
+msgstr "Direción"
+
+#: analytics_gui/companies/models.py:56
+msgid "ATM address"
+msgstr "Direción de ATM"
+
+#: analytics_gui/companies/templates/companies/config.html:48
+msgid "settings"
+msgstr "configuración"
+
+#: analytics_gui/companies/templates/companies/config.html:154
+msgid "ATMs address"
+msgstr "Dirección de ATMs"
+
+#: analytics_gui/companies/templates/companies/config.html:185
+msgid "Or upload addresses in CSV format"
+msgstr "O Subir direcciones en CSV"
+
+#: analytics_gui/companies/templates/companies/config.html:193
+msgid "ATMs replenishment events in CSV format"
+msgstr "Eventos de reposición de ATMs en formato CSV"
+
+#: analytics_gui/settings/base.py:95
+msgid "English"
+msgstr "Ingles"
+
+#: analytics_gui/settings/base.py:96
+msgid "Spanish"
+msgstr "Español"

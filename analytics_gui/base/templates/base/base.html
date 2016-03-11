@@ -1,5 +1,8 @@
 {% load staticfiles %}
 {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+
 
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
@@ -56,11 +59,34 @@
                            aria-expanded="false"><i class="fa fa-user"></i> {{ user.email }} <span
                                 class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="{% url 'logout' %}?next=/"><i class="fa fa-sign-out"></i> {% trans "Log out" %}</a></li>
+                            <li><a href="{% url 'logout' %}?next=/"><i class="fa fa-sign-out"></i> {% trans "Log out" %}
+                            </a></li>
                         </ul>
                     </li>
                 </ul>
             {% endif %}
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        {% with "images/"|add:LANGUAGE_CODE|add:".jpg" as flag %}
+                            <img class="flag-img" src="{% static flag %}">
+                        {% endwith %}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lang" role="menu">
+                        {% for lang in LANGUAGES %}
+                            <li>
+                                <a href="{% url "base:set_lang" %}?lang={{ lang.0 }}">
+                                    {% with "images/"|add:lang.0|add:".jpg" as flag %}
+                                        <img class="flag-img" src="{% static flag %}">
+                                        {{ lang.1 }}
+                                    {% endwith %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
         </div>
         <!-- /.navbar-collapse -->
     </div>
