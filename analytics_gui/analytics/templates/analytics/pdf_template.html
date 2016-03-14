@@ -1,0 +1,402 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <title>Analíticas</title>
+
+    <style>
+        table, tr, td, th, tbody, thead, tfoot {
+        page-break-inside: avoid !important;
+        }
+
+        #page-break {
+        page-break-after: always;
+        }
+
+        #files-table > *{
+        font-size: 9px;
+        }
+
+        #files-table {
+        width: 100%;
+        }
+
+        #filters_timeline > * {
+        display: inline ! important;
+        }
+
+        .dynamic-analysis {
+        background-color: #00A9FF ! important;
+        color: white;
+        }
+
+        #timeline-dynamic-range-dates span {
+        font-size: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row" style="padding-top: 30;">
+        <div class="col-md-12">
+            <div>
+                <span class="pull-right">{% trans "Date of issue PDF" %}: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
+            </div>
+            <h3>{% trans "Case Analysis" %}</h3>
+            <br>
+            <p><b>ID:</b> {{ case.id }}</p>
+            <p><b>{% trans "Analyst name" %}:</b> {{ analyst_name }}</p>
+            <span class="pull-right" style="padding-right: 100px;">
+                        {% if case.picture %}
+                            <img src="{{ case_picture }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% elif case.bank.company.logo %}
+                            <img src="{{ company_logo }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% else %}
+                            <img src="{{ default_avatar }}"
+                                 class="img-circle img-responsive" width="100px" height="100px">
+                        {% endif %}
+            </span>
+            <p><b>{% trans "Date" %}:</b> {{ case.created_date }}</p>
+            <p><b>{% trans "Number of affected ATMs" %}:</b> {{ case.atms.count }}</p>
+            <p><b>{% trans "Missing amount" %}:</b> {{ case.missing_amount }}</p>
+            <p><b>{% trans "Client" %}:</b> {{ case.bank }}</p>
+            <p><b>{% trans "Affected ATMs locations" %}:</b></p>
+            <ul>
+                {% for loc in atm_locations %}
+                <li>{{ loc }}</li>
+                {% endfor %}
+            </ul>
+            <br>
+            <div class="panel panel-primary" style="padding-top: 30;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans "Log files" %}</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover" id="files-table">
+                        <thead>
+                        <tr>
+                            <th>{% trans "File name" %}</th>
+                            <th>{% trans "Creation date" %}</th>
+                            <th>SHA1</th>
+                            <th>MD5</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td>{{ file.filename }}</td>
+                            <td>{{ file.date }}</td>
+                            <td>{{ file.sha1 }}</td>
+                            <td>{{ file.md5 }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <h3>{% trans "Automatic analysis" %}</h3>
+                <h4>{% trans "XFS events" %}</h4>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Number of transactions" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.transactions_number }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total amount of valid transactions" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.valid_transactions }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.errors.critics_number }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total percentage of transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.errors.critics_number_percentage }}%
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total amount of transactions with critical errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.critical_errors_transactions }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total amount of transactions with important errors" %}</h6>
+                    <div class="well percent-result">{{ meta.journal.amount.important_errors_transactions }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+            </div>
+            <div id="page-break"></div>
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Timeline range" %}</h6>
+                    <div id="timeline-dynamic-range-dates" class="well dynamic-analysis text-center">
+                        <span>{{ timeline_dynamic_range_dates_1 | first }}
+                            <br>
+                            {{ timeline_dynamic_range_dates_2 | first }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Missing amount in the timeline" %}</h6>
+                    <div id="timeline-dynamic-missing-amount"
+                         class="well percent-result dynamic-analysis">
+                        {{ timeline_dynamic_missing_amount | first}}
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Estimated cash missing in case" %}</h6>
+                    <div class="well percent-result dynamic-analysis">{{ case.missing_amount }} {{ case.pretty_currency }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Percentage of critical errors identified as missing" %}</h6>
+                    <div id="timeline-dynamic-critic-errors-vs-critic-errors"
+                         class="well percent-result dynamic-analysis">
+                        {{ timeline_dynamic_critic_errors_vs_critic_errors | first}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>{% trans "Microsoft EventViewer" %}</h4>
+                {% if meta.windows.are_there %}
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events" %}</h6>
+                    <div class="well percent-result">{{ meta.windows.count }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events shown in the timeline" %}</h6>
+                    <div id="timeline-dynamic-number-windows-events"
+                         class="well percent-result">
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Total events that can induce errors XFS" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Percentage of total errors that induce errors XFS" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                {% else %}
+                <div class="well text-center">{% trans "Not provided logs for analysis" %}</div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <h4>{% trans "Cash replenishment events" %}</h4>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Amount of total cash replenishment events" %}</h6>
+                    <div class="well percent-result">{{ meta.reposition.count }}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Amount of cash events involving the analyzed ATM addresses" %}</h6>
+                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Number of events in timeline which can induce malfunction" %}</h6>
+                    <div class="well percent-result">{{ meta.reposition.close_events_count }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>{% trans "Estimating percentage of fault" %}</h4>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "User" %}</h6>
+                    <div class="well percent-result text-center">33%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "Bank" %}</h6>
+                    <div class="well percent-result text-center">30%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "Maintenance or replacement company" %}</h6>
+                    <div class="well percent-result text-center">27%</div>
+                </div>
+                <div class="col-md-3 col-xs-3">
+                    <h6>{% trans "External" %}</h6>
+                    <div class="well percent-result text-center">10%</div>
+                </div>
+            </div>
+
+            <div id="page-break"></div>
+
+            <h3>{% trans "Technical Report" %}</h3>
+            <h4>{% trans "Analyst"%}: {{ analyst_name }}</h4>
+            {% if resolution %}
+            <br>
+            <p><b>{% trans "Resolution" %}:</b></p>
+            <div class="form-group">
+                    <textarea class="form-control" readonly>
+                        {{ resolution|first }}
+                    </textarea>
+            </div>
+            {% endif %}
+            <div class="row" style="padding-top: 70px;">
+                <div class="col-md-6 col-xs-6">
+                    <h6>ATMs</h6>
+                    <img src="{{ atm_index_chart }}"
+                         style="width: 100%; height: 130px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                    <h6>{% trans "Type of errors" %}</h6>
+                    <img src="{{ total_operations_report_chart }}"
+                         style="width: 100%; height: 130px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-12 col-xs-12" style="padding-top: 50px; padding-bottom: 50px;">
+                    <h6>{% trans "Errors" %}</h6>
+                    <img src="{{ errors_report_chart }}"
+                         style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+                <div id="page-break"></div>
+                <div class="col-md-12 col-xs-12" style="padding-bottom: 50px;">
+                    <h6>{% trans "Amounts" %}</h6>
+                    <img src="{{ amount_report_chart }}"
+                         style="width: 100%; height: 160px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+                <div id="page-break"></div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Critical errors" %}</h6>
+                    <img src="{{ critical_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Important errors" %}</h6>
+                    <img src="{{ important_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h6>{% trans "Transactions without problems" %}</h6>
+                    <img src="{{ no_errors_chart }}"
+                         style="width: 100%; height: 200px; margin: 0px auto; max-height: 200px; position: relative;"/>
+                </div>
+                <div class="col-md-12 col-xs-12">
+                    <h5>{% trans "Operations report" %}</h5>
+                    <img src="{{ operations_report_chart }}"
+                         style="width: 100%; height: 300px; margin: 0px auto; max-height: 280px; position: relative;"/>
+                </div>
+            </div>
+
+            <div id="page-break"></div>
+
+            {% if operations_table %}
+            <div class="panel panel-primary" style="padding-top: 30;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans "Operations" %}</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>{% trans "Date" %}</th>
+                            <th>Error</th>
+                            <th>{% trans "Amount" %}</th>
+                            <th>{% trans "ATMs number" %}</th>
+                            <th>{% trans "Address" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in operations_table %}
+                        <tr>
+                            {% for col in row %}
+                            <td>
+                                {{ col }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="page-break"></div>
+
+            <div class="row" style="padding-top: 30;">
+                {% if critical_filter or important_filter or no_error_filter %}
+                <h4>{% trans "Journal events filters" %}</h4>
+                <div class="col-md-4 col-xs-4">
+                    <h5>{% trans "Filter errors" %}:<br>
+                        <small>
+                            {% if critical_filter %}
+                            {% trans "Critical error" %}
+                            {% endif %}
+                            {% if important_filter %}
+                            {% trans "Important error" %}
+                            {% endif %}
+                            {% if no_error_filter %}
+                            {% trans "No errors" %}
+                            {% endif %}
+                        </small>
+                    </h5>
+                </div>
+                {% endif%}
+                <div class="col-md-4 col-xs-4">
+                    <h5>{% trans "Filter by date" %}:<br>
+                        <small>{{ date_filter|first }}</small>
+                    </h5>
+                </div>
+                <div class="col-md-4 col-xs-4">
+                    <h5>{% trans "Other filters" %}:<br>
+                        <small>{{ filters|first }}</small>
+                    </h5>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <h5>Timeline</h5>
+                    <img src="{{ chart_events_timeline }}"
+                         style="width: 100%; margin: 0px auto; max-height: 20000px; position: relative;"/>
+                </div>
+            </div>
+            <div id="page-break"></div>
+
+            {% if time_line_table %}
+
+            <div class="panel panel-primary" style="padding-top: 30;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Timeline</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover" style="font-size: 14px;">
+                        <thead>
+                        <tr>
+                            <th>{% trans "Date" %}</th>
+                            <th>Error</th>
+                            <th>{% trans "Amount" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in time_line_table %}
+                        <tr>
+                            {% for col in row %}
+                            <td>
+                                {{ col }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+<br>
+</body>
+</html>
