@@ -641,6 +641,40 @@
 
             var timelineContainer = document.getElementById('chart-events-timeline');
             var options = {};
+
+            $("#generate-pdf").on("click", function() {
+                var timelineContainer = document.getElementById('chart-events-timeline');
+                // bounds dates for xfs data
+                var minDateMoment = moment(minDate);
+                var maxDateMoment = moment(maxDate);
+
+                // bounds dates for reposition events
+
+                if (meta.reposition.min_date && meta.reposition.max_date) {
+                    meta.reposition.min_date = moment(meta.reposition.min_date);
+                    meta.reposition.max_date = moment(meta.reposition.max_date);
+                    minDateMoment = meta.reposition.min_date < minDateMoment ? meta.reposition.min_date : minDateMoment;
+                    maxDateMoment = meta.reposition.max_date > maxDateMoment ? meta.reposition.max_date : maxDateMoment;
+                }
+
+                // bounds dates for windows events
+
+                if (meta.windows.are_there && meta.windows.min_date && meta.windows.max_date) {
+                    meta.windows.min_date = moment(meta.windows.min_date);
+                    meta.windows.max_date = moment(meta.windows.max_date);
+                    minDateMoment = meta.windows.min_date < minDateMoment ? meta.windows.min_date : minDateMoment;
+                    maxDateMoment = meta.windows.max_date > maxDateMoment ? meta.windows.max_date : maxDateMoment;
+                }
+
+                var options = {
+                    min: minDateMoment,
+                    max: maxDateMoment
+                };
+                var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
+                fillTimelineTableAndDynamicFields(window.timelineData);
+                timeline.fit();
+            });
+
             var timeline = new vis.Timeline(timelineContainer, window.timelineData, options);
             fillTimelineTableAndDynamicFields(window.timelineData);
             timeline.fit();
