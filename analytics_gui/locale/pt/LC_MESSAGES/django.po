@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-10 20:42+0000\n"
+"POT-Creation-Date: 2016-03-14 21:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgid "Extra brief description of the case"
 msgstr ""
 
 #: analytics_gui/analytics/models.py:84
-#: analytics_gui/analytics/templates/analytics/results.html:388
+#: analytics_gui/analytics/templates/analytics/results.html:406
 #: analytics_gui/companies/models.py:43
 msgid "Bank"
 msgstr ""
@@ -298,7 +298,7 @@ msgid "Do you have the Microsoft EventViewer log?"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/create.html:314
-#: analytics_gui/analytics/templates/analytics/results.html:336
+#: analytics_gui/analytics/templates/analytics/results.html:354
 msgid "Microsoft EventViewer"
 msgstr ""
 
@@ -338,7 +338,7 @@ msgid "Add ATM"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/create.html:412
-#: analytics_gui/analytics/templates/analytics/results.html:433
+#: analytics_gui/analytics/templates/analytics/results.html:451
 #: analytics_gui/companies/templates/companies/config.html:200
 msgid "Save"
 msgstr ""
@@ -409,7 +409,7 @@ msgid "Operations"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:171
-#: analytics_gui/analytics/templates/analytics/results.html:256
+#: analytics_gui/analytics/templates/analytics/results.html:274
 msgid "Filter"
 msgstr ""
 
@@ -418,38 +418,38 @@ msgid "Filter operations"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:185
-#: analytics_gui/analytics/templates/analytics/results.html:270
+#: analytics_gui/analytics/templates/analytics/results.html:288
 msgid "Selector"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:186
-#: analytics_gui/analytics/templates/analytics/results.html:271
-#: analytics_gui/analytics/templates/analytics/results.html:407
+#: analytics_gui/analytics/templates/analytics/results.html:289
+#: analytics_gui/analytics/templates/analytics/results.html:425
 msgid "Date"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:187
-#: analytics_gui/analytics/templates/analytics/results.html:272
+#: analytics_gui/analytics/templates/analytics/results.html:290
 msgid "Error"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:188
-#: analytics_gui/analytics/templates/analytics/results.html:273
+#: analytics_gui/analytics/templates/analytics/results.html:291
 msgid "Amount"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:189
-#: analytics_gui/analytics/templates/analytics/results.html:274
+#: analytics_gui/analytics/templates/analytics/results.html:292
 msgid "ATMs number"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:190
-#: analytics_gui/analytics/templates/analytics/results.html:275
+#: analytics_gui/analytics/templates/analytics/results.html:293
 msgid "Type"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:197
-#: analytics_gui/analytics/templates/analytics/results.html:253
+#: analytics_gui/analytics/templates/analytics/results.html:271
 msgid "Timeline"
 msgstr ""
 
@@ -474,163 +474,172 @@ msgstr ""
 msgid "Windows event filters"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:265
-msgid "timeline filter"
+#: analytics_gui/analytics/templates/analytics/results.html:248
+msgid "Windows events"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:283
-msgid "Automatic analysis"
+#: analytics_gui/analytics/templates/analytics/results.html:253
+msgid "Cash replenishment events filters"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:284
-msgid "XFS events"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:286
-msgid "Number of transactions"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:290
-msgid "Total amount of valid transactions"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:294
-msgid "Transactions with critical errors"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:300
-msgid "Total percentage of transactions with critical errors"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:305
-msgid "Total amount of transactions with critical errors"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:309
-msgid "Total amount of transactions with important errors"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:315
-msgid "Timeline range"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:319
-msgid "Missing amount analyzed in the timeline"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:324
-msgid "Estimated cash missing in case"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:330
-msgid "Percentage of critical errors identified as missing"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:339
-msgid "Total events"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:343
-msgid "Total events shown in the timeline"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:348
-msgid "Total events that can induce errors XFS"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:349
-#: analytics_gui/analytics/templates/analytics/results.html:353
-#: analytics_gui/analytics/templates/analytics/results.html:367
-msgid "Undefined"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:352
-msgid "Percentage of total errors that induce errors XFS"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:356
-msgid "Not provided logs for analysis"
-msgstr ""
-
-#: analytics_gui/analytics/templates/analytics/results.html:360
+#: analytics_gui/analytics/templates/analytics/results.html:259
+#: analytics_gui/analytics/templates/analytics/results.html:378
 msgid "Cash replenishment events"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:362
-msgid "Amount of total cash replenishment events"
+#: analytics_gui/analytics/templates/analytics/results.html:283
+msgid "timeline filter"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:301
+msgid "Automatic analysis"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:302
+msgid "XFS events"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:304
+msgid "Number of transactions"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:308
+msgid "Total amount of valid transactions"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:312
+msgid "Transactions with critical errors"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:318
+msgid "Total percentage of transactions with critical errors"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:323
+msgid "Total amount of transactions with critical errors"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:327
+msgid "Total amount of transactions with important errors"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:333
+msgid "Timeline range"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:337
+msgid "Missing amount analyzed in the timeline"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:342
+msgid "Estimated cash missing in case"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:348
+msgid "Percentage of critical errors identified as missing"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:357
+msgid "Total events"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:361
+msgid "Total events shown in the timeline"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:366
-msgid "Amount of cash events involving the analyzed ATM addresses"
+msgid "Total events that can induce errors XFS"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:367
+#: analytics_gui/analytics/templates/analytics/results.html:371
+#: analytics_gui/analytics/templates/analytics/results.html:385
+msgid "Undefined"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:370
-msgid "Number of events in timeline which can induce malfunction"
+msgid "Percentage of total errors that induce errors XFS"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:375
-msgid "Estimating percentage of fault"
+#: analytics_gui/analytics/templates/analytics/results.html:374
+msgid "Not provided logs for analysis"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:379
-msgid "Estimate based on events XFS"
+#: analytics_gui/analytics/templates/analytics/results.html:380
+msgid "Amount of total cash replenishment events"
 msgstr ""
 
 #: analytics_gui/analytics/templates/analytics/results.html:384
+msgid "Amount of cash events involving the analyzed ATM addresses"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:388
+msgid "Number of events in timeline which can induce malfunction"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:393
+msgid "Estimating percentage of fault"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:397
+msgid "Estimate based on events XFS"
+msgstr ""
+
+#: analytics_gui/analytics/templates/analytics/results.html:402
 #: analytics_gui/authentication/models.py:30
 #: analytics_gui/authentication/templates/authentication/login.html:55
 msgid "User"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:392
+#: analytics_gui/analytics/templates/analytics/results.html:410
 msgid "Maintenance or replacement company"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:396
+#: analytics_gui/analytics/templates/analytics/results.html:414
 msgid "External"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:402
+#: analytics_gui/analytics/templates/analytics/results.html:420
 msgid "Case Analysis"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:403
+#: analytics_gui/analytics/templates/analytics/results.html:421
 #: analytics_gui/companies/models.py:19 analytics_gui/companies/models.py:35
 msgid "Name"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:404
+#: analytics_gui/analytics/templates/analytics/results.html:422
 #: analytics_gui/base/templates/base/analyst_dashboard.html:31
 msgid "ID"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:405
+#: analytics_gui/analytics/templates/analytics/results.html:423
 #: analytics_gui/base/templates/base/analyst_dashboard.html:33
 msgid "Missing amount"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:406
+#: analytics_gui/analytics/templates/analytics/results.html:424
 msgid "Number of affected ATMs"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:408
+#: analytics_gui/analytics/templates/analytics/results.html:426
 msgid "Client"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:409
+#: analytics_gui/analytics/templates/analytics/results.html:427
 msgid "Resolution"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:426
+#: analytics_gui/analytics/templates/analytics/results.html:444
 #: analytics_gui/base/templates/base/manager_dashboard.html:56
 msgid "Close"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:429
+#: analytics_gui/analytics/templates/analytics/results.html:447
 msgid "Open"
 msgstr ""
 
-#: analytics_gui/analytics/templates/analytics/results.html:435
+#: analytics_gui/analytics/templates/analytics/results.html:453
 msgid "PDF"
 msgstr ""
 
