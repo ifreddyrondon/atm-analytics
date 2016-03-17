@@ -11,6 +11,8 @@ from django.conf import settings
 PIXELS_X_PAGE = 1657.9
 
 
+# PIXELS_X_PAGE = 1667.8
+
 def build_table(date, error, mount, atm, atms):
     table = []
 
@@ -84,8 +86,18 @@ def add_header_and_rotate_timeline(target, height):
         page = pdf_target.getPage(page_num)
         if (page_num >= 6) and (page_num <= (6 + total_pages - 1)):
             page.rotateClockwise(-90)
+        '''if all_filters and (total_pages + 5 <= page_num <= total_pages + 6):
+            pdf_writer.addPage(page)
+            # pass
+        else:'''
         pdf_writer.addPage(page)
 
     result = open(result_root, 'wb')
     pdf_writer.write(result)
     result.close()
+
+
+def get_size(filename):
+    st = os.stat(filename)
+    return st.st_size
+

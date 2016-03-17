@@ -2,14 +2,15 @@ $("#generate-pdf").click(function(event) {
     event.preventDefault();
     $("#wait").show();
     var svgList = document.getElementsByTagName("svg");
-    var time_line = document.getElementById("chart-events-timeline");
+    timelineSetting();
+    var timeline = document.getElementById("chart-events-timeline");
     var atm_index_chart = document.getElementById("atm-index-chart");
     var total_op_report_chart = document.getElementById("total-operations-report-chart");
     var operations_report_chart = document.getElementById("operations-report-chart");
     var errors_report_chart = document.getElementById("errors-report-chart");
     var amount_report_chart = document.getElementById("amount-report-chart");
     var array = Array.prototype.slice.call(svgList);
-    array.push(time_line);
+    array.push(timeline);
     array.push(atm_index_chart);
     array.push(total_op_report_chart);
     array.push(operations_report_chart);
@@ -51,6 +52,7 @@ generatePdf = function(array) {
             file_content = JSON.parse(json)["file"];
             $("#wait").hide();
             convertBase64ToPDF("report.pdf", file_content);
+            resetTimeline();
         },
         // handle a non-successful response
         error: function(xhr, errmsg, err) {
@@ -229,19 +231,46 @@ getDataFilters = function(data) {
     data['no_error_filter'] = no_error = document.getElementById("timeline-filter-no-erros").checked;
 
     data['date_filter'] = document.getElementById("timeline-calendar-picker").value;
+    if (document.getElementById("timeline-windows-event-calendar-picker") != null) {
+        data['date_windows_filter'] = document.getElementById("timeline-windows-event-calendar-picker").value;
+    }
 
     filters = []
+    window_filters = undefined
 
-    $(".select2-selection__rendered > *").each(function(index) {
+    $("#timeline-filter-errors")
+        .next()
+        .find(".select2-selection__rendered")
+        .children().each(function() {
         if($(this).attr("title") != undefined) {
             filters.push($(this).attr("title"));
         }
     });
 
+    if (document.getElementById("timeline-filter-windows-errors") != null) {
+        window_filters = []
+        $("#timeline-filter-windows-errors")
+            .next()
+            .find(".select2-selection__rendered")
+            .children().each(function() {
+            if($(this).attr("title") != undefined) {
+                window_filters.push($(this).attr("title"));
+            }
+        });
+    }
+
     if (filters.length == 0) {
-        data['filters'] = "Todos";
+        data['filters'] = "All";
     } else {
-        data['filters'] = filters.join(", ")
+        data['filters'] = filters.join(", ");
+    }
+
+    if (window_filters != undefined) {
+        if (window_filters.length == 0) {
+            data['window_filters'] = "All";
+        } else {
+            data['window_filters'] = window_filters.join(", ");
+        }
     }
 
     var dates_text = $("#timeline-dynamic-range-dates").text()
@@ -250,7 +279,21 @@ getDataFilters = function(data) {
     data['timeline_dynamic_range_dates_1'] = dates_text.slice(0, length/2);
     data['timeline_dynamic_range_dates_2'] = dates_text.slice(length/2, length);
     data['timeline_dynamic_missing_amount'] = $("#timeline-dynamic-missing-amount").text();
+    data['timeline_dynamic_number_windows_events'] = $("#timeline-dynamic-number-windows-events").text();
     // TODO: Falta por añadir
     // console.log($(".well .percent-result .dynamic-analysis").text());
     data['timeline_dynamic_critic_errors_vs_critic_errors'] = $("#timeline-dynamic-critic-errors-vs-critic-errors").text();
+}
+
+timelineSetting = function() {
+    var timelineWindow = window.timeline.getWindow();
+
+    window.timeline.setOptions({
+        min: timelineWindow.start,
+        max: timelineWindow.end
+    });
+}
+
+resetTimeline = function() {
+    window.timeline.setOptions({});
 }

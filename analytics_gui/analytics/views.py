@@ -504,6 +504,7 @@ def generate_pdf(request, case_id):
         os.remove(image)
 
     timeline_height = int(args['timeline_height'][0])
+
     utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf', timeline_height)
 
     with open(media_root + 'report.pdf', 'rb') as pdf_file:
