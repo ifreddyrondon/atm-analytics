@@ -235,6 +235,10 @@ getDataFilters = function(data) {
         data['date_windows_filter'] = document.getElementById("timeline-windows-event-calendar-picker").value;
     }
 
+    if (document.getElementById("timeline-filter-replenishment-events") != null) {
+        data['timeline_filter_replenishment_events'] = document.getElementById("timeline-filter-replenishment-events").checked
+    }
+
     filters = []
     window_filters = undefined
 

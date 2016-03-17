@@ -331,13 +331,13 @@
                 <div class="col-xs-4">
                     <h5>{% trans "Filter errors" %}:<br>
                         <small>
-                            {% if critical_filter %}
+                            {% if critical_filter|first == 'true' %}
                             {% trans "Critical error" %}
                             {% endif %}
-                            {% if important_filter %}
+                            {% if important_filter|first == 'true' %}
                             {% trans "Important error" %}
                             {% endif %}
-                            {% if no_error_filter %}
+                            {% if no_error_filter|first == 'true' %}
                             {% trans "No errors" %}
                             {% endif %}
                         </small>
@@ -366,6 +366,16 @@
                 <div class="col-xs-6">
                     <h5>{% trans "Event filters" %}:<br>
                         <small>{{ window_filters|first}}</small>
+                    </h5>
+                </div>
+            </div>
+            {% endif %}
+            {% if timeline_filter_replenishment_events|first == 'true' %}
+            <div class="row">
+                <h4>{% trans "Cash replenishment events filters" %}</h4>
+                <div class="col-xs-12">
+                    <h5>
+                        {% trans "Cash replenishment events applied" %}
                     </h5>
                 </div>
             </div>

@@ -501,7 +501,7 @@ def generate_pdf(request, case_id):
     pdfkit.from_string(rendered_html, media_root + 'tmp_report.pdf', css=style_list, options=options)
 
     for image in images.values():
-        os.remove(image)
+        pass
 
     timeline_height = int(args['timeline_height'][0])
 
