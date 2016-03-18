@@ -138,6 +138,7 @@ def analyze_case(request, case_id):
             "min_date": None,
             "max_date": None,
             "count": 0,
+            "atms_index_count": [],
             "close_events_count": 0,
         }
     }
@@ -184,6 +185,7 @@ def analyze_case(request, case_id):
 
         # reposition events
         atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())
+        meta["reposition"]["atms_index_count"].append(len(atm_reposition_events))
         meta["reposition"]["count"] += len(atm_reposition_events)
         for event in atm_reposition_events:
             # get the min and max dates for filter
