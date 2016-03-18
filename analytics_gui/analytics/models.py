@@ -254,6 +254,13 @@ class AtmJournal(models.Model):
         return self.filename
 
 
+class OperatingSystem(models.Model):
+    name = models.CharField(_("Operating System"), max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
+
 class AtmErrorXFS(models.Model):
     class Meta:
         verbose_name = _("XFS Error")
@@ -305,15 +312,6 @@ class AtmErrorXFS(models.Model):
         (SOFTWARE_OTRO, _("Other XFS")),
     )
 
-    OS_WINDOWS_XP = '0'
-    OS_WINDOWS_7 = '1'
-    OS_WINDOWS_8 = '2'
-    OS_CHOICES = (
-        (OS_WINDOWS_XP, "Windows XP"),
-        (OS_WINDOWS_7, "Windows 7"),
-        (OS_WINDOWS_8, "Windows 8"),
-    )
-
     identifier = models.CharField(
         _("Identifier"),
         max_length=255,
@@ -342,10 +340,8 @@ class AtmErrorXFS(models.Model):
         help_text=_("ATM software"),
     )
 
-    operating_system = models.CharField(
-        _("Operating System"),
-        max_length=1,
-        choices=OS_CHOICES,
+    operating_system = models.ManyToManyField(
+        OperatingSystem,
         help_text=_("ATM Operating System"),
     )
 
@@ -378,15 +374,6 @@ class AtmErrorEventViewer(models.Model):
         (ERROR_COLOR_ORANGE, _("orange")),
     )
 
-    OS_WINDOWS_XP = '0'
-    OS_WINDOWS_7 = '1'
-    OS_WINDOWS_8 = '2'
-    OS_CHOICES = (
-        (OS_WINDOWS_XP, "Windows XP"),
-        (OS_WINDOWS_7, "Windows 7"),
-        (OS_WINDOWS_8, "Windows 8"),
-    )
-
     identifier = models.CharField(
         _("Identifier"),
         max_length=255,
@@ -401,10 +388,8 @@ class AtmErrorEventViewer(models.Model):
         help_text=_("Description of error"),
     )
 
-    operating_system = models.CharField(
-        _("Operating System"),
-        max_length=1,
-        choices=OS_CHOICES,
+    operating_system = models.ManyToManyField(
+        OperatingSystem,
         help_text=_("ATM Operating System"),
     )
 

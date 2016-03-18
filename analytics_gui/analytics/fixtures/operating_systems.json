@@ -1,0 +1,1 @@
+[{"fields": {"name": "Windows XP"}, "model": "analytics.operatingsystem", "pk": 1}, {"fields": {"name": "Windows 7"}, "model": "analytics.operatingsystem", "pk": 2}, {"fields": {"name": "Windows 8"}, "model": "analytics.operatingsystem", "pk": 3}]
