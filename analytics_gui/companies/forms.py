@@ -24,7 +24,7 @@ BankFormSet = inlineformset_factory(
     Bank,
     form=BankForm,
     extra=0,
-    min_num=0,
+    min_num=1,
     max_num=1,
 )
 
@@ -40,6 +40,6 @@ CompanyAtmLocationFormSet = inlineformset_factory(
     CompanyAtmLocation,
     form=CompanyAtmLocationForm,
     extra=0,
-    min_num=0,
+    min_num=1,
     max_num=1,
 )
