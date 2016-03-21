@@ -383,11 +383,23 @@
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Amount of cash events involving the analyzed ATM addresses" %}</h5>
-                            <div class="well percent-result">
-                                {% for atm_index_count in meta.reposition.atms_index_count %}
-                                    ATM {{ forloop.counter }}: {{ atm_index_count }}<br>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>{% trans "Address" %}</th>
+                                    <th>{% trans "Events" %}</th>
+                                    <th>{% trans "Schedule" %}</th>
+                                </thead>
+                                <tbody>
+                                {% for atm_count in meta.reposition.atms_count %}
+                                    <tr>
+                                        <td>{{ atm_count.address }}</td>
+                                        <td>{{ atm_count.count }}</td>
+                                        <td>{{ atm_count.date }}</td>
+                                    </tr>
                                 {% endfor %}
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="col-md-4 col-xs-12">
                             <h5>{% trans "Number of events in timeline which can induce malfunction" %}</h5>
