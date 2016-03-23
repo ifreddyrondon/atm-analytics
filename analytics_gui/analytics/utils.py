@@ -9,6 +9,7 @@ import PyPDF2
 from django.conf import settings
 
 PIXELS_X_PAGE = 1657.9
+ROWS_X_PAGE = 13
 
 
 # PIXELS_X_PAGE = 1667.8
@@ -70,7 +71,7 @@ def hash_file_to_sha1(file_path):
     return method.hexdigest()
 
 
-def add_header_and_rotate_timeline(target, height):
+def add_header_and_rotate_timeline(target, height, operations_height):
     header_root = os.path.join(settings.BASE_DIR, 'base', 'static', 'doc', 'header.pdf')
     result_root = os.path.join(settings.BASE_DIR, 'media', 'report.pdf')
     pdf_target = PyPDF2.PdfFileReader(open(target, 'rb'))
@@ -78,18 +79,16 @@ def add_header_and_rotate_timeline(target, height):
     pdf_writer = PyPDF2.PdfFileWriter()
 
     total_pages = int(math.ceil(height / PIXELS_X_PAGE))
+    total_pages_x_rows = int(math.ceil(operations_height / ROWS_X_PAGE))
 
     for page_num in range(pdf_target.getNumPages()):
         pdf_target.getPage(page_num).mergePage(pdf_header.getPage(0))
 
     for page_num in range(pdf_target.getNumPages()):
         page = pdf_target.getPage(page_num)
-        if (page_num >= 6) and (page_num <= (6 + total_pages - 1)):
+        if (page_num >= (4 + total_pages_x_rows)) \
+                and (page_num <= (4 + total_pages_x_rows + total_pages)):
             page.rotateClockwise(-90)
-        '''if all_filters and (total_pages + 5 <= page_num <= total_pages + 6):
-            pdf_writer.addPage(page)
-            # pass
-        else:'''
         pdf_writer.addPage(page)
 
     result = open(result_root, 'wb')
@@ -100,4 +99,3 @@ def add_header_and_rotate_timeline(target, height):
 def get_size(filename):
     st = os.stat(filename)
     return st.st_size
-

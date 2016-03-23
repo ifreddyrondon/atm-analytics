@@ -42,8 +42,8 @@
         clone.insertBefore(defs, clone.firstChild);
 
         var svg = doctype + outer.innerHTML;
-        // var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
-        return window.btoa(reEncode(svg));
+        var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
+        return uri;
     }
 
     function styles(el, selectorRemap) {
