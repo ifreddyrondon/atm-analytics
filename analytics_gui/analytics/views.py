@@ -450,11 +450,11 @@ def generate_pdf(request, case_id):
                     image_data = base64.b64decode(args[key][0].split(",")[1])
                     filename = key + ".png"
                 else:
-                    image_data = base64.b64decode(args[key][0])
+                    image_data = base64.b64decode(args[key][0].split(",")[1])
                     filename = key + ".svg"
                 with open(media_root + filename, 'w') as f:
                     f.write(image_data)
-                    images[key.replace('-', '_')] = media_root + filename
+                    images[key] = media_root + filename
 
     time_line_table = utils.build_table(
         args['time_line[Fecha][]'],
@@ -507,11 +507,12 @@ def generate_pdf(request, case_id):
     pdfkit.from_string(rendered_html, media_root + 'tmp_report.pdf', css=style_list, options=options)
 
     for image in images.values():
-        pass
+        os.remove(image)
 
     timeline_height = int(args['timeline_height'][0])
+    operations_height = int(args['operations_height'][0])
 
-    utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf', timeline_height)
+    utils.add_header_and_rotate_timeline(media_root + 'tmp_report.pdf', timeline_height, operations_height)
 
     with open(media_root + 'report.pdf', 'rb') as pdf_file:
         return HttpResponse(
