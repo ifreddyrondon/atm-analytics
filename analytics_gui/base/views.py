@@ -8,7 +8,7 @@ from django.utils.translation import check_for_language
 from analytics_gui.analytics.models import Case
 from analytics_gui.authentication.forms import CreateAnalystForm
 from analytics_gui.authentication.models import UserDashboard
-from analytics_gui.companies.models import Company
+from analytics_gui.companies.models import Company, XFSFormat
 
 
 def set_language(request):
@@ -38,6 +38,7 @@ def dashboard(request):
 
     if user.charge == UserDashboard.POSITION_ADMIN:
         create_analyst_form = CreateAnalystForm()
+        xfs_formats = XFSFormat.objects.filter(company=company)
 
         if request.method == 'POST':
             if 'add-user' in request.POST:
@@ -62,6 +63,7 @@ def dashboard(request):
 
         return render(request, 'base/manager_dashboard.html', {
             "company": company,
+            "xfs_formats": xfs_formats,
             "users": company.users.filter(charge=UserDashboard.POSITION_ANALYST),
             "create_analyst_form": create_analyst_form,
         })

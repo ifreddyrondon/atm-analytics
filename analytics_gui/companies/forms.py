@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from analytics_gui.companies.models import Company, Bank, CompanyAtmLocation
+from analytics_gui.companies.models import Company, Bank, CompanyAtmLocation, XFSFormat
 
 
 class ConfigForm(forms.ModelForm):
@@ -43,3 +43,11 @@ CompanyAtmLocationFormSet = inlineformset_factory(
     min_num=1,
     max_num=1,
 )
+
+
+class XFSFormatForm(forms.ModelForm):
+    class Meta:
+        model = XFSFormat
+        fields = ['hardware', 'software', 'xfs_sample_file',
+                  'group_separator', 'row_separator', 'date_pattern',
+                  'total_amount_pattern', 'currency_pattern']

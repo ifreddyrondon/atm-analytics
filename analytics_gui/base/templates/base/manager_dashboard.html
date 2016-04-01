@@ -53,7 +53,8 @@
                                     <input type="hidden" name="add-user">
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}
+                                    <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">{% trans "Close" %}
                                     </button>
                                     <input type="submit" value="{% trans "Create" %}"
                                            class="btn btn-primary"/>
@@ -96,6 +97,39 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="panel panel-primary row">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            {% trans "XFS formats" %}
+                            <a href="{% url "companies:create_xfs_format" %}" class="pull-right"><i
+                                    class="fa fa-file-code-o"></i> {% trans "New format" %}</a>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="text" class="form-control" id="format-table-filter" data-action="filter"
+                               data-filters="#format-table" placeholder="{% trans "Filter formats" %}"/>
+                    </div>
+                    <table class="table table-hover" id="format-table">
+                        <thead>
+                        <tr>
+                            <th>{% trans "Hardware" %}</th>
+                            <th>{% trans "Software" %}</th>
+                            <th>{% trans "Config" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for format in xfs_formats %}
+                            <tr>
+                                <td>{{ format.get_hardware_display }}</td>
+                                <td>{{ format.get_software_display }}</td>
+                                <td><a href="{% url 'companies:update_xfs_format' format.id %}">config</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
@@ -108,6 +142,10 @@
             var oTable = $("#users-table").DataTable();
             $('#users-table-filter').keyup(function () {
                 oTable.search($(this).val()).draw();
+            });
+            var fTable = $("#format-table").DataTable();
+            $('#format-table-filter').keyup(function () {
+                fTable.search($(this).val()).draw();
             });
             $('[data-toggle="tooltip"]').tooltip();
 
@@ -133,36 +171,36 @@
             $('#add-user-form').on('submit', function (e) {
                 e.preventDefault();
                 $.ajax({
-                        type: 'POST',
-                        data: $('#add-user-form').serialize()
-                    })
-                    .done(function (data) {
-                        location.reload();
-                    })
-                    .fail(function (data) {
-                        cleanNewUserModal();
-                        console.log(data);
-                        if (data.responseJSON["first_name"]) {
-                            $('#user_first_name-group').addClass('has-error');
-                            $('#user_first_name-error').text(data.responseJSON["first_name"].join("<br>"));
-                        }
-                        if (data.responseJSON["last_name"]) {
-                            $('#user_last_name-group').addClass('has-error');
-                            $('#user_last_name-error').text(data.responseJSON["last_name"].join("<br>"));
-                        }
-                        if (data.responseJSON["email"]) {
-                            $('#user_email-group').addClass('has-error');
-                            $('#user_email-error').text(data.responseJSON["email"].join("<br>"));
-                        }
-                        if (data.responseJSON["username"]) {
-                            $('#user_username-group').addClass('has-error');
-                            $('#user_username-error').text(data.responseJSON["username"].join("<br>"));
-                        }
-                        if (data.responseJSON["password"]) {
-                            $('#user_password-group').addClass('has-error');
-                            $('#user_password-error').text(data.responseJSON["password"].join("<br>"));
-                        }
-                    });
+                            type: 'POST',
+                            data: $('#add-user-form').serialize()
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        })
+                        .fail(function (data) {
+                            cleanNewUserModal();
+                            console.log(data);
+                            if (data.responseJSON["first_name"]) {
+                                $('#user_first_name-group').addClass('has-error');
+                                $('#user_first_name-error').text(data.responseJSON["first_name"].join("<br>"));
+                            }
+                            if (data.responseJSON["last_name"]) {
+                                $('#user_last_name-group').addClass('has-error');
+                                $('#user_last_name-error').text(data.responseJSON["last_name"].join("<br>"));
+                            }
+                            if (data.responseJSON["email"]) {
+                                $('#user_email-group').addClass('has-error');
+                                $('#user_email-error').text(data.responseJSON["email"].join("<br>"));
+                            }
+                            if (data.responseJSON["username"]) {
+                                $('#user_username-group').addClass('has-error');
+                                $('#user_username-error').text(data.responseJSON["username"].join("<br>"));
+                            }
+                            if (data.responseJSON["password"]) {
+                                $('#user_password-group').addClass('has-error');
+                                $('#user_password-error').text(data.responseJSON["password"].join("<br>"));
+                            }
+                        });
             });
         })
     </script>

@@ -1,0 +1,436 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+{% load json_filters %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        #xfs_content_wrap .input-group .form-control:first-child,
+        #xfs_content_wrap .input-group-btn:last-child > .btn {
+            border-radius: 0 !important;
+        }
+
+        #xfs_content {
+            padding-top: 15px;
+            max-height: 450px;
+            min-height: 450px;
+            overflow-y: scroll;
+            margin-bottom: 0px;
+            margin-left: 10px;
+            white-space: pre-wrap;
+        }
+
+        #xfs_content_wrap {
+            background-color: white;
+            margin-top: 15px;
+            border: 1px solid #ccc;
+            min-height: 450px;
+        }
+
+        .highlight {
+            background-color: #FFFF88;
+        }
+
+        .tab-content {
+            background-color: white;
+            min-height: 116px;
+            max-height: 116px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            border-top: 0;
+        }
+
+        .unstyled {
+            list-style: none;
+            padding-top: 4px;
+        }
+
+        .rm-event-category {
+            margin-right: 15px;
+            margin-top: 4px;
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <ol class="breadcrumb">
+                    <li><a href="{% url "base:dashboard" %}">{% trans "home" %}</a></li>
+                    <li class="active">{% trans "format" %}</li>
+                </ol>
+                <div class="wall inner-wall">
+                    <h2>{% trans "XFS format" %}
+                        {% if can_delete %}
+                            <a class="btn btn-danger pull-right"
+                               href="{% url "companies:delete_xfs_format" form.instance.id %}">{% trans "Delete" %}</a>
+                        {% endif %}
+                    </h2>
+                    <form id="xfs_format_form" method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div id="page-errors" class="alert alert-error">
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6 form-group {% if form.hardware.errors %}has-error{% endif %}">
+                                {{ form.hardware.label_tag }}
+                                {% if form.hardware.errors %}
+                                    <span class="help-block errors">{{ form.hardware.errors|join:"<br \>" }}</span>
+                                {% endif %}
+                                {{ form.hardware|add_class:"form-control select-hardware" }}
+                            </div>
+
+                            <div class="col-md-6 form-group {% if form.software.errors %}has-error{% endif %}">
+                                {{ form.software.label_tag }}
+                                {% if form.software.errors %}
+                                    <span class="help-block errors">{{ form.software.errors|join:"<br \>" }}</span>
+                                {% endif %}
+                                {{ form.software|add_class:"form-control select-software" }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-12">
+
+                                <b>{% trans "XFS file" %}</b>
+                                <input type="file" class="filestyle" id="id_xfs_sample_file"
+                                       name="xfs_sample_file"
+                                       data-iconName="glyphicon glyphicon-file"
+                                       data-buttonText="{% trans "Read file" %}">
+
+                                {% if form.xfs_sample_file.errors %}
+                                    <div class="form-group has-error">
+                                        <span class="help-block errors">{{ form.xfs_sample_file.errors|join:"<br \>" }}</span>
+                                    </div>
+                                {% endif %}
+                                <div id="xfs_content_wrap">
+                                    <div style="margin-top: -1px; margin-left: -1px; margin-right: -2px;"
+                                         id="search-toolbar">
+                                        <div class="input-group">
+                                            <input type="text" id="search-text" class="form-control"
+                                                   placeholder="{% trans "Search for..." %}">
+                                            <span class="input-group-btn">
+                                                <button id="search-remove" class="btn btn-default" type="button">x
+                                                </button>
+                                                <button id="search-prev" class="btn btn-default" type="button"><i
+                                                        class="fa fa-angle-left"></i></button>
+                                                <button id="search-next" class="btn btn-default" type="button"><i
+                                                        class="fa fa-angle-right"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p id="xfs_content" rows="8"></p>
+                                    <input type="hidden" id="xfs_content_hide" value="{{ xfs_sample_file_txt }}">
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 col-xs-12">
+                                <div class="form-group {% if form.group_separator.errors %}has-error{% endif %}">
+                                    {{ form.group_separator.label_tag }}
+                                    {% if form.group_separator.errors %}
+                                        <span class="help-block">{{ form.group_separator.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-sign-in"></i></div>
+                                        {{ form.group_separator|add_class:"form-control" }}
+                                    </div>
+                                    {% if form.group_separator.help_text %}
+                                        <span class="help-block">{{ form.group_separator.help_text }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group {% if form.row_separator.errors %}has-error{% endif %}">
+                                    {{ form.row_separator.label_tag }}
+                                    {% if form.row_separator.errors %}
+                                        <span class="help-block">{{ form.row_separator.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-sign-in"></i></div>
+                                        {{ form.row_separator|add_class:"form-control" }}
+                                    </div>
+                                    {% if form.row_separator.help_text %}
+                                        <span class="help-block">{{ form.row_separator.help_text }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group {% if form.date_pattern.errors %}has-error{% endif %}">
+                                    {{ form.date_pattern.label_tag }}
+                                    {% if form.date_pattern.errors %}
+                                        <span class="help-block">{{ form.date_pattern.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-sign-in"></i></div>
+                                        {{ form.date_pattern|add_class:"form-control" }}
+                                    </div>
+                                    {% if form.date_pattern.help_text %}
+                                        <span class="help-block">{{ form.date_pattern.help_text }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="form-group {% if form.total_amount_pattern.errors %}has-error{% endif %}">
+                                            {{ form.total_amount_pattern.label_tag }}
+                                            {% if form.total_amount_pattern.errors %}
+                                                <span class="help-block">{{ form.total_amount_pattern.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            <div class="input-group">
+                                                <div class="input-group-addon"><i class="fa fa-sign-in"></i></div>
+                                                {{ form.total_amount_pattern|add_class:"form-control" }}
+                                            </div>
+                                            {% if form.total_amount_pattern.help_text %}
+                                                <span class="help-block">{{ form.total_amount_pattern.help_text }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="form-group {% if form.currency_pattern.errors %}has-error{% endif %}">
+                                            {{ form.currency_pattern.label_tag }}
+                                            {% if form.currency_pattern.errors %}
+                                                <span class="help-block">{{ form.currency_pattern.errors|join:"<br \>" }}</span>
+                                            {% endif %}
+                                            {{ form.currency_pattern|add_class:"form-control" }}
+                                            {% if form.currency_pattern.help_text %}
+                                                <span class="help-block">{{ form.currency_pattern.help_text }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="id_date_pattern">{% trans "Add event" %}</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon"><i class="fa fa-sign-in"></i></div>
+                                        <input type="text" class="form-control" name="add_event" id="id_add_event">
+                                        <span class="input-group-btn">
+                                            <button id="add_event_btn" class="btn btn-default"
+                                                    type="button">Add
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <ul class="nav nav-tabs nav-justified" id="errors-category">
+                                    <li id="critical-errors_tab" class="active"><a href="#critical-errors"
+                                                                                   data-toggle="tab">{% trans "Critical errors" %}</a>
+                                    </li>
+                                    <li id="important-errors_tab" class=""><a href="#important-errors"
+                                                                              data-toggle="tab">{% trans "Important errors" %}</a>
+                                    </li>
+                                    <li id="no-errors_tab" class=""><a href="#no-errors"
+                                                                       data-toggle="tab">{% trans "No Errors" %}</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane fade in active" id="critical-errors">
+                                        <ul class="unstyled"></ul>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane fade" id="important-errors">
+                                        <ul class="unstyled"></ul>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane fade" id="no-errors">
+                                        <ul class="unstyled"></ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <hr>
+                            <div class="form-group">
+                                <input class="btn btn-default btn-lg pull-right" name="save" type="submit"
+                                       value="{% trans "Save" %}"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "js/vendor/jquery-selection/rangy-core.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/vendor/jquery-search/jquery.scrollTo.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/vendor/jquery-search/jquery.search.js" %}"></script>
+    <script>
+        $(function () {
+            // Check for the various File API support.
+            if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+                alert("The File APIs are not fully supported in this browser.")
+            }
+
+            function handleFileSelect(evt) {
+                var file = evt.target.files[0]; // FileList object
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    $("#xfs_content").html(event.target.result);
+                };
+
+                reader.onerror = function (event) {
+                    console.error("File could not be read! Code " + event.target.error.code);
+                };
+
+                reader.readAsText(file);
+            }
+
+            document.getElementById('id_xfs_sample_file').addEventListener('change', handleFileSelect, false);
+
+            function unwrap(tag) {
+                var b = document.getElementById("xfs_content").getElementsByTagName(tag);
+
+                while (b.length) {
+                    var parent = b[0].parentNode;
+                    while (b[0].firstChild) {
+                        parent.insertBefore(b[0].firstChild, b[0]);
+                    }
+                    parent.removeChild(b[0]);
+                }
+            }
+
+            function find(up) {
+                var currentText = window.searcher.getText();
+                var text = $("#search-text").val();
+                if (text != currentText) {
+                    searcher.setText(text);
+                }
+                searcher.findConcurrence(up);
+            }
+
+            window.searcher = $("#xfs_content_wrap").search({
+                searchType: "highlightSelected",
+                searchSelector: "p",
+                target: "xfs_content_wrap",
+                scrollTo: true,
+                caseSensitive: true,
+                debug: true,
+                beforeSearch: function (text) {
+                    unwrap('mark');
+                    unwrap('span');
+                    if ($("#search-text").val() != "") {
+                        $('#xfs_content:contains("' + text + '")').each(function () {
+                            regex = RegExp([text].join('|'), 'gi')
+                            $(this).html(
+                                    $(this).html().replace(regex, '<mark>$&</mark>')
+                            );
+                        });
+                        var i = 0;
+                        $('#xfs_content_wrap p mark').each(function () {
+                            $(this).attr('id', "m" + i++);
+                        });
+                    }
+                }
+            });
+
+            $("#search-prev").click(function (e) {
+                e.preventDefault();
+                find(true);
+            });
+
+            $("#search-next").click(function (e) {
+                e.preventDefault();
+                find(false);
+            });
+
+            $("#search-remove").click(function (e) {
+                e.preventDefault();
+                $("#search-text").val("");
+                $('#xfs_content_wrap p').scrollTo(0, 300);
+                unwrap('mark');
+                unwrap('span');
+            });
+
+            $('#search-text').keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                // if press Enter, then do the search
+                if (keycode == '13') {
+                    find(false);
+                    return false;
+                }
+                event.stopPropagation();
+            });
+
+            function formatEventCategoryItem(item, category) {
+                var format = '<li>' +
+                        '<span data-error-category="' + category + '">' + item + '</span>' +
+                        '<a class="rm-event-category pull-right" style="clear: right" href="javascript:;">x</a>' +
+                        '</li>';
+                return format;
+            }
+
+            $(document).on("click", ".rm-event-category", function () {
+                $(this).parent().remove();
+            });
+
+            $("#add_event_btn").click(function (evt) {
+                var event_pattern = $("#id_add_event").val();
+                if (event_pattern != "") {
+                    var errorCategory = $("#errors-category > li.active").attr("id").split("_")[0];
+                    $("#" + errorCategory + " > ul").append(formatEventCategoryItem(event_pattern, errorCategory));
+                    $("#id_add_event").val("");
+                }
+            });
+
+            // send xfsFormatEvents to backend
+            $("#xfs_format_form").submit(function (evt) {
+                var criticalErrors = [], importantErrors = [], noErrors = [];
+                $("#critical-errors").find("> ul > li").each(function (i, li) {
+                    var event = $(li).children("span").html();
+                    criticalErrors.push(event);
+                });
+                $("<input />").attr('type', 'hidden')
+                        .attr('name', "critical-errors-list")
+                        .attr('value', criticalErrors)
+                        .appendTo('#xfs_format_form');
+                $("#important-errors").find("> ul > li").each(function (i, li) {
+                    var event = $(li).children("span").html();
+                    importantErrors.push(event);
+                });
+                $("<input />").attr('type', 'hidden')
+                        .attr('name', "important-errors-list")
+                        .attr('value', importantErrors)
+                        .appendTo('#xfs_format_form');
+                $("#no-errors").find("> ul > li").each(function (i, li) {
+                    var event = $(li).children("span").html();
+                    noErrors.push(event);
+                });
+                $("<input />").attr('type', 'hidden')
+                        .attr('name', "no-errors-list")
+                        .attr('value', noErrors)
+                        .appendTo('#xfs_format_form');
+
+                return true;
+            });
+
+            var xfsFormatEvents = {{ xfs_format_events | jsonify }};
+            // add xfs to box events
+            _.each(xfsFormatEvents['critical_errors'], function (item) {
+                $("#critical-errors").find("> ul").append(formatEventCategoryItem(item, "critical-errors"));
+            });
+            _.each(xfsFormatEvents['important_errors'], function (item) {
+                $("#important-errors").find("> ul").append(formatEventCategoryItem(item, "important-errors"));
+            });
+            _.each(xfsFormatEvents['no_errors'], function (item) {
+                $("#no-errors").find("> ul").append(formatEventCategoryItem(item, "no-errors"));
+            });
+
+            $("#xfs_content").html($("#xfs_content_hide").val());
+        });
+    </script>
+{% endblock %}
