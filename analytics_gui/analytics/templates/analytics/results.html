@@ -486,8 +486,7 @@
             // init popover (help text)
             $("[data-toggle=popover]").popover();
 
-            var traces =
-            {{ traces | jsonify }}
+            var traces = {{ traces | jsonify }};
             var journalData = traces.journal;
             var meta = {{ meta | jsonify }};
             var transformed = {};
@@ -668,6 +667,10 @@
                 fillTimelineTableAndDynamicFields(_.sortBy(tableData, 'date'));
             });
 
+            window.timeline.on("changed", function(evt){
+                $("#wait").hide();
+            });
+
             function filterTimeline() {
                 var itemsJournal = window.timelineData;
 
@@ -761,6 +764,7 @@
                 "minDate": minDate,
                 "maxDate": maxDate
             }, function (start, end, label) {
+                $("#wait").show();
                 filterTimeline()
             });
 
@@ -774,11 +778,12 @@
                         "separator": " / "
                     },
                     "alwaysShowCalendars": true,
-                    "minDate": meta.windows.min_date,
-                    "maxDate": meta.windows.max_date,
-                    "startDate": meta.windows.min_date,
-                    "endDate": meta.windows.max_date
+                    "minDate": moment(meta.windows.min_date),
+                    "maxDate": moment(meta.windows.max_date),
+                    "startDate": moment(meta.windows.min_date),
+                    "endDate": moment(meta.windows.max_date)
                 }, function (start, end, label) {
+                    $("#wait").show();
                     $.ajax({
                                 method: "POST",
                                 data: {
@@ -810,6 +815,7 @@
             });
             $("#timeline-filter-errors").change(function (evt) {
                 if ($("#timeline-filter-errors").val() != "all") {
+                    $("#wait").show();
                     filterTimeline();
                 }
             });
@@ -824,12 +830,15 @@
                 }
             });
             $("#timeline-filter-critical-erros").change(function (evt) {
+                $("#wait").show();
                 filterTimeline();
             });
             $("#timeline-filter-important-erros").change(function (evt) {
+                $("#wait").show();
                 filterTimeline();
             });
             $("#timeline-filter-no-erros").change(function (evt) {
+                $("#wait").show();
                 filterTimeline();
             });
             // windows events
@@ -839,6 +848,7 @@
             });
             $("#timeline-filter-windows-errors").change(function (evt) {
                 if ($("#timeline-filter-windows-errors").val() != "all") {
+                    $("#wait").show();
                     filterTimeline();
                 }
             });
@@ -853,11 +863,13 @@
                 }
             });
             $("#timeline-filter-windows-events").change(function (evt) {
+                $("#wait").show();
                 filterTimeline();
             });
             // cash replaiments events
             if (meta.reposition.count > 0) {
                 $("#timeline-filter-replenishment-events").change(function (evt) {
+                    $("#wait").show();
                     filterTimeline();
                 });
             }
