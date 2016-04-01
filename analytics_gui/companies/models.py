@@ -110,17 +110,13 @@ class XFSFormat(models.Model):
     xfs_sample_file = models.FileField(
         _("XFS sample file"), upload_to=get_xfs_samples_attachment_path)
 
-    group_separator = models.CharField(
-        _("Group Separator"), max_length=255, null=True, blank=True, )
-    row_separator = models.CharField(
-        _("Row Separator"), max_length=255, null=True, blank=True, )
+    group_separator = models.CharField(_("Group Separator"), max_length=255)
+    row_separator = models.CharField(_("Row Separator"), max_length=255)
     date_pattern = models.CharField(
-        _("Date pattern"),
-        max_length=255, null=True, blank=True,
+        _("Date pattern"), max_length=255,
         help_text=_('Select any "date-time" inside the text'),
     )
-    total_amount_pattern = models.CharField(
-        _("Total amount pattern"), max_length=255, null=True, blank=True)
+    total_amount_pattern = models.CharField(_("Total amount pattern"), max_length=255)
     currency_pattern = models.CharField(
         _("Currency pattern"), max_length=255, null=True, blank=True)
 
