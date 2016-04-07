@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from analytics_gui.analytics import utils
+from analytics_gui.analytics.decorators import format_for_xfs_files_required
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
 from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
@@ -98,6 +99,7 @@ def view_case(request, case_id):
 
 
 @login_required(login_url='/login')
+@format_for_xfs_files_required()
 def analyze_case(request, case_id):
     # threshold to find close events, 5 min
     threshold_time = 300
@@ -282,6 +284,11 @@ def delete_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
     return HttpResponseRedirect(reverse("base:dashboard"))
+
+
+@login_required(login_url='/login')
+def no_format_available(request):
+    return render(request, 'analytics/no_format_available_2_analyze.html', {})
 
 
 def generate_pdf(request, case_id):

@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% load json_filters %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <ol class="breadcrumb">
+                    <li><a href="{% url "base:dashboard" %}">{% trans "home" %}</a></li>
+                    <li class="active">{% trans "error" %}</li>
+                </ol>
+                <div class="wall inner-wall">
+                    <h3>{% trans "Missing format for XFS files" %}</h3>
+                    <p>{% blocktrans %}There are no formats created to analyze the XFS files in the case. Please contact
+                        the manager for more information.{% endblocktrans %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+
+        });
+    </script>
+{% endblock %}
