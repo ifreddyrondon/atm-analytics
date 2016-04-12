@@ -99,3 +99,17 @@ def add_header_and_rotate_timeline(target, height, operations_height):
 def get_size(filename):
     st = os.stat(filename)
     return st.st_size
+
+
+def try_unicode(string, errors='strict'):
+    encoding_guess_list = ['utf32', 'utf16', 'utf8', 'ascii', 'latin1']
+    if isinstance(string, unicode):
+        return string
+    assert isinstance(string, str), repr(string)
+    for enc in encoding_guess_list:
+        print(enc)
+        try:
+            return string.decode(enc, errors)
+        except UnicodeError, exc:
+            continue
+    raise UnicodeError('Failed to convert %r' % string)

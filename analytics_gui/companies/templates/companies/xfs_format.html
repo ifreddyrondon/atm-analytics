@@ -59,6 +59,7 @@
 
 {% block content %}
     <div class="container">
+        <div id="wait"></div>
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <ol class="breadcrumb">
@@ -131,8 +132,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <p id="xfs_content" rows="8"></p>
-                                    <input type="hidden" id="xfs_content_hide" value="{{ xfs_sample_file_txt }}">
+                                    <p id="xfs_content">{{ xfs_sample_file_txt }}</p>
                                 </div>
 
                             </div>
@@ -271,16 +271,20 @@
     <script type="text/javascript" src="{% static "js/vendor/jquery-search/jquery.search.js" %}"></script>
     <script>
         $(function () {
+            $("#wait").hide();
             // Check for the various File API support.
             if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
                 alert("The File APIs are not fully supported in this browser.")
             }
 
             function handleFileSelect(evt) {
+                $("#wait").show();
                 var file = evt.target.files[0]; // FileList object
                 var reader = new FileReader();
                 reader.onload = function (event) {
-                    $("#xfs_content").html(event.target.result);
+                    $("#xfs_content").html();
+                    $("#xfs_content").append(event.target.result);
+                    $("#wait").hide();
                 };
 
                 reader.onerror = function (event) {
@@ -429,8 +433,6 @@
             _.each(xfsFormatEvents['no_errors'], function (item) {
                 $("#no-errors").find("> ul").append(formatEventCategoryItem(item, "no-errors"));
             });
-
-            $("#xfs_content").html($("#xfs_content_hide").val());
         });
     </script>
 {% endblock %}

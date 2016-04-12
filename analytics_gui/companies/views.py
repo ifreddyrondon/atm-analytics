@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
+from analytics_gui.analytics.utils import try_unicode
 from analytics_gui.companies.forms import ConfigForm, BankFormSet, CompanyAtmLocationFormSet, XFSFormatForm
 from analytics_gui.companies.models import Company, CompanyAtmLocation, Bank, AtmRepositionEvent, XFSFormat, \
     XFSFormatEvent
@@ -112,6 +113,7 @@ def create_xfs_format(request):
 def update_xfs_format(request, xfs_format_id):
     xfs_format = XFSFormat.objects.get(id=xfs_format_id)
     xfs_sample_file_txt = xfs_format.xfs_sample_file.file.read()
+    xfs_sample_file_txt = try_unicode(xfs_sample_file_txt)
 
     user = request.user.dash_user
     company = Company.objects.get(users=user)
