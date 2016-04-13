@@ -17,11 +17,11 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from analytics_gui.analytics import utils
-from analytics_gui.analytics.decorators import format_for_xfs_files_required
+from analytics_gui.analytics.decorators import format_for_xfs_files_required, select_xfs_format_required
 from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
 from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
 from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
-from analytics_gui.companies.models import Company, AtmRepositionEvent
+from analytics_gui.companies.models import Company, AtmRepositionEvent, XFSFormat
 
 
 @login_required(login_url='/login')
@@ -100,7 +100,8 @@ def view_case(request, case_id):
 
 @login_required(login_url='/login')
 @format_for_xfs_files_required()
-def analyze_case(request, case_id):
+@select_xfs_format_required()
+def analyze_case(request, case_id, atms_with_format=None):
     # threshold to find close events, 5 min
     threshold_time = 300
     case = get_object_or_404(Case, id=case_id)
@@ -289,6 +290,36 @@ def delete_case(request, case_id):
 @login_required(login_url='/login')
 def no_format_available(request):
     return render(request, 'analytics/no_format_available_2_analyze.html', {})
+
+
+@login_required(login_url='/login')
+def select_xfs_format(request, case_id):
+    case = get_object_or_404(Case, id=case_id)
+    company = case.bank.company
+    atms = case.atms.all()
+    atms_need_select_format = []
+    atms_with_format = []
+
+    for atm in atms:
+        formats = XFSFormat.objects.filter(company=company, hardware=atm.hardware, software=atm.software)
+
+        if len(formats) > 1:
+            atms_need_select_format.append({
+                'atm': atm,
+                'formats': formats
+            })
+
+    if request.method == 'POST':
+        atms_id = [k[6:] for k in request.POST.keys() if 'radio' in k]
+        for atm_id in atms_id:
+            format_id = request.POST['radio_' + atm_id]
+            atms_with_format.append([atm_id, format_id])
+        return HttpResponseRedirect(
+            reverse("analytics:analyze-with-format", args=[case.id, json.dumps(atms_with_format)]))
+
+    return render(request, 'analytics/select_xfs_format.html', {
+        'atms_need_select_format': atms_need_select_format
+    })
 
 
 def generate_pdf(request, case_id):

@@ -1,0 +1,85 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% load json_filters %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <ol class="breadcrumb">
+                    <li><a href="{% url "base:dashboard" %}">{% trans "home" %}</a></li>
+                    <li class="active">{% trans "select format" %}</li>
+                </ol>
+                <div class="wall inner-wall">
+                    <h3>{% trans "Select XFS format" %}</h3>
+                    <hr>
+                    <form method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for atm_info in atms_need_select_format %}
+                            <h4>{{ forloop.counter }} - <span
+                                    style="text-decoration: underline;">Hardware</span>: {{ atm_info.atm.get_hardware_display }},
+                                <span style="text-decoration: underline;">Software</span>: {{ atm_info.atm.get_software_display }}
+                            </h4>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>{% trans "Select" %}</th>
+                                    <th>{% trans "Group Separator" %}</th>
+                                    <th>{% trans "Row Separator" %}</th>
+                                    <th>{% trans "Date pattern" %}</th>
+                                    <th>{% trans "Total amount pattern" %}</th>
+                                    <th>{% trans "Currency pattern" %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for format in atm_info.formats %}
+                                    <tr>
+                                        {% if forloop.counter0 == 0 %}
+                                            <td><input type="radio" value="{{ format.id }}"
+                                                       name="radio_{{ atm_info.atm.id }}" checked></td>
+                                        {% else %}
+                                            <td><input type="radio" value="{{ format.id }}"
+                                                       name="radio_{{ atm_info.atm.id }}"></td>
+                                        {% endif %}
+                                        <td>{{ format.group_separator }}</td>
+                                        <td>{{ format.row_separator }}</td>
+                                        <td>{{ format.date_pattern }}</td>
+                                        <td>{{ format.total_amount_pattern }}</td>
+                                        <td>{{ format.currency_pattern }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <hr>
+                        {% endfor %}
+                        <div class="row">
+                            <div class="form-group">
+                                <input class="btn btn-primary btn-lg pull-left" name="analyze" type="submit"
+                                       value="{% trans "Analyze" %}"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+
+        });
+    </script>
+{% endblock %}

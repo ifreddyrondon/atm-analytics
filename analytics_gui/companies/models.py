@@ -136,7 +136,7 @@ class XFSFormatEvent(models.Model):
     EVENT_TYPE_IMPORTANT_ERROR = '1'
     EVENT_TYPE_NO_ERROR = '2'
     EVENT_TYPES = (
-        (EVENT_TYPE_CRITICAL_ERROR, "Critical erros"),
+        (EVENT_TYPE_CRITICAL_ERROR, "Critical error"),
         (EVENT_TYPE_IMPORTANT_ERROR, "Important error"),
         (EVENT_TYPE_NO_ERROR, "No error"),
     )
