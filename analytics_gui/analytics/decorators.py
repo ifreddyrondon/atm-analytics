@@ -26,7 +26,7 @@ def format_for_xfs_files_required():
 
                 can_parsed += 1
 
-            if can_parsed > 1:
+            if can_parsed > 0:
                 return func(request, *args, **kwargs)
             return redirect('analytics:no-format-available-2-analyze')
 
