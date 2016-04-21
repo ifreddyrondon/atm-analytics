@@ -506,11 +506,10 @@
             amountReportChart = dc.barChart("#amount-report-chart");
             var dataTable = dc.dataTable("#operations-table");
 
-            var dtgFormat = d3.time.format("%d/%m/%Y %H:%M:%S");
             var dtgFormat2 = d3.time.format("%Y-%m-%d %H:%M:%S");
 
             _.map(journalData, function (d) {
-                d.date = dtgFormat.parse(d.date);
+                d.date = dtgFormat2.parse(d.date);
                 d.start = d.date;
                 d.content = d.has_errors ? d.error : 'No errors';
                 transformed[d.date] = d;
@@ -537,8 +536,13 @@
                 return d.date;
             });
             // range for x axis. Get the min and max date value in data
-            var minDate = dateDim.bottom(1)[0].date;
-            var maxDate = dateDim.top(1)[0].date;
+            if (dateDim.bottom(1)[0] && dateDim.top(1)[0]){
+                var minDate = dateDim.bottom(1)[0].date;
+                var maxDate = dateDim.top(1)[0].date;
+            } else {
+                var minDate = new Date();
+                var maxDate = new Date();
+            }
 
             var countATMsIndex = atmsDim.group().reduceCount(function (d) {
                 return d.atm_index;
@@ -644,7 +648,9 @@
                 var end = moment(timeline.getWindow().end);
                 $("#timeline-dynamic-range-dates").html(start.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ") + "<br>" + end.format("ddd MMM DD YYYY HH:mm:ss [GTM]ZZ"));
                 $("#timeline-dynamic-missing-amount").html(missingAmount + " " + "{{ case.pretty_currency }}");
-                $("#timeline-dynamic-critic-errors-vs-critic-errors").html((numberOfCriticErrors * 100 / meta.journal.errors.critics_number).toFixed(2) + "%");
+                var dinCriticVsCritic = numberOfCriticErrors * 100 / meta.journal.errors.critics_number;
+                dinCriticVsCritic = isNaN(dinCriticVsCritic) ? 0 : dinCriticVsCritic;
+                $("#timeline-dynamic-critic-errors-vs-critic-errors").html((dinCriticVsCritic).toFixed(2) + "%");
 
                 $("#timeline-dynamic-number-windows-events").html(numberOfWindowsEvents);
             }

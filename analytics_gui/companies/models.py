@@ -114,7 +114,7 @@ class XFSFormat(models.Model):
     row_separator = models.CharField(_("Row Separator"), max_length=255)
     date_pattern = models.CharField(
         _("Date pattern"), max_length=255,
-        help_text=_('Select any "date-time" inside the text'),
+        help_text=_('This must be a regular expression pattern'),
     )
     total_amount_pattern = models.CharField(_("Total amount pattern"), max_length=255)
     currency_pattern = models.CharField(
@@ -141,7 +141,7 @@ class XFSFormatEvent(models.Model):
         (EVENT_TYPE_NO_ERROR, "No error"),
     )
 
-    xfs_format = models.ForeignKey(XFSFormat)
+    xfs_format = models.ForeignKey(XFSFormat, related_name="format_events")
     pattern = models.CharField(max_length=255)
     type = models.CharField(
         max_length=1,

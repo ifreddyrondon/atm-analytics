@@ -105,8 +105,13 @@ def analyze_case(request, case_id, atms_with_format=None):
     # threshold to find close events, 5 min
     threshold_time = 300
     case = get_object_or_404(Case, id=case_id)
+    company = case.bank.company
     atms = case.atms.all()
     form = AnalyticForm(instance=case)
+
+    if atms_with_format:
+        atms_id_with_format = [int(item[0]) for item in json.loads(atms_with_format)]
+        formats_id = [int(item[1]) for item in json.loads(atms_with_format)]
 
     traces = {
         "journal": [],
@@ -165,8 +170,24 @@ def analyze_case(request, case_id, atms_with_format=None):
             meta["windows"]["count"] += atm.event_viewer_errors.count()
 
         # Journals Virtual
+        meta_journal = None
         for journal_file in atm.journals.all():
-            trace, meta_journal = parse_log_file(journal_file.file.file, index)
+            # get XFSFormat or continue
+            xfs_format = None
+            if atms_with_format and atm.id in atms_id_with_format:
+                # get index id on list
+                index = atms_id_with_format.index(atm.id)
+                xfs_format = XFSFormat.objects.get(id=formats_id[index])
+            else:
+                xfs_format = XFSFormat.objects.filter(
+                    company=company, hardware=atm.hardware, software=atm.software)
+                if len(xfs_format) > 0:
+                    xfs_format = xfs_format[0]
+
+            if not xfs_format:
+                continue
+
+            trace, meta_journal = parse_log_file(journal_file.file.file, index, xfs_format)
             traces["journal"].append(trace)
             # save only new errors names
             in_all_errors_names = set(meta["journal"]["errors"]["names"])
@@ -185,6 +206,9 @@ def analyze_case(request, case_id, atms_with_format=None):
                 meta["journal"]["dates"]["min"] = meta_journal["dates"]["min"]
             if not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]:
                 meta["journal"]["dates"]["max"] = meta_journal["dates"]["max"]
+
+        if not meta_journal:
+            continue
 
         # reposition events
         atm_reposition_events = AtmRepositionEvent.objects.filter(bank=case.bank, location=atm.atm_location.first())

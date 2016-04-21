@@ -107,7 +107,6 @@ def try_unicode(string, errors='strict'):
         return string
     assert isinstance(string, str), repr(string)
     for enc in encoding_guess_list:
-        print(enc)
         try:
             return string.decode(enc, errors)
         except UnicodeError, exc:

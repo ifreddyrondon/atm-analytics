@@ -1,14 +1,16 @@
-import random
 import re
 from datetime import datetime
 from decimal import Decimal
 
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
+from dateutil.parser import parse
 
 from django.utils.translation import ugettext as _
 
 from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
+from analytics_gui.analytics.utils import try_unicode
+from analytics_gui.companies.models import XFSFormatEvent
 
 
 def parse_date(date):
@@ -17,33 +19,23 @@ def parse_date(date):
     date = date.replace("  ", " ")
     date = date.replace("*", " ")
 
-    just_date = date.split(" ")[0]
-    hour = date.split(" ")[1]
-    # if seconds is missing append it
-    if len(hour) == 5:
-        hour += ":00"
+    return str(parse(date))
 
-    # if year is incomplete, complete it
-    day = just_date.split("/")[0]
-    month = just_date.split("/")[1]
-    year = just_date.split("/")[2]
 
-    if len(year) == 4:
-        date = "{}/{}/{} {}".format(month, day, year, hour)
-    if len(year) == 3:
-        year = "20{}".format(year[1:])
-        date = "{}/{}/{} {}".format(day, month, year, hour)
-    if len(year) == 2:
-        year = "20{}".format(year)
-        date = "{}/{}/{} {}".format(day, month, year, hour)
-
-    return date
+def is_date_valid(date):
+    try:
+        date.strftime("%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return False
+    else:
+        return True
 
 
 def parse_currency(currency_string):
     if currency_string == "":
         currency = 0
     else:
+        # currency_string = ''.join(e for e in currency_string if e.isalnum())
         currency_string = re.sub(r'[^\d\-.]', '', currency_string)
         if currency_string[0] == ".":
             currency = Decimal(currency_string[1:])
@@ -53,11 +45,11 @@ def parse_currency(currency_string):
     return float(currency)
 
 
-def parse_log_file(file_2_parse, atm_index, separator="------"):
+def parse_log_file(file_2_parse, atm_index, xfs_format):
     file_2_parse.open(mode='rb')
     data = file_2_parse.read()
-    data = data.decode("utf-16", "replace")
-    data = data.split(separator)
+    data = try_unicode(data)
+    data = data.split(xfs_format.group_separator)
 
     traces = []
     meta = {
@@ -78,17 +70,21 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
         }
     }
 
-    for item in data[0:-1]:
+    for item in data:
         meta["transactions_number"] += 1
         trace = {}
-        item = item.replace("\r", "")
+
         # GET DATE
-        match = re.search(r'\d{2}/\d{2}/\d{2,4}( |  |\*| \n)\d{2}:\d{2}(:\d{2})?', item)
+        match = re.search(r'{}'.format(xfs_format.date_pattern), item)
         if not match:
             continue
         trace["date"] = parse_date(match.group())
+        # check is date is correct
+        meta_date = datetime.strptime(trace["date"], '%Y-%m-%d %H:%M:%S')
+        if not is_date_valid(meta_date):
+            continue
+
         # min and max dates
-        meta_date = datetime.strptime(trace["date"], '%d/%m/%Y %H:%M:%S')
         if not meta["dates"]["min"] or meta["dates"]["min"] > meta_date:
             meta["dates"]["min"] = meta_date
         if not meta["dates"]["max"] or meta["dates"]["max"] < meta_date:
@@ -98,62 +94,53 @@ def parse_log_file(file_2_parse, atm_index, separator="------"):
             meta["dates"]["all"].append(meta_date)
 
         # GET AMOUNT
-        match = re.search(r'RETIRO:.*', item)
-        trace["amount"] = match.group().split(":")[1].strip() if match else ""
-        # check is consult
-        if trace["amount"] == "":
-            match = re.search(r'CONSULTA', item)
-            if not match:
-                continue
+        match = re.search(r'{}.*'.format(xfs_format.total_amount_pattern), item)
+        trace["amount"] = match.group() if match else ""
         trace["amount"] = parse_currency(trace["amount"])
+
         # GET ERRORS
         error = None
-        # delete the lines that start with " " and empty lines
-        lines = item.split("\n")
-        lines = [x for x in lines if not x.startswith(" ") and x]
-        # if last line start with number is error
-        if lines[-1].split(" ")[0].isdigit():
-            error = lines[-1]
-        # if there are no errors of last line, find M- and R- errors
-        if error is None:
-            match = re.search(r'M-\d+.*', item)
-            if match:
-                error = match.group()
-        # get R- errors
-        if error is None:
-            match = re.search(r'R-\d+.*', item)
-            if match:
-                error = match.group()
+        event_type = None
+        for event in XFSFormatEvent.objects.filter(xfs_format=xfs_format):
+            match = re.search(r'{}.*'.format(event.pattern), item)
+            if not match:
+                continue
+            error = match.group()
+            event_type = event.type
+
+        # if nothing to report continue
+        if not error:
+            continue
+
         # clean error
-        if error:
-            error = error.strip()
+        error = error.strip()
         # track errors names
-        if error and error not in meta["errors"]["names"]:
+        if error not in meta["errors"]["names"]:
             meta["errors"]["names"].append(error)
 
-        color = AtmErrorXFS.ERROR_COLOR_GREEN if not error else random.choice(
-            [AtmErrorXFS.ERROR_COLOR_ORANGE, AtmErrorXFS.ERROR_COLOR_RED])
-
-        event_type = _("No error")
-        class_name = "green"
-        if color == AtmErrorXFS.ERROR_COLOR_ORANGE:
-            event_type = _("Important error")
-            class_name = "orange"
-            meta["amount"]["important_errors_transactions"] += trace["amount"]
-        elif color == AtmErrorXFS.ERROR_COLOR_RED:
-            event_type = _("Critical error")
+        # type of event
+        if event_type == XFSFormatEvent.EVENT_TYPE_CRITICAL_ERROR:
+            color = AtmErrorXFS.ERROR_COLOR_RED
+            event_type_name = _("Critical error")
             class_name = "red"
             meta["errors"]["critics_number"] += 1
             meta["amount"]["critical_errors_transactions"] += trace["amount"]
-
-        if not error:
+        elif event_type == XFSFormatEvent.EVENT_TYPE_IMPORTANT_ERROR:
+            color = AtmErrorXFS.ERROR_COLOR_ORANGE
+            event_type_name = _("Important error")
+            class_name = "orange"
+            meta["amount"]["important_errors_transactions"] += trace["amount"]
+        elif event_type == XFSFormatEvent.EVENT_TYPE_NO_ERROR:
+            color = AtmErrorXFS.ERROR_COLOR_GREEN
+            event_type_name = _("No error")
+            class_name = "green"
             meta["amount"]["valid_transactions"] += trace["amount"]
 
         trace.update({
             "has_errors": False if not error else True,
             "color": color,
             "className": class_name,
-            "event_type": event_type,
+            "event_type": event_type_name,
             "error": error,
             "atm_index": atm_index,
         })
