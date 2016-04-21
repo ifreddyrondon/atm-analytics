@@ -7,7 +7,15 @@
 {% block css %}
     {{ block.super }}
     <style>
-
+        .green {
+            color: {{ COLORS.GREEN }};
+        }
+        .orange {
+            color: {{ COLORS.ORANGE }};
+        }
+        .red {
+            color: {{ COLORS.RED }};
+        }
     </style>
 {% endblock %}
 
@@ -57,6 +65,26 @@
                                         <td>{{ format.total_amount_pattern }}</td>
                                         <td>{{ format.currency_pattern }}</td>
                                     </tr>
+                                    {% if format.format_events.count > 0 %}
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="5">
+                                            <ul>
+                                                {% for event in format.format_events.all %}
+                                                <li>{{ event.pattern }}
+                                                    {% if event.type == event.EVENT_TYPE_CRITICAL_ERROR %}
+                                                        <span class="red">{{ event.get_type_display }}</span>
+                                                    {% elif event.type == event.EVENT_TYPE_IMPORTANT_ERROR %}
+                                                        <span class="orange">{{ event.get_type_display }}</span>
+                                                    {% elif event.type == event.EVENT_TYPE_NO_ERROR %}
+                                                        <span class="green">{{ event.get_type_display }}</span>
+                                                    {% endif %}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
                                 {% endfor %}
                                 </tbody>
                             </table>

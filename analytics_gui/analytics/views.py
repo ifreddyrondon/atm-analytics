@@ -318,7 +318,12 @@ def select_xfs_format(request, case_id):
             reverse("analytics:analyze-with-format", args=[case.id, json.dumps(atms_with_format)]))
 
     return render(request, 'analytics/select_xfs_format.html', {
-        'atms_need_select_format': atms_need_select_format
+        'atms_need_select_format': atms_need_select_format,
+        'COLORS': {
+            'GREEN': settings.COLOR_GREEN,
+            'RED': settings.COLOR_RED,
+            'ORANGE': settings.COLOR_ORANGE,
+        }
     })
 
 
