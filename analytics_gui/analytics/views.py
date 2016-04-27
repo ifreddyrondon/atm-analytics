@@ -202,9 +202,11 @@ def analyze_case(request, case_id, atms_with_format=None):
             meta["journal"]["amount"]["important_errors_transactions"] += meta_journal["amount"][
                 "important_errors_transactions"]
             meta["journal"]["errors"]["critics_number"] += meta_journal["errors"]["critics_number"]
-            if not meta["journal"]["dates"]["min"] or meta["journal"]["dates"]["min"] > meta_journal["dates"]["min"]:
+            if meta_journal["dates"]["min"] and (
+                not meta["journal"]["dates"]["min"] or meta["journal"]["dates"]["min"] > meta_journal["dates"]["min"]):
                 meta["journal"]["dates"]["min"] = meta_journal["dates"]["min"]
-            if not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]:
+            if meta_journal["dates"]["max"] and (
+                not meta["journal"]["dates"]["max"] or meta["journal"]["dates"]["max"] < meta_journal["dates"]["max"]):
                 meta["journal"]["dates"]["max"] = meta_journal["dates"]["max"]
 
         if not meta_journal:
