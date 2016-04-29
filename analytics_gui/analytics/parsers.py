@@ -5,7 +5,6 @@ from decimal import Decimal
 from Evtx.Evtx import FileHeader
 from Evtx.Views import evtx_file_xml_view
 from dateutil.parser import parse
-
 from django.utils.translation import ugettext as _
 
 from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
@@ -101,12 +100,17 @@ def parse_log_file(file_2_parse, atm_index, xfs_format):
         # GET ERRORS
         error = None
         event_type = None
-        for event in XFSFormatEvent.objects.filter(xfs_format=xfs_format):
+        events = XFSFormatEvent.objects.filter(xfs_format=xfs_format)
+        critical_errors_event = list(events.filter(type=XFSFormatEvent.EVENT_TYPE_CRITICAL_ERROR))
+        important_errors_event = list(events.filter(type=XFSFormatEvent.EVENT_TYPE_IMPORTANT_ERROR))
+        no_errors_event = list(events.filter(type=XFSFormatEvent.EVENT_TYPE_NO_ERROR))
+        for event in critical_errors_event + important_errors_event + no_errors_event:
             match = re.search(r'{}.*'.format(event.pattern), item)
             if not match:
                 continue
             error = match.group()
             event_type = event.type
+            break
 
         # if nothing to report continue
         if not error:
