@@ -84,6 +84,9 @@ def add_header_and_rotate_timeline(target, height, operations_height):
     for page_num in range(pdf_target.getNumPages()):
         pdf_target.getPage(page_num).mergePage(pdf_header.getPage(0))
 
+    if pdf_target.getNumPages() - 1 == 4 + total_pages_x_rows + total_pages:
+        total_pages -= 1
+
     for page_num in range(pdf_target.getNumPages()):
         page = pdf_target.getPage(page_num)
         if (page_num >= (4 + total_pages_x_rows)) \

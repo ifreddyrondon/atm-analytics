@@ -203,7 +203,23 @@
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h6>{% trans "Amount of cash events involving the analyzed ATM addresses" %}</h6>
-                    <div class="well percent-result">{% trans "Undefined" %}</div>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>{% trans "Address" %}</th>
+                            <th>{% trans "Events" %}</th>
+                            <th>{% trans "Schedule" %}</th>
+                        </thead>
+                        <tbody>
+                        {% for atm_count in meta.reposition.atms_count %}
+                        <tr>
+                            <td>{{ atm_count.address }}</td>
+                            <td>{{ atm_count.count }}</td>
+                            <td>{{ atm_count.date }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
                 <div class="col-md-4 col-xs-4">
                     <h6>{% trans "Number of events in timeline which can induce malfunction" %}</h6>
