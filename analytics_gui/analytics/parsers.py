@@ -12,13 +12,13 @@ from analytics_gui.analytics.utils import try_unicode
 from analytics_gui.companies.models import XFSFormatEvent
 
 
-def parse_date(date):
+def parse_date(date, is_day_first=True):
     # normalize date deleting extra spaces or strange characters
     date = date.replace(" \n", " ")
     date = date.replace("  ", " ")
     date = date.replace("*", " ")
 
-    return str(parse(date))
+    return str(parse(date, dayfirst=is_day_first))
 
 
 def is_date_valid(date):
@@ -77,7 +77,7 @@ def parse_log_file(file_2_parse, atm_index, xfs_format):
         match = re.search(r'{}'.format(xfs_format.date_pattern), item)
         if not match:
             continue
-        trace["date"] = parse_date(match.group())
+        trace["date"] = parse_date(match.group(), xfs_format.is_day_first)
         # check is date is correct
         meta_date = datetime.strptime(trace["date"], '%Y-%m-%d %H:%M:%S')
         if not is_date_valid(meta_date):

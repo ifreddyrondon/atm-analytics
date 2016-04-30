@@ -116,6 +116,7 @@ class XFSFormat(models.Model):
         _("Date pattern"), max_length=255,
         help_text=_('This must be a regular expression pattern'),
     )
+    is_day_first = models.BooleanField(_("Is day first?"), default=True)
     total_amount_pattern = models.CharField(_("Total amount pattern"), max_length=255)
     currency_pattern = models.CharField(
         _("Currency pattern"), max_length=255, null=True, blank=True)

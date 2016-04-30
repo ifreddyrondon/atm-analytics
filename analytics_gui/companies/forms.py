@@ -50,4 +50,4 @@ class XFSFormatForm(forms.ModelForm):
         model = XFSFormat
         fields = ['hardware', 'software', 'xfs_sample_file',
                   'group_separator', 'row_separator', 'date_pattern',
-                  'total_amount_pattern', 'currency_pattern']
+                  'total_amount_pattern', 'currency_pattern', 'is_day_first']

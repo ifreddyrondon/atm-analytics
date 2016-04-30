@@ -15,10 +15,10 @@
 
         #xfs_content {
             padding-top: 15px;
-            max-height: 450px;
-            min-height: 450px;
+            max-height: 490px;
+            min-height: 490px;
             overflow-y: scroll;
-            margin-bottom: 0px;
+            margin-bottom: 0;
             margin-left: 10px;
             white-space: pre-wrap;
         }
@@ -176,6 +176,16 @@
                                     </div>
                                     {% if form.date_pattern.help_text %}
                                         <span class="help-block">{{ form.date_pattern.help_text }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group {% if form.is_day_first.errors %}has-error{% endif %}">
+                                    {% if form.is_day_first.errors %}
+                                        <span class="help-block">{{ form.is_day_first.errors|join:"<br \>" }}</span>
+                                    {% endif %}
+                                    {{ form.is_day_first }} {{ form.is_day_first.label_tag }}
+                                    {% if form.is_day_first.help_text %}
+                                        <span class="help-block">{{ form.is_day_first.help_text }}</span>
                                     {% endif %}
                                 </div>
 
