@@ -1,8 +1,8 @@
 # coding=utf-8
 from django.contrib import admin
 
-from analytics_gui.authentication.models import UserDashboard
-from analytics_gui.companies.models import Company
+from atm_analytics.authentication.models import UserDashboard
+from atm_analytics.companies.models import Company
 
 
 class UserDashboardAdmin(admin.ModelAdmin):

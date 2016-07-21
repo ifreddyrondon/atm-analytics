@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 
-from analytics_gui.authentication.forms import CustomAuthenticationForm
+from atm_analytics.authentication.forms import CustomAuthenticationForm
 
 
 class Login(View):

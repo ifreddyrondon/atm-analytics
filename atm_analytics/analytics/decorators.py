@@ -5,8 +5,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 
-from analytics_gui.analytics.models import Case
-from analytics_gui.companies.models import XFSFormat
+from atm_analytics.analytics.models import Case
+from atm_analytics.companies.models import XFSFormat
 
 
 def format_for_xfs_files_required():

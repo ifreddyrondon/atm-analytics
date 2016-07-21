@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from analytics_gui.companies.models import Company
+from atm_analytics.companies.models import Company
 
 
 class UserDashboard(models.Model):

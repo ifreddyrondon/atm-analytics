@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import analytics_gui.analytics.models
+import atm_analytics.analytics.models
 
 
 class Migration(migrations.Migration):
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='atmcase',
             name='other_log',
-            field=models.FileField(help_text='Another type of log?', null=True, upload_to=analytics_gui.analytics.models.get_atm_other_log_attachment_path, blank=True),
+            field=models.FileField(help_text='Another type of log?', null=True, upload_to=atm_analytics.analytics.models.get_atm_other_log_attachment_path, blank=True),
         ),
         migrations.AlterField(
             model_name='atmcase',

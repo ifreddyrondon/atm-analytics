@@ -18,7 +18,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 
-from analytics_gui.authentication.views import Login
+from atm_analytics.authentication.views import Login
 from .analytics import urls as analytics_urls
 from .base import urls as base_urls
 from .companies import urls as companies_urls

@@ -35,10 +35,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'analytics_gui.base',
-    'analytics_gui.authentication',
-    'analytics_gui.analytics',
-    'analytics_gui.companies',
+    'atm_analytics.base',
+    'atm_analytics.authentication',
+    'atm_analytics.analytics',
+    'atm_analytics.companies',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,7 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'analytics_gui.urls'
+ROOT_URLCONF = 'atm_analytics.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'analytics_gui.wsgi.application'
+WSGI_APPLICATION = 'atm_analytics.wsgi.application'
 
 
 # Internationalization

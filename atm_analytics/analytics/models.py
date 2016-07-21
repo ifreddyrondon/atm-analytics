@@ -5,9 +5,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from analytics_gui.analytics.choices import CURRENCY_CHOICES
-from analytics_gui.authentication.models import UserDashboard
-from analytics_gui.companies.models import Bank, CompanyAtmLocation
+from atm_analytics.analytics.choices import CURRENCY_CHOICES
+from atm_analytics.authentication.models import UserDashboard
+from atm_analytics.companies.models import Bank, CompanyAtmLocation
 
 
 def get_case_picture_path(instance, filename):

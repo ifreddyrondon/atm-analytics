@@ -140,7 +140,7 @@ crashlytics-build.properties
 media/*
 
 # STATIC FILES
-analytics_gui/static/
+atm_analytics/static/
 
 db.sqlite3
 
@@ -149,6 +149,6 @@ db.sqlite3
 .pydevproject
 .settings/
 
-analytics_gui/settings/local.py
+atm_analytics/settings/local.py
 
-analytics_gui/media/*
+atm_analytics/media/*

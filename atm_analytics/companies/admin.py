@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.utils.translation import ugettext as _
 from grappelli.forms import GrappelliSortableHiddenMixin
 
-from analytics_gui.authentication.models import UserDashboard
-from analytics_gui.companies.models import CompanyAtmLocation, Bank, Company
+from atm_analytics.authentication.models import UserDashboard
+from atm_analytics.companies.models import CompanyAtmLocation, Bank, Company
 
 
 class UserDashboardInline(GrappelliSortableHiddenMixin, admin.TabularInline):

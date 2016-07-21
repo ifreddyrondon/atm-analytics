@@ -16,12 +16,12 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from analytics_gui.analytics import utils
-from analytics_gui.analytics.decorators import format_for_xfs_files_required, select_xfs_format_required
-from analytics_gui.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
-from analytics_gui.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
-from analytics_gui.analytics.parsers import parse_log_file, parse_window_event_viewer
-from analytics_gui.companies.models import Company, AtmRepositionEvent, XFSFormat
+from atm_analytics.analytics import utils
+from atm_analytics.analytics.decorators import format_for_xfs_files_required, select_xfs_format_required
+from atm_analytics.analytics.forms import CreateCaseForm, CreateAtmFormSet, AnalyticForm
+from atm_analytics.analytics.models import Case, AtmJournal, AtmCase, AtmEventViewerEvent
+from atm_analytics.analytics.parsers import parse_log_file, parse_window_event_viewer
+from atm_analytics.companies.models import Company, AtmRepositionEvent, XFSFormat
 
 
 @login_required(login_url='/login')

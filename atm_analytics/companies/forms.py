@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from analytics_gui.companies.models import Company, Bank, CompanyAtmLocation, XFSFormat
+from atm_analytics.companies.models import Company, Bank, CompanyAtmLocation, XFSFormat
 
 
 class ConfigForm(forms.ModelForm):

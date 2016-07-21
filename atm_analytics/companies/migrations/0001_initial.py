@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import analytics_gui.companies.models
+import atm_analytics.companies.models
 
 
 class Migration(migrations.Migration):
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             name='Company',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('logo', models.ImageField(null=True, upload_to=analytics_gui.companies.models.get_company_logo_attachment_path, blank=True)),
+                ('logo', models.ImageField(null=True, upload_to=atm_analytics.companies.models.get_company_logo_attachment_path, blank=True)),
                 ('name', models.CharField(help_text=b'Nombre de la Empresa', max_length=255, verbose_name=b'Nombre')),
                 ('email', models.EmailField(help_text=b'Email', max_length=255, verbose_name=b'Email')),
                 ('phone', models.CharField(help_text=b'Tel\xc3\xa9fono', max_length=255, verbose_name=b'Tel\xc3\xa9fono')),

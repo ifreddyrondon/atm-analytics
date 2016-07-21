@@ -7,9 +7,9 @@ from Evtx.Views import evtx_file_xml_view
 from dateutil.parser import parse
 from django.utils.translation import ugettext as _
 
-from analytics_gui.analytics.models import AtmErrorXFS, AtmEventViewerEvent
-from analytics_gui.analytics.utils import try_unicode
-from analytics_gui.companies.models import XFSFormatEvent
+from atm_analytics.analytics.models import AtmErrorXFS, AtmEventViewerEvent
+from atm_analytics.analytics.utils import try_unicode
+from atm_analytics.companies.models import XFSFormatEvent
 
 
 def parse_date(date, is_day_first=True):

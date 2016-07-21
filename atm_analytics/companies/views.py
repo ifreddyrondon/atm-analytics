@@ -6,9 +6,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
-from analytics_gui.analytics.utils import try_unicode
-from analytics_gui.companies.forms import ConfigForm, BankFormSet, CompanyAtmLocationFormSet, XFSFormatForm
-from analytics_gui.companies.models import Company, CompanyAtmLocation, Bank, AtmRepositionEvent, XFSFormat, \
+from atm_analytics.analytics.utils import try_unicode
+from atm_analytics.companies.forms import ConfigForm, BankFormSet, CompanyAtmLocationFormSet, XFSFormatForm
+from atm_analytics.companies.models import Company, CompanyAtmLocation, Bank, AtmRepositionEvent, XFSFormat, \
     XFSFormatEvent
 
 

@@ -5,10 +5,10 @@ from django.shortcuts import render, redirect
 from django.utils import translation
 from django.utils.translation import check_for_language
 
-from analytics_gui.analytics.models import Case
-from analytics_gui.authentication.forms import CreateAnalystForm
-from analytics_gui.authentication.models import UserDashboard
-from analytics_gui.companies.models import Company, XFSFormat
+from atm_analytics.analytics.models import Case
+from atm_analytics.authentication.forms import CreateAnalystForm
+from atm_analytics.authentication.models import UserDashboard
+from atm_analytics.companies.models import Company, XFSFormat
 
 
 def set_language(request):

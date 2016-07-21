@@ -2,20 +2,19 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import analytics_gui.companies.models
+import atm_analytics.companies.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('companies', '0010_xfsformat_xfs_sample_file'),
+        ('companies', '0009_remove_xfsformat_content_xfs_file_sample'),
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='xfsformat',
             name='xfs_sample_file',
-            field=models.FileField(default=1, upload_to=analytics_gui.companies.models.get_xfs_samples_attachment_path),
-            preserve_default=False,
+            field=models.FileField(null=True, upload_to=atm_analytics.companies.models.get_xfs_samples_attachment_path, blank=True),
         ),
     ]

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import analytics_gui.companies.models
+import atm_analytics.companies.models
 
 
 class Migration(migrations.Migration):
@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='xfsformat',
             name='xfs_sample_file',
-            field=models.FileField(upload_to=analytics_gui.companies.models.get_xfs_samples_attachment_path, verbose_name='XFS sample file'),
+            field=models.FileField(upload_to=atm_analytics.companies.models.get_xfs_samples_attachment_path, verbose_name='XFS sample file'),
         ),
     ]
