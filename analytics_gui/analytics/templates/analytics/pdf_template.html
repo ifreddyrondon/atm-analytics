@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="row" style="padding-top: 30;">
+    <div class="row" style="padding-top: 30px;">
         <div class="col-md-12">
             <div>
                 <span class="pull-right">{% trans "Date of issue PDF" %}: {{ date | date:"SHORT_DATE_FORMAT"}}</span>
@@ -74,7 +74,7 @@
                 {% endfor %}
             </ul>
             <br>
-            <div class="panel panel-primary" style="padding-top: 30;">
+            <div class="panel panel-primary" style="padding-top: 30px;">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans "Log files" %}</h3>
                 </div>
@@ -303,7 +303,7 @@
             <div id="page-break"></div>
 
             {% if operations_table %}
-            <div class="panel panel-primary" style="padding-top: 30;">
+            <div class="panel panel-primary" style="padding-top: 30px;">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans "Operations" %}</h3>
                 </div>
@@ -336,7 +336,7 @@
 
             <div id="page-break"></div>
 
-            <div class="row" style="padding-top: 30;">
+            <div class="row" style="padding-top: 30px;">
                 {% if critical_filter or important_filter or no_error_filter %}
                 <h4>{% trans "Journal events filters" %}</h4>
                 <div class="col-xs-4">
@@ -405,7 +405,7 @@
 
             {% if time_line_table %}
 
-            <div class="panel panel-primary" style="padding-top: 30;">
+            <div class="panel panel-primary" style="padding-top: 30px;">
                 <div class="panel-heading">
                     <h3 class="panel-title">Timeline</h3>
                 </div>

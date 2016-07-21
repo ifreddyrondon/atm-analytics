@@ -381,7 +381,6 @@ def generate_pdf(request, case_id):
     bootstrap = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'bootstrap.min.css')
     base = os.path.join(settings.BASE_DIR, 'base', 'static', 'css', 'base.css')
     media_root = os.path.join(settings.BASE_DIR, 'media/')
-    logo = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'cyttek-group.png')
     default_avatar = os.path.join(settings.BASE_DIR, 'base', 'static', 'images', 'default_avatar.png')
     html_template = 'analytics/pdf_template.html'
 
@@ -554,7 +553,6 @@ def generate_pdf(request, case_id):
     args.update(images)
     args['case'] = case
     args['date'] = timezone.now()
-    args['logo'] = logo
     args['time_line_table'] = time_line_table
     args['operations_table'] = operations_table
     args['meta'] = meta

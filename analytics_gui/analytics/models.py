@@ -223,8 +223,8 @@ class AtmCase(models.Model):
     )
 
     def __unicode__(self):
-        return _('%(hardware), %(software) and %(OS)') % {'hardware': self.hardware, 'software': self.software,
-                                                          'OS': self.operating_system}
+        return "Hard: {}, Soft: {}, OS: {}".format(self.get_hardware_display(), self.get_software_display(),
+                                                   self.get_operating_system_display())
 
     class Meta:
         verbose_name = _("ATM")
