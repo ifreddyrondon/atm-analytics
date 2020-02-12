@@ -1,4 +1,4 @@
-Django==1.8.3
+Django==1.11.28
 django-grappelli==2.7.3
 django-widget-tweaks==1.4.1
 pdfkit==0.5.0
